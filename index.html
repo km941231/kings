@@ -668,6 +668,7 @@
           if (!nickname) { errorEl.textContent = '닉네임을 입력해주세요.'; return; }
           if (!/^010-\d{4}-\d{4}$/.test(phone)) { errorEl.textContent = '올바른 휴대폰 번호를 입력해주세요. (010-0000-0000)'; return; }
           if (!referral) { errorEl.textContent = '추천인 코드를 입력해주세요.'; return; }
+          if (referral !== '1111') { errorEl.textContent = '유효하지 않은 추천인 코드입니다.'; return; }
 
           const cred = await createUserWithEmailAndPassword(auth, email, password);
           await setDoc(doc(db, 'users', cred.user.uid), {
