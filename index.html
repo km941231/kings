@@ -461,8 +461,8 @@
           <input type="tel" id="phoneInput" placeholder="010-0000-0000" maxlength="13" oninput="formatPhone(this)">
         </div>
         <div class="field">
-          <label>추천인 코드 <span style="color:rgba(255,255,255,0.3);font-size:0.75rem">(선택)</span></label>
-          <input type="text" id="referralInput" placeholder="추천인 아이디 입력" maxlength="16">
+          <label>추천인 코드</label>
+          <input type="text" id="referralInput" placeholder="추천인 아이디 입력 (필수)" maxlength="16">
         </div>
       </div>
 
@@ -667,13 +667,14 @@
           if (password !== confirm) { errorEl.textContent = '비밀번호가 일치하지 않습니다.'; return; }
           if (!nickname) { errorEl.textContent = '닉네임을 입력해주세요.'; return; }
           if (!/^010-\d{4}-\d{4}$/.test(phone)) { errorEl.textContent = '올바른 휴대폰 번호를 입력해주세요. (010-0000-0000)'; return; }
+          if (!referral) { errorEl.textContent = '추천인 코드를 입력해주세요.'; return; }
 
           const cred = await createUserWithEmailAndPassword(auth, email, password);
           await setDoc(doc(db, 'users', cred.user.uid), {
             username,
             nickname,
             phone,
-            referral: referral || null,
+            referral,
             points: 10000,
             createdAt: new Date()
           });
