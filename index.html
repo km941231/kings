@@ -963,7 +963,7 @@
     let currentUserData = {};
 
     window.openMyInfo = function() {
-      document.getElementById('infoUsername').textContent  = currentUserData.username  || '—';
+      document.getElementById('infoUsername').textContent  = currentUserData.username  || auth.currentUser?.email?.split('@')[0] || '—';
       document.getElementById('infoNickname').textContent  = currentUserData.nickname  || '—';
       document.getElementById('infoPhone').textContent     = currentUserData.phone     || '—';
       document.getElementById('infoPoints').textContent    = points.toLocaleString()   + ' P';
@@ -1012,10 +1012,12 @@
           points = data.points ?? 10000;
           document.getElementById('userNickname').textContent = data.nickname || data.username || '유저';
         } else {
-          points = 10000;
+          // Firestore 문서가 없는 경우 (가입 오류 등)
           const uname = auth.currentUser?.email?.split('@')[0] || '유저';
+          currentUserData = { username: uname, nickname: uname, phone: '—', referral: '—', points: 10000 };
+          points = 10000;
           document.getElementById('userNickname').textContent = uname;
-          await setDoc(doc(db, 'users', uid), { username: uname, nickname: uname, points: 10000, createdAt: new Date() });
+          await setDoc(doc(db, 'users', uid), currentUserData);
         }
         updatePointsDisplay();
       } catch(e) {
@@ -1084,6 +1086,14 @@
           if (referral !== '1111') { errEl.textContent = '유효하지 않은 추천인 코드입니다.'; return; }
           const cred = await createUserWithEmailAndPassword(auth, toEmail(username), password);
           await setDoc(doc(db, 'users', cred.user.uid), { username, nickname, phone, referral, points: 10000, createdAt: new Date() });
+          await signOut(auth);
+          errEl.style.color = '#4ade80';
+          errEl.textContent = '회원가입이 완료됐습니다! 로그인해주세요.';
+          switchTab('login');
+          document.getElementById('usernameInput').value = username;
+          btn.disabled = false;
+          btn.textContent = '회원가입';
+          return;
         } else {
           await signInWithEmailAndPassword(auth, toEmail(username), password);
         }
