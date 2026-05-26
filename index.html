@@ -1382,7 +1382,8 @@
     // ── 캔버스 그리기 ──
     const LGC = { W:280, H:320, LX:78, RX:202, ROWS:[82,122,162,202], TOP:30, BOT:272 };
 
-    function lgDraw(data, charX, charY) {
+    // pending=true : 추첨 전 — 출발위치·가로줄 숨김
+    function lgDraw(data, charX, charY, pending = false) {
       const c = LG.ctx;
       const { W, H, LX, RX, ROWS, TOP, BOT } = LGC;
       const { bars, startLeft } = data;
@@ -1396,15 +1397,26 @@
         c.beginPath(); c.moveTo(x, TOP); c.lineTo(x, BOT); c.stroke();
       });
 
-      // 가로줄 (막대)
-      bars.forEach((b, i) => {
-        if (!b) return;
-        c.strokeStyle = '#c8a951'; c.lineWidth = 3;
-        c.beginPath(); c.moveTo(LX, ROWS[i]); c.lineTo(RX, ROWS[i]); c.stroke();
-      });
+      if (!pending) {
+        // 추첨 중/후: 가로줄 표시
+        bars.forEach((b, i) => {
+          if (!b) return;
+          c.strokeStyle = '#c8a951'; c.lineWidth = 3;
+          c.beginPath(); c.moveTo(LX, ROWS[i]); c.lineTo(RX, ROWS[i]); c.stroke();
+        });
+      } else {
+        // 추첨 전: 가로줄 위치에 점선(? 표시)만
+        ROWS.forEach(ry => {
+          c.strokeStyle = '#2a2a4a'; c.lineWidth = 2;
+          c.setLineDash([5, 5]);
+          c.beginPath(); c.moveTo(LX, ry); c.lineTo(RX, ry); c.stroke();
+          c.setLineDash([]);
+        });
+      }
 
-      // X 원 (출발 위치 표시)
-      [{ x: LX, isStart: startLeft }, { x: RX, isStart: !startLeft }].forEach(({ x, isStart }) => {
+      // X 원 — pending이면 양쪽 동일하게 표시
+      [LX, RX].forEach((x, idx) => {
+        const isStart = !pending && (idx === 0 ? startLeft : !startLeft);
         c.fillStyle = isStart ? '#6b7280' : '#1f2937';
         c.beginPath(); c.arc(x, TOP - 15, 13, 0, Math.PI * 2); c.fill();
         c.strokeStyle = isStart ? '#9ca3af' : '#374151'; c.lineWidth = 1.5; c.stroke();
@@ -1415,14 +1427,17 @@
         c.stroke();
       });
 
-      // 출발 라벨 (좌/우)
+      // 출발 라벨 — pending이면 ?로 표시
       c.font = 'bold 10px Malgun Gothic, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle';
-      c.fillStyle = startLeft ? '#c8a951' : '#888';
-      c.fillText('좌', LX, TOP - 33);
-      c.fillStyle = !startLeft ? '#c8a951' : '#888';
-      c.fillText('우', RX, TOP - 33);
+      if (pending) {
+        c.fillStyle = '#444'; c.fillText('?', LX, TOP - 33);
+        c.fillStyle = '#444'; c.fillText('?', RX, TOP - 33);
+      } else {
+        c.fillStyle = startLeft ? '#c8a951' : '#555'; c.fillText('좌', LX, TOP - 33);
+        c.fillStyle = !startLeft ? '#c8a951' : '#555'; c.fillText('우', RX, TOP - 33);
+      }
 
-      // 홀/짝 원 (하단)
+      // 홀/짝 원 (하단) — 항상 표시
       [[LX,'홀','#e05555'], [RX,'짝','#4a9eff']].forEach(([x, lbl, col]) => {
         c.fillStyle = col;
         c.beginPath(); c.arc(x, BOT + 18, 17, 0, Math.PI * 2); c.fill();
@@ -1431,10 +1446,12 @@
         c.fillText(lbl, x, BOT + 18);
       });
 
-      // 줄수 표시
-      c.fillStyle = '#888'; c.font = '11px Malgun Gothic, sans-serif';
-      c.textAlign = 'center';
-      c.fillText(`${bars.filter(Boolean).length}줄`, W/2, ROWS[1]);
+      // 줄수 — pending이면 숨김
+      if (!pending) {
+        c.fillStyle = '#666'; c.font = '11px Malgun Gothic, sans-serif';
+        c.textAlign = 'center';
+        c.fillText(`${bars.filter(Boolean).length}줄`, W/2, ROWS[1]);
+      }
 
       // 캐릭터
       if (charX !== null) {
@@ -1592,7 +1609,7 @@
       renderLGPickList();
       renderLGResultList();
       updateLGStats();
-      lgDraw(getLGResult(LG.round), null, null);
+      lgDraw(getLGResult(LG.round), null, null, true); // 추첨 전: 숨김 상태
 
       LG.timer = setInterval(() => {
         const newRound = getLGRound();
@@ -1649,7 +1666,7 @@
             resetBet();
 
             setTimeout(() => {
-              lgDraw(getLGResult(LG.round), null, null);
+              lgDraw(getLGResult(LG.round), null, null, true); // 다음 회차: 다시 숨김 상태
               renderLGResultList(); renderLGPickList(); updateLGStats();
             }, 1800);
           });
