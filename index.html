@@ -722,29 +722,16 @@
       <!-- 메인 콘텐츠 -->
       <main class="main-content">
         <div class="content-header">
-          <div class="content-title">홀짝 게임</div>
+          <div class="content-title">게임</div>
           <div class="saving-indicator" id="savingIndicator"></div>
         </div>
 
         <div class="game-panel">
           <div class="game-panel-header">
-            <div class="game-panel-title">🎲 홀짝 — 숫자를 보고 홀수/짝수를 맞춰보세요</div>
-            <div style="font-size:0.75rem;color:#888">배당 2.00배</div>
+            <div class="game-panel-title">게임을 선택해주세요</div>
           </div>
-          <div class="game-panel-body">
-
-            <!-- 결과 표시창 -->
-            <div class="result-display" id="resultArea">
-              <div class="idle-text">배팅 후 버튼을 눌러 게임을 시작하세요</div>
-            </div>
-
-            <!-- 홀/짝 버튼 -->
-            <div class="choice-row">
-              <button class="btn-odd" id="btnOdd" onclick="play('홀')">홀 (ODD)</button>
-              <button class="btn-even" id="btnEven" onclick="play('짝')">짝 (EVEN)</button>
-            </div>
-            <div class="odds-label">맞추면 배팅액 × 2배 지급 | 틀리면 배팅액 차감</div>
-
+          <div class="game-panel-body" style="text-align:center;padding:60px 20px;color:#444;font-size:0.9rem;">
+            좌측 메뉴에서 게임을 선택해주세요
           </div>
         </div>
       </main>
@@ -785,9 +772,7 @@
 
           <hr class="slip-divider">
 
-          <button class="btn-bet-now" id="btnOdd2" onclick="play('홀')">홀 배팅</button>
-          <button class="btn-bet-now" id="btnEven2" onclick="play('짝')" style="background:linear-gradient(90deg,#1a4a8a,#2a6ac8,#1a4a8a);color:#fff;margin-top:6px">짝 배팅</button>
-          <button class="btn-recharge-slip" onclick="recharge()" style="margin-top:8px">+ 포인트 충전 (10,000P)</button>
+          <button class="btn-recharge-slip" onclick="recharge()">+ 포인트 충전 (10,000P)</button>
         </div>
 
         <!-- 최근 기록 -->
@@ -973,55 +958,6 @@
       updatePointsDisplay();
       await savePoints();
     };
-
-    function setButtons(disabled) {
-      ['btnOdd','btnEven','btnOdd2','btnEven2'].forEach(id => {
-        document.getElementById(id).disabled = disabled;
-      });
-    }
-
-    window.play = async function(choice) {
-      const bet = getBet();
-      if (bet <= 0) { alert('배팅 금액을 입력해주세요!'); return; }
-      if (bet > points) { alert('포인트가 부족합니다!'); return; }
-      setButtons(true);
-      const area = document.getElementById('resultArea');
-      area.innerHTML = '<div class="result-number rolling" id="rollingNum">?</div>';
-      const el = document.getElementById('rollingNum');
-      let count = 0;
-      const iv = setInterval(async () => {
-        const r = Math.floor(Math.random() * 100) + 1;
-        el.textContent = r;
-        el.className = 'result-number rolling ' + (r % 2 === 1 ? 'odd' : 'even');
-        if (++count >= 18) {
-          clearInterval(iv);
-          const final = Math.floor(Math.random() * 100) + 1;
-          await showResult(choice, bet, final);
-        }
-      }, 80);
-    };
-
-    async function showResult(choice, bet, number) {
-      const isOdd = number % 2 === 1;
-      const cls = isOdd ? 'odd' : 'even';
-      const tag = isOdd ? '홀수' : '짝수';
-      const isWin = (choice === '홀' && isOdd) || (choice === '짝' && !isOdd);
-      const payout = isWin ? bet : -bet;
-      points += payout;
-      updatePointsDisplay();
-      const area = document.getElementById('resultArea');
-      area.innerHTML = `
-        <div class="result-number ${cls}">${number}</div>
-        <div class="result-tag ${cls}">${tag}</div>
-        <div class="result-outcome ${isWin ? 'win' : 'lose'}">${isWin ? '🎉 WIN!' : '😢 LOSE'}</div>
-        <div class="result-change">${isWin ? '+' : ''}${payout.toLocaleString()} P</div>
-      `;
-      gameHistory.unshift({ number, cls, choice, bet, isWin, payout });
-      renderHistory();
-      setButtons(false);
-      resetBet();
-      await savePoints();
-    }
 
     function renderHistory() {
       const list = document.getElementById('historyList');
