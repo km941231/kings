@@ -810,29 +810,42 @@
 
     /* 결과 목록 */
     .lg-result-header {
-      display: grid; grid-template-columns: 1fr 50px 50px 40px;
-      padding: 5px 10px; font-size: 0.65rem; color: #888;
-      border-bottom: 1px solid #2a2a4a; background: #0d0d1a; text-align: center;
+      display: grid; grid-template-columns: 1fr 58px;
+      padding: 5px 12px; font-size: 0.65rem; color: #888;
+      border-bottom: 1px solid #2a2a4a; background: #0d0d1a;
     }
-    .lg-result-header span:first-child { text-align: left; }
     .lg-result-item {
-      display: grid; grid-template-columns: 1fr 50px 50px 40px;
-      padding: 5px 10px; font-size: 0.72rem;
-      border-bottom: 1px solid #1a2030; align-items: center;
+      display: grid; grid-template-columns: 1fr 58px;
+      padding: 6px 12px; border-bottom: 1px solid #1a2030; align-items: center;
     }
     .lg-result-item:last-child { border-bottom: none; }
     .lg-result-round { color: #666; font-size: 0.68rem; }
-    .lg-badge {
-      display: inline-flex; align-items: center; justify-content: center;
-      height: 20px; border-radius: 10px; font-size: 0.68rem; font-weight: bold; width: 36px;
+
+    /* 결과 배지: 큰 원(홀/짝) + 작은 검정 원(줄수, 좌/우 위치) */
+    .lg-res-wrap {
+      position: relative;
+      width: 44px; height: 44px;
+      display: inline-block; flex-shrink: 0;
     }
-    .lg-badge.hol   { background: #e05555; color: #fff; }
-    .lg-badge.jjak  { background: #4a9eff; color: #fff; }
-    .lg-badge.left  { background: #c8a951; color: #000; }
-    .lg-badge.right { background: #555; color: #ccc; }
-    .lg-badge.three { background: #4ade80; color: #000; }
-    .lg-badge.four  { background: #f59e0b; color: #000; }
-    .lg-badge.wait  { background: #2a2a4a; color: #555; font-size: 0.6rem; width: auto; padding: 0 6px; }
+    .lg-res-big {
+      width: 44px; height: 44px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem; font-weight: bold; color: #fff;
+    }
+    .lg-res-big.hol  { background: #e05555; }
+    .lg-res-big.jjak { background: #4a9eff; }
+    .lg-res-big.wait { background: #2a2a4a; font-size: 0.6rem; color: #555; }
+    .lg-res-small {
+      position: absolute; top: -4px;
+      width: 19px; height: 19px; border-radius: 50%;
+      background: #111; border: 1.5px solid #333;
+      color: #fff; font-size: 0.65rem; font-weight: bold;
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1;
+    }
+    .lg-res-small.left  { left: -4px; }
+    .lg-res-small.right { right: -4px; }
+
     .lg-result-list { max-height: 430px; overflow-y: auto; }
     .lg-result-list::-webkit-scrollbar { width: 3px; }
     .lg-result-list::-webkit-scrollbar-thumb { background: #c8a951; }
@@ -1064,7 +1077,7 @@
             <div class="lg-panel">
               <div class="lg-panel-title">회차별 결과</div>
               <div class="lg-result-header">
-                <span>회차</span><span>좌/우</span><span>줄수</span><span>결과</span>
+                <span>회차</span><span>결과</span>
               </div>
               <div class="lg-result-list" id="lgResultList"></div>
             </div>
@@ -1528,21 +1541,27 @@
       return `${d.getFullYear()}.${p(d.getMonth()+1)}.${p(d.getDate())} - ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
     }
 
+    // 배지 HTML 생성 (큰 원 + 작은 검정 원)
+    function makeLGBadge(d) {
+      const hjCls  = d.result === '홀' ? 'hol' : 'jjak';
+      const posCls = d.startLeft ? 'left' : 'right';
+      return `<div class="lg-res-wrap">
+        <div class="lg-res-big ${hjCls}">${d.result}</div>
+        <div class="lg-res-small ${posCls}">${d.numBars}</div>
+      </div>`;
+    }
+
     function renderLGPickList() {
       const cur = getLGRound();
       const mo = new Date().getMonth()+1, dy = new Date().getDate();
       let html = '';
-      for (let i = 1; i <= 7; i++) {
+      for (let i = 1; i <= 8; i++) {
         const r = cur - i;
         const d = getLGResult(r);
         html += `<div class="lg-pick-item">
           <div class="lg-pick-num">${i}</div>
           <div class="lg-pick-info">${mo}월 ${dy}일<br>${r}회차</div>
-          <div class="lg-pick-badges">
-            <span class="lg-pick-badge ${d.startLeft ? 'left' : ''}" style="${!d.startLeft ? 'background:rgba(160,160,160,0.15);color:#999;border:1px solid rgba(160,160,160,0.3)' : ''}">${d.side}</span>
-            <span class="lg-pick-badge three" style="${d.numBars===4 ? 'background:rgba(245,158,11,0.15);color:#f59e0b;border:1px solid rgba(245,158,11,0.3)' : ''}">${d.line}</span>
-            <span class="lg-pick-badge ${d.result==='홀'?'hol':'jjak'}">${d.result}</span>
-          </div>
+          ${makeLGBadge(d)}
         </div>`;
       }
       const el = document.getElementById('lgPickList');
@@ -1552,22 +1571,19 @@
     function renderLGResultList() {
       const cur = getLGRound();
       const mo = new Date().getMonth()+1, dy = new Date().getDate();
+      // 현재 회차: 대기 중
       let html = `<div class="lg-result-item">
         <span class="lg-result-round">${mo}.${dy} - ${cur}</span>
-        <span class="lg-badge wait" style="width:auto;padding:0 4px">대기</span>
-        <span></span><span></span>
+        <div class="lg-res-wrap">
+          <div class="lg-res-big wait">대기 중</div>
+        </div>
       </div>`;
-      for (let i = 1; i <= 16; i++) {
+      for (let i = 1; i <= 18; i++) {
         const r = cur - i;
         const d = getLGResult(r);
-        const sideCls = d.startLeft ? 'left' : 'right';
-        const lineCls = d.numBars === 3 ? 'three' : 'four';
-        const hjCls   = d.result === '홀' ? 'hol' : 'jjak';
         html += `<div class="lg-result-item">
           <span class="lg-result-round">${mo}.${dy} - ${r}</span>
-          <span class="lg-badge ${sideCls}">${d.side}</span>
-          <span class="lg-badge ${lineCls}">${d.line}</span>
-          <span class="lg-badge ${hjCls}">${d.result}</span>
+          ${makeLGBadge(d)}
         </div>`;
       }
       const el = document.getElementById('lgResultList');
