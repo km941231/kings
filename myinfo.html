@@ -200,8 +200,8 @@
 
   <div id="mainScreen">
     <header class="header">
-      <div class="header-logo" onclick="window.close()">♠ KINGS</div>
-      <button class="btn-back" onclick="window.close()">← 게임으로 돌아가기</button>
+      <div class="header-logo" onclick="location.href='index.html'">♠ KINGS</div>
+      <button class="btn-back" onclick="location.href='index.html'">← 게임으로 돌아가기</button>
     </header>
 
     <div class="page-body">
@@ -327,7 +327,7 @@
         await updatePassword(user, newPw);
         await signOut(auth);
         setMsg('비밀번호가 변경됐습니다. 다시 로그인해주세요.', 'success');
-        setTimeout(() => { window.close(); }, 2000);
+        setTimeout(() => { location.href = 'index.html'; }, 2000);
       } catch(e) {
         const map = {
           'auth/wrong-password': '현재 비밀번호가 틀렸습니다.',
