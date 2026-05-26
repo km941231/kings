@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>관리자 페이지 — KINGS</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0d0d1a;
+      font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+      color: #ccc;
+      min-height: 100vh;
+    }
+
+    #loadingScreen {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .loading-logo { font-size: 2rem; font-weight: 900; color: #c8a951; letter-spacing: 6px; }
+    .loading-spinner {
+      width: 32px; height: 32px;
+      border: 3px solid #2a2a4a;
+      border-top-color: #c8a951;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #mainScreen { display: none; flex-direction: column; min-height: 100vh; }
+
+    .header {
+      background: linear-gradient(90deg, #0d0d1a, #16213e, #0d0d1a);
+      border-bottom: 2px solid #c8a951;
+      padding: 0 24px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-left { display: flex; align-items: center; gap: 16px; }
+
+    .header-logo {
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: #c8a951;
+      letter-spacing: 4px;
+    }
+
+    .admin-badge {
+      background: #e05555;
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: bold;
+      padding: 3px 10px;
+      border-radius: 10px;
+      letter-spacing: 1px;
+    }
+
+    .btn-back {
+      background: #1a2240;
+      border: 1px solid #c8a951;
+      color: #c8a951;
+      padding: 6px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.82rem;
+    }
+
+    .btn-back:hover { background: rgba(200,169,81,0.15); }
+
+    .page-body {
+      max-width: 1100px;
+      margin: 30px auto;
+      padding: 0 20px;
+      width: 100%;
+    }
+
+    /* 통계 카드 */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    @media (max-width: 800px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .stat-card {
+      background: #16213e;
+      border: 1px solid #2a2a4a;
+      border-radius: 8px;
+      padding: 18px 20px;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: #888;
+      margin-bottom: 8px;
+      letter-spacing: 1px;
+    }
+
+    .stat-value {
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: #c8a951;
+    }
+
+    .stat-sub {
+      font-size: 0.75rem;
+      color: #555;
+      margin-top: 4px;
+    }
+
+    /* 섹션 */
+    .section-title {
+      font-size: 1rem;
+      font-weight: bold;
+      color: #c8a951;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-title::before {
+      content: '';
+      display: inline-block;
+      width: 4px;
+      height: 18px;
+      background: #c8a951;
+      border-radius: 2px;
+    }
+
+    /* 카드 */
+    .card {
+      background: #16213e;
+      border: 1px solid #2a2a4a;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 28px;
+    }
+
+    .card-header {
+      background: linear-gradient(90deg, #1a2240, #16213e);
+      padding: 12px 20px;
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: #e0c87a;
+      border-bottom: 1px solid #2a2a4a;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .btn-refresh {
+      background: transparent;
+      border: 1px solid #2a2a4a;
+      color: #888;
+      padding: 4px 12px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 0.78rem;
+      transition: all 0.2s;
+    }
+
+    .btn-refresh:hover { border-color: #c8a951; color: #c8a951; }
+
+    /* 유저 테이블 */
+    .user-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .user-table th {
+      padding: 10px 16px;
+      text-align: left;
+      font-size: 0.75rem;
+      color: #888;
+      border-bottom: 1px solid #2a2a4a;
+      white-space: nowrap;
+    }
+
+    .user-table td {
+      padding: 12px 16px;
+      font-size: 0.85rem;
+      border-bottom: 1px solid #1a2030;
+      vertical-align: middle;
+    }
+
+    .user-table tr:last-child td { border-bottom: none; }
+    .user-table tr:hover td { background: rgba(200,169,81,0.04); }
+
+    .badge-admin {
+      background: rgba(224,85,85,0.2);
+      color: #e05555;
+      font-size: 0.68rem;
+      padding: 2px 8px;
+      border-radius: 10px;
+      border: 1px solid rgba(224,85,85,0.3);
+    }
+
+    .badge-user {
+      background: rgba(74,158,255,0.15);
+      color: #4a9eff;
+      font-size: 0.68rem;
+      padding: 2px 8px;
+      border-radius: 10px;
+      border: 1px solid rgba(74,158,255,0.3);
+    }
+
+    .point-val { color: #c8a951; font-weight: bold; }
+
+    .action-btns { display: flex; gap: 6px; }
+
+    .btn-edit-pts {
+      background: transparent;
+      border: 1px solid #c8a951;
+      color: #c8a951;
+      padding: 4px 10px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 0.75rem;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .btn-edit-pts:hover { background: rgba(200,169,81,0.15); }
+
+    .btn-del-user {
+      background: transparent;
+      border: 1px solid #e05555;
+      color: #e05555;
+      padding: 4px 10px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 0.75rem;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .btn-del-user:hover { background: rgba(224,85,85,0.15); }
+
+    .empty-row { text-align: center; color: #444; padding: 30px; }
+
+    .loading-row { text-align: center; color: #888; padding: 20px; font-size: 0.85rem; }
+
+    /* 포인트 수정 인라인 */
+    .pts-input {
+      width: 100px;
+      background: #0d0d1a;
+      border: 1px solid #c8a951;
+      border-radius: 3px;
+      padding: 4px 8px;
+      color: #fff;
+      font-size: 0.82rem;
+      outline: none;
+    }
+
+    .btn-save-pts {
+      background: #c8a951;
+      border: none;
+      color: #000;
+      padding: 4px 10px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+
+    .btn-cancel-pts {
+      background: transparent;
+      border: 1px solid #555;
+      color: #888;
+      padding: 4px 8px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 0.75rem;
+    }
+
+    /* 회원 추가 */
+    .add-user-form {
+      padding: 20px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr) auto;
+      gap: 10px;
+      align-items: end;
+    }
+
+    @media (max-width: 900px) {
+      .add-user-form { grid-template-columns: 1fr 1fr; }
+    }
+
+    .form-field label {
+      display: block;
+      font-size: 0.75rem;
+      color: #c8a951;
+      margin-bottom: 5px;
+    }
+
+    .form-field input {
+      width: 100%;
+      background: #0d0d1a;
+      border: 1px solid #2a2a4a;
+      border-radius: 4px;
+      padding: 9px 12px;
+      color: #fff;
+      font-size: 0.85rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-field input:focus { border-color: #c8a951; }
+    .form-field input::placeholder { color: #444; }
+
+    .btn-add-user {
+      background: linear-gradient(90deg, #b8941f, #c8a951);
+      border: none;
+      color: #000;
+      padding: 9px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: bold;
+      white-space: nowrap;
+      transition: opacity 0.2s;
+    }
+
+    .btn-add-user:hover { opacity: 0.85; }
+    .btn-add-user:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .add-msg {
+      grid-column: 1 / -1;
+      font-size: 0.8rem;
+      min-height: 18px;
+      text-align: center;
+    }
+
+    .add-msg.error { color: #e05555; }
+    .add-msg.success { color: #4ade80; }
+
+    /* 모달 */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal-box {
+      background: #16213e;
+      border: 1px solid #c8a951;
+      border-radius: 8px;
+      width: 100%;
+      max-width: 380px;
+      overflow: hidden;
+    }
+
+    .modal-header {
+      background: linear-gradient(90deg, #b8941f, #c8a951);
+      padding: 12px 18px;
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: #000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-close { background: none; border: none; color: #000; font-size: 1.1rem; cursor: pointer; font-weight: bold; }
+
+    .modal-body { padding: 24px; }
+    .modal-body p { font-size: 0.88rem; color: #ccc; margin-bottom: 16px; line-height: 1.6; }
+    .modal-body .target-name { color: #c8a951; font-weight: bold; }
+
+    .modal-pts-input {
+      width: 100%;
+      background: #0d0d1a;
+      border: 1px solid #2a2a4a;
+      border-radius: 4px;
+      padding: 10px 14px;
+      color: #fff;
+      font-size: 0.95rem;
+      outline: none;
+      margin-bottom: 16px;
+    }
+
+    .modal-pts-input:focus { border-color: #c8a951; }
+
+    .modal-btns { display: flex; gap: 10px; }
+
+    .btn-modal-ok {
+      flex: 1;
+      padding: 10px;
+      background: linear-gradient(90deg, #b8941f, #c8a951);
+      border: none;
+      border-radius: 4px;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .btn-modal-cancel {
+      flex: 1;
+      padding: 10px;
+      background: transparent;
+      border: 1px solid #555;
+      border-radius: 4px;
+      color: #888;
+      cursor: pointer;
+    }
+
+    /* 삭제 확인 모달 */
+    .btn-modal-del {
+      flex: 1;
+      padding: 10px;
+      background: #e05555;
+      border: none;
+      border-radius: 4px;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .msg-bar {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1e2a3a;
+      border: 1px solid #c8a951;
+      color: #c8a951;
+      padding: 10px 24px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      opacity: 0;
+      transition: opacity 0.3s;
+      z-index: 9999;
+      white-space: nowrap;
+    }
+
+    .msg-bar.show { opacity: 1; }
+    .msg-bar.error { border-color: #e05555; color: #e05555; }
+  </style>
+</head>
+<body>
+
+  <div id="loadingScreen">
+    <div class="loading-logo">♠ KINGS</div>
+    <div class="loading-spinner"></div>
+  </div>
+
+  <div id="mainScreen">
+    <header class="header">
+      <div class="header-left">
+        <div class="header-logo">♠ KINGS</div>
+        <span class="admin-badge">ADMIN</span>
+      </div>
+      <button class="btn-back" onclick="location.href='index.html'">← 게임으로 돌아가기</button>
+    </header>
+
+    <div class="page-body">
+
+      <!-- 통계 -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">총 회원수</div>
+          <div class="stat-value" id="statTotal">—</div>
+          <div class="stat-sub">명</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">총 포인트</div>
+          <div class="stat-value" id="statPoints">—</div>
+          <div class="stat-sub">P 지급됨</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">일반 회원</div>
+          <div class="stat-value" id="statUsers">—</div>
+          <div class="stat-sub">명</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">관리자</div>
+          <div class="stat-value" id="statAdmins">—</div>
+          <div class="stat-sub">명</div>
+        </div>
+      </div>
+
+      <!-- 회원 추가 -->
+      <div class="section-title">회원 직접 추가</div>
+      <div class="card" style="margin-bottom:28px">
+        <div class="card-header">새 회원 등록</div>
+        <div class="add-user-form">
+          <div class="form-field">
+            <label>아이디</label>
+            <input type="text" id="newUsername" placeholder="아이디" maxlength="16">
+          </div>
+          <div class="form-field">
+            <label>비밀번호</label>
+            <input type="password" id="newPassword" placeholder="6자 이상" maxlength="20">
+          </div>
+          <div class="form-field">
+            <label>닉네임</label>
+            <input type="text" id="newNickname" placeholder="닉네임" maxlength="12">
+          </div>
+          <div class="form-field">
+            <label>휴대폰</label>
+            <input type="tel" id="newPhone" placeholder="010-0000-0000" maxlength="13" oninput="formatPhone(this)">
+          </div>
+          <div class="form-field">
+            <label>초기 포인트</label>
+            <input type="number" id="newPoints" placeholder="10000" value="10000">
+          </div>
+          <button class="btn-add-user" id="addUserBtn" onclick="addUser()">추가</button>
+          <p class="add-msg" id="addMsg"></p>
+        </div>
+      </div>
+
+      <!-- 회원 목록 -->
+      <div class="section-title">회원 관리</div>
+      <div class="card">
+        <div class="card-header">
+          전체 회원 목록
+          <button class="btn-refresh" onclick="loadUsers()">새로고침</button>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="user-table">
+            <thead>
+              <tr>
+                <th>아이디</th>
+                <th>닉네임</th>
+                <th>휴대폰</th>
+                <th>추천인</th>
+                <th>포인트</th>
+                <th>구분</th>
+                <th>관리</th>
+              </tr>
+            </thead>
+            <tbody id="userTableBody">
+              <tr><td colspan="7" class="loading-row">불러오는 중...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 포인트 수정 모달 -->
+  <div class="modal-overlay" id="ptsModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <span>포인트 수정</span>
+        <button class="modal-close" onclick="closePtsModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p><span class="target-name" id="ptsModalName">—</span> 님의 포인트를 변경합니다.</p>
+        <input class="modal-pts-input" type="number" id="ptsModalInput" placeholder="새 포인트 입력">
+        <div class="modal-btns">
+          <button class="btn-modal-cancel" onclick="closePtsModal()">취소</button>
+          <button class="btn-modal-ok" onclick="savePoints()">저장</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 삭제 확인 모달 -->
+  <div class="modal-overlay" id="delModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <span>회원 삭제</span>
+        <button class="modal-close" onclick="closeDelModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p><span class="target-name" id="delModalName">—</span> 계정을 삭제합니다.<br>이 작업은 되돌릴 수 없습니다.</p>
+        <div class="modal-btns">
+          <button class="btn-modal-cancel" onclick="closeDelModal()">취소</button>
+          <button class="btn-modal-del" onclick="confirmDelete()">삭제</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 메시지 바 -->
+  <div class="msg-bar" id="msgBar"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, collection, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDJv5VYIt2xFrQmignCwSzuThAkULz1NW8",
+      authDomain: "kings-44a9b.firebaseapp.com",
+      projectId: "kings-44a9b",
+      storageBucket: "kings-44a9b.firebasestorage.app",
+      messagingSenderId: "715133382138",
+      appId: "1:715133382138:web:62cf478cc321fa418c0843"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // 회원 추가용 별도 앱 인스턴스 (관리자 세션 유지를 위해)
+    const secondaryApp = initializeApp(firebaseConfig, 'secondary');
+    const secondaryAuth = getAuth(secondaryApp);
+
+    let currentAdminUid = null;
+    let editingUid = null;
+    let deletingUid = null;
+    let allUsers = [];
+
+    // ── 인증 확인 ──
+    onAuthStateChanged(auth, async (user) => {
+      document.getElementById('loadingScreen').style.display = 'none';
+      if (!user) { location.href = 'index.html'; return; }
+
+      const snap = await getDoc(doc(db, 'users', user.uid));
+      if (!snap.exists() || !snap.data().isAdmin) {
+        alert('관리자 권한이 없습니다.');
+        location.href = 'index.html';
+        return;
+      }
+
+      currentAdminUid = user.uid;
+      document.getElementById('mainScreen').style.display = 'flex';
+      loadUsers();
+    });
+
+    // ── 유저 목록 로드 ──
+    async function loadUsers() {
+      const tbody = document.getElementById('userTableBody');
+      tbody.innerHTML = '<tr><td colspan="7" class="loading-row">불러오는 중...</td></tr>';
+
+      try {
+        const snapshot = await getDocs(collection(db, 'users'));
+        allUsers = [];
+        snapshot.forEach(d => allUsers.push({ uid: d.id, ...d.data() }));
+        renderUsers();
+        updateStats();
+      } catch(e) {
+        tbody.innerHTML = '<tr><td colspan="7" class="empty-row" style="color:#e05555">데이터를 불러오지 못했습니다.</td></tr>';
+      }
+    }
+
+    function renderUsers() {
+      const tbody = document.getElementById('userTableBody');
+      if (allUsers.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="empty-row">등록된 회원이 없습니다.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = allUsers.map(u => `
+        <tr data-uid="${u.uid}">
+          <td>${u.username || '—'}</td>
+          <td>${u.nickname || '—'}</td>
+          <td>${u.phone || '—'}</td>
+          <td>${u.referral || '—'}</td>
+          <td class="point-val" id="pts-${u.uid}">${(u.points ?? 0).toLocaleString()} P</td>
+          <td>${u.isAdmin ? '<span class="badge-admin">관리자</span>' : '<span class="badge-user">일반</span>'}</td>
+          <td>
+            <div class="action-btns">
+              <button class="btn-edit-pts" onclick="openPtsModal('${u.uid}','${u.nickname || u.username}',${u.points ?? 0})">포인트 수정</button>
+              ${u.isAdmin ? '' : `<button class="btn-del-user" onclick="openDelModal('${u.uid}','${u.username}')">삭제</button>`}
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function updateStats() {
+      const total = allUsers.length;
+      const admins = allUsers.filter(u => u.isAdmin).length;
+      const totalPts = allUsers.reduce((s, u) => s + (u.points ?? 0), 0);
+      document.getElementById('statTotal').textContent = total;
+      document.getElementById('statAdmins').textContent = admins;
+      document.getElementById('statUsers').textContent = total - admins;
+      document.getElementById('statPoints').textContent = totalPts.toLocaleString();
+    }
+
+    // ── 회원 추가 ──
+    window.addUser = async function() {
+      const username = document.getElementById('newUsername').value.trim();
+      const password = document.getElementById('newPassword').value;
+      const nickname = document.getElementById('newNickname').value.trim();
+      const phone    = document.getElementById('newPhone').value.trim();
+      const points   = parseInt(document.getElementById('newPoints').value) || 0;
+      const msgEl    = document.getElementById('addMsg');
+      const btn      = document.getElementById('addUserBtn');
+
+      msgEl.className = 'add-msg';
+      msgEl.textContent = '';
+
+      if (!username) { setAddMsg('아이디를 입력해주세요.', 'error'); return; }
+      if (password.length < 6) { setAddMsg('비밀번호는 6자 이상이어야 합니다.', 'error'); return; }
+      if (!nickname) { setAddMsg('닉네임을 입력해주세요.', 'error'); return; }
+
+      btn.disabled = true;
+      btn.textContent = '처리 중...';
+
+      try {
+        const email = username.toLowerCase() + '@kings.com';
+        // secondaryAuth 사용 → 관리자 세션 유지됨
+        const cred = await createUserWithEmailAndPassword(secondaryAuth, email, password);
+        const uid = cred.user.uid;
+
+        await setDoc(doc(db, 'users', uid), {
+          username, nickname, phone: phone || '', referral: '', points, createdAt: new Date()
+        });
+
+        // secondary 계정 즉시 로그아웃
+        await signOut(secondaryAuth);
+
+        // 입력 초기화
+        ['newUsername','newPassword','newNickname','newPhone'].forEach(id => {
+          document.getElementById(id).value = '';
+        });
+        document.getElementById('newPoints').value = '10000';
+
+        setAddMsg('회원이 추가됐습니다!', 'success');
+        await loadUsers();
+
+      } catch(e) {
+        const errMap = {
+          'auth/email-already-in-use': '이미 존재하는 아이디입니다.',
+          'auth/weak-password': '비밀번호는 6자 이상이어야 합니다.',
+        };
+        setAddMsg(errMap[e.code] ?? '오류: ' + e.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '추가';
+      }
+    };
+
+    function setAddMsg(txt, type) {
+      const el = document.getElementById('addMsg');
+      el.className = 'add-msg ' + type;
+      el.textContent = txt;
+    }
+
+    // ── 포인트 수정 ──
+    window.openPtsModal = function(uid, name, pts) {
+      editingUid = uid;
+      document.getElementById('ptsModalName').textContent = name;
+      document.getElementById('ptsModalInput').value = pts;
+      document.getElementById('ptsModal').classList.add('open');
+      setTimeout(() => document.getElementById('ptsModalInput').focus(), 100);
+    };
+
+    window.closePtsModal = function() {
+      document.getElementById('ptsModal').classList.remove('open');
+      editingUid = null;
+    };
+
+    window.savePoints = async function() {
+      if (!editingUid) return;
+      const pts = parseInt(document.getElementById('ptsModalInput').value);
+      if (isNaN(pts) || pts < 0) { showMsg('올바른 포인트를 입력해주세요.', true); return; }
+
+      try {
+        await updateDoc(doc(db, 'users', editingUid), { points: pts });
+        const u = allUsers.find(x => x.uid === editingUid);
+        if (u) u.points = pts;
+        document.getElementById(`pts-${editingUid}`).textContent = pts.toLocaleString() + ' P';
+        updateStats();
+        closePtsModal();
+        showMsg('포인트가 수정됐습니다.');
+      } catch(e) {
+        showMsg('저장 실패: ' + e.message, true);
+      }
+    };
+
+    // ── 회원 삭제 ──
+    window.openDelModal = function(uid, username) {
+      deletingUid = uid;
+      document.getElementById('delModalName').textContent = username;
+      document.getElementById('delModal').classList.add('open');
+    };
+
+    window.closeDelModal = function() {
+      document.getElementById('delModal').classList.remove('open');
+      deletingUid = null;
+    };
+
+    window.confirmDelete = async function() {
+      if (!deletingUid) return;
+      try {
+        await deleteDoc(doc(db, 'users', deletingUid));
+        allUsers = allUsers.filter(u => u.uid !== deletingUid);
+        renderUsers();
+        updateStats();
+        closeDelModal();
+        showMsg('회원이 삭제됐습니다.');
+      } catch(e) {
+        showMsg('삭제 실패: ' + e.message, true);
+      }
+    };
+
+    // ── 메시지 바 ──
+    let msgTimer = null;
+    function showMsg(text, isError = false) {
+      const el = document.getElementById('msgBar');
+      el.textContent = text;
+      el.className = 'msg-bar show' + (isError ? ' error' : '');
+      if (msgTimer) clearTimeout(msgTimer);
+      msgTimer = setTimeout(() => { el.className = 'msg-bar'; }, 2500);
+    }
+
+    window.loadUsers = loadUsers;
+
+    window.formatPhone = function(el) {
+      let v = el.value.replace(/\D/g,'');
+      if (v.length <= 3) el.value = v;
+      else if (v.length <= 7) el.value = v.slice(0,3)+'-'+v.slice(3);
+      else el.value = v.slice(0,3)+'-'+v.slice(3,7)+'-'+v.slice(7,11);
+    };
+  </script>
+</body>
+</html>

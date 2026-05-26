@@ -809,6 +809,7 @@
         <div class="user-point-box" id="headerPoints">0 P</div>
         <div class="myinfo-nickname" id="userNickname">—</div>
         <button class="btn-myinfo" onclick="location.href='myinfo.html'">👤 내정보</button>
+        <button class="btn-myinfo" id="btnAdmin" style="display:none;border-color:#e05555;color:#e05555;background:#1a0d0d" onclick="location.href='admin.html'">⚙ 관리자</button>
         <button class="btn-logout-top" onclick="handleLogout()">로그아웃</button>
       </div>
     </header>
@@ -995,6 +996,9 @@
           currentUserData = data;
           points = data.points ?? 10000;
           document.getElementById('userNickname').textContent = data.nickname || data.username || '유저';
+          if (data.isAdmin) {
+            document.getElementById('btnAdmin').style.display = 'flex';
+          }
         } else {
           const uname = auth.currentUser?.email?.split('@')[0] || '유저';
           currentUserData = { username: uname, nickname: uname, phone: '—', referral: '—', points: 10000 };
