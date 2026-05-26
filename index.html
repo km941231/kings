@@ -190,6 +190,90 @@
 
     .btn-logout-top:hover { border-color: #e05555; color: #e05555; }
 
+    .btn-myinfo {
+      background: #1a2240;
+      border: 1px solid #c8a951;
+      color: #c8a951;
+      padding: 5px 14px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.82rem;
+      font-weight: bold;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-myinfo:hover { background: rgba(200,169,81,0.15); }
+
+    .myinfo-nickname {
+      color: #fff;
+      font-weight: bold;
+      font-size: 0.88rem;
+      background: #0d0d1a;
+      border: 1px solid #2a2a4a;
+      border-radius: 4px;
+      padding: 4px 12px;
+    }
+
+    /* 내정보 모달 */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal-box {
+      background: #16213e;
+      border: 1px solid #c8a951;
+      border-radius: 8px;
+      width: 100%;
+      max-width: 360px;
+      overflow: hidden;
+    }
+
+    .modal-header {
+      background: linear-gradient(90deg, #b8941f, #c8a951);
+      padding: 12px 18px;
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: #000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: #000;
+      font-size: 1.1rem;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .modal-body { padding: 20px; }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #1e2a3a;
+      font-size: 0.85rem;
+    }
+
+    .info-row:last-child { border-bottom: none; }
+    .info-label { color: #888; }
+    .info-value { color: #fff; font-weight: bold; }
+
     /* ─── 서브 네비 ─── */
     .subnav {
       background: #16213e;
@@ -687,11 +771,44 @@
     <header class="header">
       <div class="header-logo">♠ KINGS</div>
       <div class="header-user">
-        <div class="user-name-box"><span id="userNickname"></span> 님</div>
         <div class="user-point-box" id="headerPoints">0 P</div>
+        <div class="myinfo-nickname" id="userNickname">—</div>
+        <button class="btn-myinfo" onclick="openMyInfo()">👤 내정보</button>
         <button class="btn-logout-top" onclick="handleLogout()">로그아웃</button>
       </div>
     </header>
+
+    <!-- 내정보 모달 -->
+    <div class="modal-overlay" id="myInfoModal">
+      <div class="modal-box">
+        <div class="modal-header">
+          <span>내 정보</span>
+          <button class="modal-close" onclick="closeMyInfo()">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="info-row">
+            <span class="info-label">아이디</span>
+            <span class="info-value" id="infoUsername">—</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">닉네임</span>
+            <span class="info-value" id="infoNickname">—</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">휴대폰</span>
+            <span class="info-value" id="infoPhone">—</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">보유 포인트</span>
+            <span class="info-value" id="infoPoints" style="color:#c8a951">—</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">추천인</span>
+            <span class="info-value" id="infoReferral">—</span>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- 서브 네비 -->
     <nav class="subnav">
@@ -808,6 +925,24 @@
     let points = 0;
     let gameHistory = [];
     let currentUid = null;
+    let currentUserData = {};
+
+    window.openMyInfo = function() {
+      document.getElementById('infoUsername').textContent  = currentUserData.username  || '—';
+      document.getElementById('infoNickname').textContent  = currentUserData.nickname  || '—';
+      document.getElementById('infoPhone').textContent     = currentUserData.phone     || '—';
+      document.getElementById('infoPoints').textContent    = points.toLocaleString()   + ' P';
+      document.getElementById('infoReferral').textContent  = currentUserData.referral  || '없음';
+      document.getElementById('myInfoModal').classList.add('open');
+    };
+
+    window.closeMyInfo = function() {
+      document.getElementById('myInfoModal').classList.remove('open');
+    };
+
+    document.getElementById('myInfoModal').addEventListener('click', function(e) {
+      if (e.target === this) closeMyInfo();
+    });
 
     // 배팅 입력 변화 감지 → 예상 당첨금 업데이트
     document.getElementById('betInput').addEventListener('input', updateSummary);
@@ -837,6 +972,7 @@
         const snap = await getDoc(doc(db, 'users', uid));
         if (snap.exists()) {
           const data = snap.data();
+          currentUserData = data;
           points = data.points ?? 10000;
           document.getElementById('userNickname').textContent = data.nickname || data.username || '유저';
         } else {
