@@ -14,6 +14,35 @@
       min-height: 100vh;
     }
 
+    /* 초기 로딩 화면 */
+    #loadingScreen {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: #0d0d1a;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .loading-logo {
+      font-size: 2rem;
+      font-weight: 900;
+      color: #c8a951;
+      letter-spacing: 6px;
+    }
+
+    .loading-spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid #2a2a4a;
+      border-top-color: #c8a951;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
     /* ══════════════════════════════
        로그인 화면
     ══════════════════════════════ */
@@ -711,10 +740,16 @@
 </head>
 <body>
 
+  <!-- 로딩 화면 -->
+  <div id="loadingScreen">
+    <div class="loading-logo">♠ KINGS</div>
+    <div class="loading-spinner"></div>
+  </div>
+
   <!-- ══════════════════════════════
        로그인 화면
   ══════════════════════════════ -->
-  <div id="loginScreen">
+  <div id="loginScreen" style="display:none">
     <div class="login-wrap">
       <div class="login-logo-area">
         <h1>♠ KINGS</h1>
@@ -954,6 +989,7 @@
     }
 
     onAuthStateChanged(auth, async (user) => {
+      document.getElementById('loadingScreen').style.display = 'none';
       if (user) {
         currentUid = user.uid;
         document.getElementById('loginScreen').style.display = 'none';
