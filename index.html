@@ -573,9 +573,9 @@
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         currentUid = user.uid;
-        await loadUserData(user.uid);
         document.getElementById('loginScreen').style.display = 'none';
         document.getElementById('gameScreen').style.display = 'flex';
+        await loadUserData(user.uid);
       } else {
         currentUid = null;
         document.getElementById('loginScreen').style.display = 'flex';
@@ -585,11 +585,27 @@
 
     // ── Firestore에서 유저 데이터 불러오기 ──
     async function loadUserData(uid) {
-      const snap = await getDoc(doc(db, 'users', uid));
-      if (snap.exists()) {
-        const data = snap.data();
-        points = data.points ?? 10000;
-        document.getElementById('userNickname').textContent = data.nickname || data.username;
+      try {
+        const snap = await getDoc(doc(db, 'users', uid));
+        if (snap.exists()) {
+          const data = snap.data();
+          points = data.points ?? 10000;
+          document.getElementById('userNickname').textContent = data.nickname || data.username || '유저';
+        } else {
+          points = 10000;
+          document.getElementById('userNickname').textContent = auth.currentUser?.email?.split('@')[0] || '유저';
+          await setDoc(doc(db, 'users', uid), {
+            username: auth.currentUser?.email?.split('@')[0] || '',
+            nickname: '유저',
+            points: 10000,
+            createdAt: new Date()
+          });
+        }
+        updatePointsDisplay();
+      } catch (e) {
+        console.error('Firestore 오류:', e);
+        points = 10000;
+        document.getElementById('userNickname').textContent = '유저';
         updatePointsDisplay();
       }
     }
