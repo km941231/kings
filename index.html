@@ -606,7 +606,7 @@
 
     // 아이디 → 내부 이메일로 변환 (사용자에게는 보이지 않음)
     function toEmail(username) {
-      return username.toLowerCase() + '@kings.game';
+      return username.toLowerCase() + '@kings.com';
     }
 
     // 폰번호 자동 하이픈
@@ -683,6 +683,7 @@
           await signInWithEmailAndPassword(auth, email, password);
         }
       } catch (e) {
+        console.error('Firebase 오류 코드:', e.code, e.message);
         errorEl.textContent = parseAuthError(e.code);
       } finally {
         btn.disabled = false;
