@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>내정보 — KINGS</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0d0d1a;
+      font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+      color: #ccc;
+      min-height: 100vh;
+    }
+
+    /* 로딩 */
+    #loadingScreen {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .loading-logo { font-size: 2rem; font-weight: 900; color: #c8a951; letter-spacing: 6px; }
+    .loading-spinner {
+      width: 32px; height: 32px;
+      border: 3px solid #2a2a4a;
+      border-top-color: #c8a951;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* 메인 */
+    #mainScreen { display: none; flex-direction: column; min-height: 100vh; }
+
+    .header {
+      background: linear-gradient(90deg, #0d0d1a, #16213e, #0d0d1a);
+      border-bottom: 2px solid #c8a951;
+      padding: 0 24px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header-logo {
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: #c8a951;
+      letter-spacing: 4px;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .btn-back {
+      background: #1a2240;
+      border: 1px solid #c8a951;
+      color: #c8a951;
+      padding: 6px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.82rem;
+      transition: all 0.2s;
+    }
+
+    .btn-back:hover { background: rgba(200,169,81,0.15); }
+
+    .page-body {
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 0 20px;
+      width: 100%;
+    }
+
+    .page-title {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #c8a951;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .page-title::before {
+      content: '';
+      display: inline-block;
+      width: 4px;
+      height: 18px;
+      background: #c8a951;
+      border-radius: 2px;
+    }
+
+    /* 카드 */
+    .card {
+      background: #16213e;
+      border: 1px solid #2a2a4a;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .card-header {
+      background: linear-gradient(90deg, #1a2240, #16213e);
+      padding: 12px 20px;
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: #e0c87a;
+      border-bottom: 1px solid #2a2a4a;
+    }
+
+    .card-body { padding: 0; }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 20px;
+      border-bottom: 1px solid #1a2030;
+      font-size: 0.88rem;
+    }
+
+    .info-row:last-child { border-bottom: none; }
+    .info-label { color: #888; min-width: 100px; }
+    .info-value { color: #fff; font-weight: bold; }
+    .info-value.gold { color: #c8a951; }
+
+    /* 비밀번호 변경 폼 */
+    .form-body { padding: 20px; }
+
+    .field { margin-bottom: 14px; }
+
+    .field label {
+      display: block;
+      font-size: 0.78rem;
+      color: #c8a951;
+      margin-bottom: 6px;
+    }
+
+    .field input {
+      width: 100%;
+      background: #0d0d1a;
+      border: 1px solid #2a2a4a;
+      border-radius: 4px;
+      padding: 11px 14px;
+      color: #fff;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .field input:focus { border-color: #c8a951; }
+    .field input::placeholder { color: #444; }
+
+    .msg {
+      font-size: 0.82rem;
+      min-height: 20px;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .msg.error { color: #e05555; }
+    .msg.success { color: #4ade80; }
+
+    .btn-submit {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(90deg, #b8941f, #c8a951, #b8941f);
+      border: none;
+      border-radius: 4px;
+      color: #000;
+      font-size: 0.95rem;
+      font-weight: bold;
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: opacity 0.2s;
+    }
+
+    .btn-submit:hover { opacity: 0.88; }
+    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .hint {
+      font-size: 0.75rem;
+      color: #555;
+      margin-top: 10px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="loadingScreen">
+    <div class="loading-logo">♠ KINGS</div>
+    <div class="loading-spinner"></div>
+  </div>
+
+  <div id="mainScreen">
+    <header class="header">
+      <div class="header-logo" onclick="window.close()">♠ KINGS</div>
+      <button class="btn-back" onclick="window.close()">← 게임으로 돌아가기</button>
+    </header>
+
+    <div class="page-body">
+      <div class="page-title">내 정보</div>
+
+      <!-- 계정 정보 -->
+      <div class="card">
+        <div class="card-header">계정 정보</div>
+        <div class="card-body">
+          <div class="info-row">
+            <span class="info-label">아이디</span>
+            <span class="info-value" id="infoUsername">—</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">닉네임</span>
+            <span class="info-value" id="infoNickname">—</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">휴대폰</span>
+            <span class="info-value" id="infoPhone">—</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">추천인</span>
+            <span class="info-value" id="infoReferral">—</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">보유 포인트</span>
+            <span class="info-value gold" id="infoPoints">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 비밀번호 변경 -->
+      <div class="card">
+        <div class="card-header">비밀번호 변경</div>
+        <div class="form-body">
+          <div class="field">
+            <label>현재 비밀번호</label>
+            <input type="password" id="currentPw" placeholder="현재 비밀번호 입력">
+          </div>
+          <div class="field">
+            <label>새 비밀번호</label>
+            <input type="password" id="newPw" placeholder="새 비밀번호 (6자 이상)">
+          </div>
+          <div class="field">
+            <label>새 비밀번호 확인</label>
+            <input type="password" id="newPwConfirm" placeholder="새 비밀번호 다시 입력">
+          </div>
+          <p class="msg" id="pwMsg"></p>
+          <button class="btn-submit" id="pwBtn" onclick="changePassword()">비밀번호 변경</button>
+          <p class="hint">비밀번호 변경 후 다시 로그인이 필요합니다.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import {
+      getAuth, onAuthStateChanged, signOut,
+      reauthenticateWithCredential, EmailAuthProvider, updatePassword
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDJv5VYIt2xFrQmignCwSzuThAkULz1NW8",
+      authDomain: "kings-44a9b.firebaseapp.com",
+      projectId: "kings-44a9b",
+      storageBucket: "kings-44a9b.firebasestorage.app",
+      messagingSenderId: "715133382138",
+      appId: "1:715133382138:web:62cf478cc321fa418c0843"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    onAuthStateChanged(auth, async (user) => {
+      document.getElementById('loadingScreen').style.display = 'none';
+      if (!user) {
+        window.location.href = '/';
+        return;
+      }
+      document.getElementById('mainScreen').style.display = 'flex';
+
+      try {
+        const snap = await getDoc(doc(db, 'users', user.uid));
+        if (snap.exists()) {
+          const d = snap.data();
+          document.getElementById('infoUsername').textContent = d.username  || '—';
+          document.getElementById('infoNickname').textContent = d.nickname  || '—';
+          document.getElementById('infoPhone').textContent    = d.phone     || '—';
+          document.getElementById('infoReferral').textContent = d.referral  || '없음';
+          document.getElementById('infoPoints').textContent   = (d.points ?? 0).toLocaleString() + ' P';
+        }
+      } catch(e) {
+        console.error(e);
+      }
+    });
+
+    window.changePassword = async function() {
+      const currentPw  = document.getElementById('currentPw').value;
+      const newPw      = document.getElementById('newPw').value;
+      const newPwCfm   = document.getElementById('newPwConfirm').value;
+      const msgEl      = document.getElementById('pwMsg');
+      const btn        = document.getElementById('pwBtn');
+
+      msgEl.className = 'msg';
+      msgEl.textContent = '';
+
+      if (!currentPw)           { setMsg('현재 비밀번호를 입력해주세요.', 'error'); return; }
+      if (newPw.length < 6)     { setMsg('새 비밀번호는 6자 이상이어야 합니다.', 'error'); return; }
+      if (newPw !== newPwCfm)   { setMsg('새 비밀번호가 일치하지 않습니다.', 'error'); return; }
+      if (newPw === currentPw)  { setMsg('현재 비밀번호와 동일합니다.', 'error'); return; }
+
+      btn.disabled = true;
+      btn.textContent = '변경 중...';
+
+      try {
+        const user = auth.currentUser;
+        const credential = EmailAuthProvider.credential(user.email, currentPw);
+        await reauthenticateWithCredential(user, credential);
+        await updatePassword(user, newPw);
+        await signOut(auth);
+        setMsg('비밀번호가 변경됐습니다. 다시 로그인해주세요.', 'success');
+        setTimeout(() => { window.close(); }, 2000);
+      } catch(e) {
+        const map = {
+          'auth/wrong-password': '현재 비밀번호가 틀렸습니다.',
+          'auth/invalid-credential': '현재 비밀번호가 틀렸습니다.',
+          'auth/too-many-requests': '잠시 후 다시 시도해주세요.',
+          'auth/weak-password': '새 비밀번호는 6자 이상이어야 합니다.'
+        };
+        setMsg(map[e.code] ?? '오류가 발생했습니다. 다시 시도해주세요.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '비밀번호 변경';
+      }
+    };
+
+    function setMsg(text, type) {
+      const el = document.getElementById('pwMsg');
+      el.className = 'msg ' + type;
+      el.textContent = text;
+    }
+  </script>
+</body>
+</html>

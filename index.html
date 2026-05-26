@@ -808,7 +808,7 @@
       <div class="header-user">
         <div class="user-point-box" id="headerPoints">0 P</div>
         <div class="myinfo-nickname" id="userNickname">—</div>
-        <button class="btn-myinfo" onclick="openMyInfo()">👤 내정보</button>
+        <button class="btn-myinfo" onclick="window.open('myinfo.html','_blank')">👤 내정보</button>
         <button class="btn-logout-top" onclick="handleLogout()">로그아웃</button>
       </div>
     </header>
@@ -962,22 +962,6 @@
     let currentUid = null;
     let currentUserData = {};
 
-    window.openMyInfo = function() {
-      document.getElementById('infoUsername').textContent  = currentUserData.username  || auth.currentUser?.email?.split('@')[0] || '—';
-      document.getElementById('infoNickname').textContent  = currentUserData.nickname  || '—';
-      document.getElementById('infoPhone').textContent     = currentUserData.phone     || '—';
-      document.getElementById('infoPoints').textContent    = points.toLocaleString()   + ' P';
-      document.getElementById('infoReferral').textContent  = currentUserData.referral  || '없음';
-      document.getElementById('myInfoModal').classList.add('open');
-    };
-
-    window.closeMyInfo = function() {
-      document.getElementById('myInfoModal').classList.remove('open');
-    };
-
-    document.getElementById('myInfoModal').addEventListener('click', function(e) {
-      if (e.target === this) closeMyInfo();
-    });
 
     // 배팅 입력 변화 감지 → 예상 당첨금 업데이트
     document.getElementById('betInput').addEventListener('input', updateSummary);
