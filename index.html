@@ -943,7 +943,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDJv5VYIt2xFrQmignCwSzuThAkULz1NW8",
@@ -1072,7 +1072,9 @@
           if (!nickname) { errEl.textContent = '닉네임을 입력해주세요.'; return; }
           if (!/^010-\d{4}-\d{4}$/.test(phone)) { errEl.textContent = '올바른 휴대폰 번호를 입력해주세요.'; return; }
           if (!referral) { errEl.textContent = '추천인 코드를 입력해주세요.'; return; }
-          if (referral !== '1111') { errEl.textContent = '유효하지 않은 추천인 코드입니다.'; return; }
+          // Firestore에서 코드 유효성 검사
+          const codeSnap = await getDoc(doc(db, 'referralCodes', referral.toUpperCase()));
+          if (!codeSnap.exists()) { errEl.textContent = '유효하지 않은 추천인 코드입니다.'; return; }
           const cred = await createUserWithEmailAndPassword(auth, toEmail(username), password);
           await setDoc(doc(db, 'users', cred.user.uid), { username, nickname, phone, referral, points: 10000, createdAt: new Date() });
           await signOut(auth);
