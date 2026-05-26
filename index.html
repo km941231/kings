@@ -3,322 +3,348 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>홀짝 게임</title>
+  <title>KINGS - 홀짝</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      background: #1a1a2e;
+      font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+      color: #ccc;
       min-height: 100vh;
-      font-family: 'Segoe UI', sans-serif;
-      color: #fff;
     }
 
-    /* ───── 로그인 화면 ───── */
+    /* ══════════════════════════════
+       로그인 화면
+    ══════════════════════════════ */
     #loginScreen {
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
       min-height: 100vh;
+      background: linear-gradient(135deg, #0d0d1a, #1a1a2e);
       padding: 20px;
     }
 
-    .login-logo {
-      font-size: 2.4rem;
-      font-weight: bold;
-      letter-spacing: 4px;
-      text-shadow: 0 0 20px #a78bfa;
-      margin-bottom: 8px;
+    .login-wrap { width: 100%; max-width: 420px; }
+
+    .login-logo-area {
+      text-align: center;
+      margin-bottom: 30px;
     }
 
-    .login-sub {
-      color: #a78bfa;
-      font-size: 0.9rem;
-      margin-bottom: 36px;
+    .login-logo-area h1 {
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: #c8a951;
+      letter-spacing: 6px;
+      text-shadow: 0 0 20px rgba(200,169,81,0.5);
+    }
+
+    .login-logo-area p {
+      color: #888;
+      font-size: 0.85rem;
+      margin-top: 6px;
     }
 
     .login-card {
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(167,139,250,0.3);
-      border-radius: 20px;
-      padding: 32px 28px;
-      width: 100%;
-      max-width: 400px;
-      backdrop-filter: blur(10px);
+      background: #16213e;
+      border: 1px solid #2a2a4a;
+      border-radius: 8px;
+      padding: 28px 24px;
     }
 
-    /* 탭 (로그인 / 회원가입) */
     .tab-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 6px;
-      margin-bottom: 28px;
+      gap: 0;
+      margin-bottom: 24px;
+      border: 1px solid #2a2a4a;
+      border-radius: 4px;
+      overflow: hidden;
     }
 
     .tab-btn {
       padding: 10px;
-      border-radius: 10px;
-      border: 1px solid rgba(167,139,250,0.3);
-      background: transparent;
-      color: rgba(255,255,255,0.45);
-      font-size: 0.95rem;
+      border: none;
+      background: #0d0d1a;
+      color: #666;
+      font-size: 0.9rem;
       cursor: pointer;
       transition: all 0.2s;
     }
 
     .tab-btn.active {
-      background: rgba(167,139,250,0.25);
-      border-color: #a78bfa;
-      color: #fff;
+      background: #c8a951;
+      color: #000;
       font-weight: bold;
     }
 
-    /* 입력 필드 */
-    .field {
-      margin-bottom: 14px;
-    }
+    .field { margin-bottom: 12px; }
 
     .field label {
       display: block;
       font-size: 0.78rem;
-      color: #a78bfa;
+      color: #c8a951;
       margin-bottom: 5px;
     }
 
     .field input {
       width: 100%;
-      background: rgba(255,255,255,0.07);
-      border: 1px solid rgba(167,139,250,0.35);
-      border-radius: 10px;
-      padding: 12px 14px;
+      background: #0d0d1a;
+      border: 1px solid #2a2a4a;
+      border-radius: 4px;
+      padding: 10px 12px;
       color: #fff;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       outline: none;
-      transition: border-color 0.2s;
     }
 
-    .field input:focus {
-      border-color: #a78bfa;
-      box-shadow: 0 0 8px rgba(167,139,250,0.3);
-    }
-
-    .field input::placeholder { color: rgba(255,255,255,0.25); }
+    .field input:focus { border-color: #c8a951; }
+    .field input::placeholder { color: #444; }
 
     .error-msg {
-      font-size: 0.82rem;
-      color: #f87171;
-      margin-bottom: 12px;
+      font-size: 0.8rem;
+      color: #e05555;
       min-height: 18px;
+      margin-bottom: 10px;
       text-align: center;
     }
 
-    .btn-submit {
+    .btn-login-submit {
       width: 100%;
-      padding: 14px;
-      border-radius: 12px;
+      padding: 12px;
+      background: linear-gradient(90deg, #b8941f, #c8a951, #b8941f);
       border: none;
-      background: linear-gradient(135deg, #7c3aed, #a78bfa);
-      color: #fff;
+      border-radius: 4px;
+      color: #000;
       font-size: 1rem;
       font-weight: bold;
       cursor: pointer;
-      letter-spacing: 1px;
-      transition: opacity 0.2s, transform 0.1s;
+      letter-spacing: 2px;
+      transition: opacity 0.2s;
     }
 
-    .btn-submit:hover { opacity: 0.88; transform: translateY(-1px); }
-    .btn-submit:active { transform: translateY(0); }
-    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-login-submit:hover { opacity: 0.88; }
+    .btn-login-submit:disabled { opacity: 0.5; cursor: not-allowed; }
 
-    /* ───── 게임 화면 ───── */
-    #gameScreen {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px;
-    }
+    /* ══════════════════════════════
+       게임 화면 전체 레이아웃
+    ══════════════════════════════ */
+    #gameScreen { display: none; flex-direction: column; min-height: 100vh; }
 
-    /* 상단 유저 바 */
-    .user-bar {
-      width: 100%;
-      max-width: 480px;
+    /* ─── 상단 헤더 ─── */
+    .header {
+      background: linear-gradient(90deg, #0d0d1a, #16213e, #0d0d1a);
+      border-bottom: 2px solid #c8a951;
+      padding: 0 16px;
+      height: 56px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 12px 18px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(167,139,250,0.2);
-      border-radius: 14px;
-      margin-bottom: 20px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
 
-    .user-greeting {
-      font-size: 0.9rem;
-      color: rgba(255,255,255,0.7);
+    .header-logo {
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: #c8a951;
+      letter-spacing: 4px;
+      text-shadow: 0 0 10px rgba(200,169,81,0.4);
     }
 
-    .user-greeting span {
-      color: #a78bfa;
+    .header-user {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 0.85rem;
+    }
+
+    .user-point-box {
+      background: #0d0d1a;
+      border: 1px solid #c8a951;
+      border-radius: 4px;
+      padding: 5px 14px;
+      color: #c8a951;
       font-weight: bold;
     }
 
-    .btn-logout {
-      background: rgba(239,68,68,0.15);
-      border: 1px solid rgba(239,68,68,0.35);
-      color: #fca5a5;
-      padding: 7px 14px;
-      border-radius: 8px;
+    .user-name-box {
+      color: #ccc;
+    }
+
+    .user-name-box span { color: #fff; font-weight: bold; }
+
+    .btn-logout-top {
+      background: transparent;
+      border: 1px solid #444;
+      color: #888;
+      padding: 5px 12px;
+      border-radius: 4px;
       cursor: pointer;
       font-size: 0.8rem;
-      transition: background 0.2s;
-    }
-
-    .btn-logout:hover { background: rgba(239,68,68,0.3); }
-
-    h1 {
-      font-size: 2.5rem;
-      margin: 10px 0 8px;
-      text-shadow: 0 0 20px #a78bfa;
-      letter-spacing: 4px;
-    }
-
-    .subtitle {
-      color: #a78bfa;
-      margin-bottom: 30px;
-      font-size: 0.95rem;
-    }
-
-    .card {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(167,139,250,0.3);
-      border-radius: 20px;
-      padding: 30px;
-      width: 100%;
-      max-width: 480px;
-      margin-bottom: 20px;
-      backdrop-filter: blur(10px);
-    }
-
-    .points-display { text-align: center; margin-bottom: 10px; }
-    .points-label { font-size: 0.85rem; color: #a78bfa; margin-bottom: 4px; }
-    .points-value {
-      font-size: 2.8rem;
-      font-weight: bold;
-      color: #fbbf24;
-      text-shadow: 0 0 15px rgba(251,191,36,0.5);
-    }
-
-    .btn-recharge {
-      background: linear-gradient(135deg, rgba(251,191,36,0.2), rgba(251,191,36,0.1));
-      border: 1px solid rgba(251,191,36,0.4);
-      color: #fbbf24;
-      padding: 10px 22px;
-      border-radius: 10px;
-      cursor: pointer;
-      font-size: 0.85rem;
-      margin-top: 10px;
       transition: all 0.2s;
     }
 
-    .btn-recharge:hover { background: rgba(251,191,36,0.3); }
+    .btn-logout-top:hover { border-color: #e05555; color: #e05555; }
 
-    .bet-section { margin-bottom: 20px; }
-    .section-title { font-size: 0.85rem; color: #a78bfa; margin-bottom: 12px; }
+    /* ─── 서브 네비 ─── */
+    .subnav {
+      background: #16213e;
+      border-bottom: 1px solid #2a2a4a;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      height: 38px;
+      gap: 4px;
+      overflow-x: auto;
+    }
 
-    .bet-presets {
+    .subnav::-webkit-scrollbar { height: 3px; }
+    .subnav::-webkit-scrollbar-thumb { background: #c8a951; }
+
+    .subnav-btn {
+      padding: 6px 16px;
+      background: transparent;
+      border: 1px solid #2a2a4a;
+      border-radius: 3px;
+      color: #888;
+      font-size: 0.82rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+
+    .subnav-btn:hover { background: #1e2a4a; color: #ccc; }
+
+    .subnav-btn.active {
+      background: #c8a951;
+      border-color: #c8a951;
+      color: #000;
+      font-weight: bold;
+    }
+
+    /* ─── 3단 레이아웃 ─── */
+    .main-layout {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: 180px 1fr 280px;
+      flex: 1;
+      min-height: 0;
+    }
+
+    /* ─── 좌측 사이드바 ─── */
+    .sidebar-left {
+      background: #13192e;
+      border-right: 1px solid #2a2a4a;
+      padding: 12px 0;
+    }
+
+    .sidebar-section-title {
+      font-size: 0.7rem;
+      color: #c8a951;
+      letter-spacing: 1px;
+      padding: 8px 14px 4px;
+      border-bottom: 1px solid #1e2440;
+    }
+
+    .sidebar-menu-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 14px;
+      font-size: 0.83rem;
+      color: #888;
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: all 0.15s;
+    }
+
+    .sidebar-menu-item:hover { background: #1a2240; color: #ccc; }
+
+    .sidebar-menu-item.active {
+      background: #1a2240;
+      color: #c8a951;
+      border-left-color: #c8a951;
+      font-weight: bold;
+    }
+
+    .sidebar-badge {
+      background: #c8a951;
+      color: #000;
+      font-size: 0.65rem;
+      padding: 1px 6px;
+      border-radius: 10px;
+      font-weight: bold;
+    }
+
+    /* ─── 메인 콘텐츠 ─── */
+    .main-content {
+      padding: 16px;
+      overflow-y: auto;
+    }
+
+    .content-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .content-title {
+      font-size: 1rem;
+      color: #c8a951;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
       gap: 8px;
+    }
+
+    .content-title::before {
+      content: '';
+      display: inline-block;
+      width: 4px;
+      height: 16px;
+      background: #c8a951;
+      border-radius: 2px;
+    }
+
+    /* ─── 게임 패널 ─── */
+    .game-panel {
+      background: #13192e;
+      border: 1px solid #2a2a4a;
+      border-radius: 6px;
+      overflow: hidden;
       margin-bottom: 12px;
     }
 
-    .btn-preset {
-      background: rgba(167,139,250,0.15);
-      border: 1px solid rgba(167,139,250,0.4);
-      color: #e2d9ff;
-      padding: 10px 6px;
-      border-radius: 10px;
-      cursor: pointer;
-      font-size: 0.85rem;
-      transition: all 0.2s;
+    .game-panel-header {
+      background: linear-gradient(90deg, #1a2240, #16213e);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #2a2a4a;
     }
 
-    .btn-preset:hover { background: rgba(167,139,250,0.35); transform: translateY(-2px); }
-
-    .bet-input-row { display: flex; gap: 10px; align-items: center; }
-
-    .bet-input {
-      flex: 1;
-      background: rgba(255,255,255,0.07);
-      border: 1px solid rgba(167,139,250,0.4);
-      border-radius: 10px;
-      padding: 12px 16px;
-      color: #fff;
-      font-size: 1.1rem;
-      text-align: right;
-      outline: none;
-    }
-
-    .bet-input:focus { border-color: #a78bfa; box-shadow: 0 0 10px rgba(167,139,250,0.3); }
-
-    .btn-reset-bet {
-      background: rgba(239,68,68,0.2);
-      border: 1px solid rgba(239,68,68,0.4);
-      color: #fca5a5;
-      padding: 12px 16px;
-      border-radius: 10px;
-      cursor: pointer;
-      font-size: 0.85rem;
-      transition: all 0.2s;
-    }
-
-    .btn-reset-bet:hover { background: rgba(239,68,68,0.35); }
-
-    .choice-section { margin-bottom: 20px; }
-
-    .choice-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-
-    .btn-choice {
-      padding: 22px;
-      border-radius: 16px;
-      border: 2px solid transparent;
-      cursor: pointer;
-      font-size: 1.5rem;
+    .game-panel-title {
+      font-size: 0.88rem;
       font-weight: bold;
-      letter-spacing: 2px;
-      transition: all 0.2s;
+      color: #e0c87a;
     }
 
-    .btn-choice:disabled { opacity: 0.5; cursor: not-allowed; }
+    .game-panel-body { padding: 20px; }
 
-    .btn-odd {
-      background: linear-gradient(135deg, rgba(239,68,68,0.2), rgba(239,68,68,0.1));
-      border-color: rgba(239,68,68,0.5);
-      color: #fca5a5;
-    }
-
-    .btn-odd:not(:disabled):hover {
-      background: linear-gradient(135deg, rgba(239,68,68,0.4), rgba(239,68,68,0.2));
-      transform: translateY(-3px);
-      box-shadow: 0 8px 20px rgba(239,68,68,0.3);
-    }
-
-    .btn-even {
-      background: linear-gradient(135deg, rgba(59,130,246,0.2), rgba(59,130,246,0.1));
-      border-color: rgba(59,130,246,0.5);
-      color: #93c5fd;
-    }
-
-    .btn-even:not(:disabled):hover {
-      background: linear-gradient(135deg, rgba(59,130,246,0.4), rgba(59,130,246,0.2));
-      transform: translateY(-3px);
-      box-shadow: 0 8px 20px rgba(59,130,246,0.3);
-    }
-
-    .result-area {
+    /* 숫자 결과창 */
+    .result-display {
+      background: #0d0d1a;
+      border: 1px solid #2a2a4a;
+      border-radius: 6px;
+      padding: 24px;
       text-align: center;
-      min-height: 120px;
+      margin-bottom: 20px;
+      min-height: 130px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -327,230 +353,460 @@
 
     .result-number {
       font-size: 5rem;
-      font-weight: bold;
+      font-weight: 900;
       line-height: 1;
-      margin-bottom: 10px;
-      transition: all 0.3s;
+      margin-bottom: 8px;
     }
 
-    .result-number.odd { color: #fca5a5; text-shadow: 0 0 30px rgba(239,68,68,0.6); }
-    .result-number.even { color: #93c5fd; text-shadow: 0 0 30px rgba(59,130,246,0.6); }
+    .result-number.odd { color: #e05555; text-shadow: 0 0 20px rgba(224,85,85,0.5); }
+    .result-number.even { color: #4a9eff; text-shadow: 0 0 20px rgba(74,158,255,0.5); }
     .result-number.rolling { animation: roll 0.08s infinite alternate; }
 
-    @keyframes roll { from { transform: scale(1.0); } to { transform: scale(1.08); } }
+    @keyframes roll { from { transform: scale(1); } to { transform: scale(1.08); } }
 
-    .result-tag { font-size: 1.2rem; font-weight: bold; letter-spacing: 3px; margin-bottom: 8px; }
+    .result-tag { font-size: 1.1rem; font-weight: bold; letter-spacing: 2px; }
+    .result-tag.odd { color: #e05555; }
+    .result-tag.even { color: #4a9eff; }
 
-    .result-outcome { font-size: 1.6rem; font-weight: bold; letter-spacing: 2px; }
-
-    .result-outcome.win {
-      color: #4ade80;
-      text-shadow: 0 0 20px rgba(74,222,128,0.6);
-      animation: pop 0.3s ease-out;
+    .result-outcome {
+      font-size: 1.4rem;
+      font-weight: bold;
+      margin-top: 6px;
     }
 
-    .result-outcome.lose { color: #f87171; }
+    .result-outcome.win { color: #4ade80; animation: pop 0.3s ease-out; }
+    .result-outcome.lose { color: #e05555; }
 
-    @keyframes pop {
-      0% { transform: scale(0.7); }
-      60% { transform: scale(1.15); }
-      100% { transform: scale(1.0); }
+    @keyframes pop { 0% { transform: scale(0.7); } 60% { transform: scale(1.15); } 100% { transform: scale(1); } }
+
+    .result-change { font-size: 0.9rem; color: #888; margin-top: 4px; }
+    .idle-text { color: #444; font-size: 0.9rem; }
+
+    /* 홀짝 선택 버튼 */
+    .choice-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
     }
 
-    .result-change { font-size: 1rem; margin-top: 4px; color: #d1fae5; }
-    .idle-text { color: rgba(255,255,255,0.25); font-size: 1rem; }
+    .btn-odd, .btn-even {
+      padding: 18px;
+      border-radius: 5px;
+      border: 1px solid;
+      cursor: pointer;
+      font-size: 1.2rem;
+      font-weight: bold;
+      letter-spacing: 2px;
+      transition: all 0.15s;
+    }
 
-    .odds-info {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
+    .btn-odd {
+      background: rgba(224,85,85,0.12);
+      border-color: #e05555;
+      color: #e05555;
+    }
+
+    .btn-odd:not(:disabled):hover {
+      background: rgba(224,85,85,0.25);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(224,85,85,0.3);
+    }
+
+    .btn-even {
+      background: rgba(74,158,255,0.12);
+      border-color: #4a9eff;
+      color: #4a9eff;
+    }
+
+    .btn-even:not(:disabled):hover {
+      background: rgba(74,158,255,0.25);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(74,158,255,0.3);
+    }
+
+    .btn-odd:disabled, .btn-even:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .odds-label {
+      text-align: center;
+      font-size: 0.75rem;
+      color: #555;
       margin-top: 10px;
-      font-size: 0.8rem;
-      color: rgba(255,255,255,0.4);
     }
 
-    .history-card { width: 100%; max-width: 480px; }
-    .history-title { font-size: 0.9rem; color: #a78bfa; margin-bottom: 14px; }
-
-    .history-list {
-      list-style: none;
+    /* ─── 우측 배팅 슬립 ─── */
+    .sidebar-right {
+      background: #13192e;
+      border-left: 1px solid #2a2a4a;
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      max-height: 220px;
-      overflow-y: auto;
     }
 
-    .history-list::-webkit-scrollbar { width: 4px; }
-    .history-list::-webkit-scrollbar-thumb { background: rgba(167,139,250,0.3); border-radius: 2px; }
+    .slip-header {
+      background: linear-gradient(90deg, #b8941f, #c8a951);
+      padding: 10px 16px;
+      font-size: 0.88rem;
+      font-weight: bold;
+      color: #000;
+      letter-spacing: 1px;
+    }
 
-    .history-item {
+    .slip-body { padding: 16px; flex: 1; }
+
+    .slip-point-row {
+      background: #0d0d1a;
+      border: 1px solid #2a2a4a;
+      border-radius: 4px;
+      padding: 10px 12px;
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .slip-point-label { font-size: 0.78rem; color: #888; }
+    .slip-point-value { font-size: 1.1rem; color: #c8a951; font-weight: bold; }
+
+    .slip-section-label {
+      font-size: 0.75rem;
+      color: #c8a951;
+      margin-bottom: 8px;
+    }
+
+    .bet-quick-btns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .bet-quick-btn {
+      background: #1a2240;
+      border: 1px solid #2a2a4a;
+      border-radius: 4px;
+      color: #ccc;
+      padding: 7px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s;
+    }
+
+    .bet-quick-btn:hover { background: #243060; border-color: #c8a951; color: #c8a951; }
+
+    .bet-input-row {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .bet-input {
+      flex: 1;
+      background: #0d0d1a;
+      border: 1px solid #2a2a4a;
+      border-radius: 4px;
+      padding: 9px 12px;
+      color: #fff;
+      font-size: 0.95rem;
+      text-align: right;
+      outline: none;
+    }
+
+    .bet-input:focus { border-color: #c8a951; }
+
+    .bet-reset-btn {
+      background: #1a2240;
+      border: 1px solid #e05555;
+      color: #e05555;
+      padding: 9px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: all 0.15s;
+    }
+
+    .bet-reset-btn:hover { background: rgba(224,85,85,0.15); }
+
+    .slip-divider {
+      border: none;
+      border-top: 1px solid #2a2a4a;
+      margin: 14px 0;
+    }
+
+    .slip-summary {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      margin-bottom: 8px;
+    }
+
+    .slip-summary .label { color: #888; }
+    .slip-summary .value { color: #fff; font-weight: bold; }
+    .slip-summary .value.gold { color: #c8a951; }
+
+    .btn-bet-now {
+      width: 100%;
+      padding: 13px;
+      background: linear-gradient(90deg, #b8941f, #c8a951, #b8941f);
+      border: none;
+      border-radius: 4px;
+      color: #000;
+      font-size: 1rem;
+      font-weight: 900;
+      letter-spacing: 3px;
+      cursor: pointer;
+      margin-bottom: 10px;
+      transition: opacity 0.2s;
+    }
+
+    .btn-bet-now:hover { opacity: 0.88; }
+    .btn-bet-now:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .btn-recharge-slip {
+      width: 100%;
+      padding: 9px;
+      background: transparent;
+      border: 1px solid #c8a951;
+      color: #c8a951;
+      border-radius: 4px;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-recharge-slip:hover { background: rgba(200,169,81,0.1); }
+
+    /* 최근 기록 */
+    .history-panel {
+      padding: 12px 16px;
+      border-top: 1px solid #2a2a4a;
+    }
+
+    .history-panel-title {
+      font-size: 0.75rem;
+      color: #c8a951;
+      margin-bottom: 8px;
+    }
+
+    .history-rows { display: flex; flex-direction: column; gap: 4px; max-height: 200px; overflow-y: auto; }
+    .history-rows::-webkit-scrollbar { width: 3px; }
+    .history-rows::-webkit-scrollbar-thumb { background: #c8a951; }
+
+    .h-row {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 10px 14px;
-      border-radius: 10px;
-      font-size: 0.88rem;
-      background: rgba(255,255,255,0.04);
+      justify-content: space-between;
+      padding: 5px 8px;
+      background: #0d0d1a;
+      border-radius: 3px;
+      font-size: 0.78rem;
+      border-left: 2px solid transparent;
     }
 
-    .history-item.win-item { border-left: 3px solid #4ade80; }
-    .history-item.lose-item { border-left: 3px solid #f87171; }
+    .h-row.win { border-left-color: #4ade80; }
+    .h-row.lose { border-left-color: #e05555; }
 
-    .h-num { font-size: 1.2rem; font-weight: bold; width: 36px; text-align: center; }
-    .h-num.odd { color: #fca5a5; }
-    .h-num.even { color: #93c5fd; }
-
-    .h-info { flex: 1; color: rgba(255,255,255,0.7); }
+    .h-num { font-weight: bold; width: 28px; }
+    .h-num.odd { color: #e05555; }
+    .h-num.even { color: #4a9eff; }
+    .h-info { flex: 1; padding: 0 6px; color: #666; }
     .h-result { font-weight: bold; }
     .h-result.win { color: #4ade80; }
-    .h-result.lose { color: #f87171; }
+    .h-result.lose { color: #e05555; }
 
-    .history-empty {
-      text-align: center;
-      color: rgba(255,255,255,0.25);
-      font-size: 0.85rem;
-      padding: 20px 0;
-    }
+    .history-empty { color: #444; font-size: 0.78rem; text-align: center; padding: 10px 0; }
 
-    .saving-indicator {
-      font-size: 0.75rem;
-      color: rgba(167,139,250,0.6);
-      text-align: center;
-      margin-top: -10px;
-      margin-bottom: 10px;
-      min-height: 16px;
+    .saving-indicator { font-size: 0.72rem; color: #c8a951; text-align: center; height: 16px; }
+
+    /* 반응형 */
+    @media (max-width: 900px) {
+      .main-layout { grid-template-columns: 1fr; }
+      .sidebar-left { display: none; }
+      .sidebar-right { border-left: none; border-top: 1px solid #2a2a4a; }
     }
   </style>
 </head>
 <body>
 
-  <!-- ───── 로그인 화면 ───── -->
+  <!-- ══════════════════════════════
+       로그인 화면
+  ══════════════════════════════ -->
   <div id="loginScreen">
-    <div class="login-logo">🎲 홀짝 게임</div>
-    <p class="login-sub">로그인하고 게임을 시작하세요</p>
-
-    <div class="login-card">
-      <div class="tab-row">
-        <button class="tab-btn active" id="tabLogin" onclick="switchTab('login')">로그인</button>
-        <button class="tab-btn" id="tabRegister" onclick="switchTab('register')">회원가입</button>
+    <div class="login-wrap">
+      <div class="login-logo-area">
+        <h1>♠ KINGS</h1>
+        <p>홀짝 게임 — 로그인하고 시작하세요</p>
       </div>
 
-      <div class="field">
-        <label>아이디</label>
-        <input type="text" id="usernameInput" placeholder="아이디 입력" maxlength="16" autocomplete="username">
+      <div class="login-card">
+        <div class="tab-row">
+          <button class="tab-btn active" id="tabLogin" onclick="switchTab('login')">로그인</button>
+          <button class="tab-btn" id="tabRegister" onclick="switchTab('register')">회원가입</button>
+        </div>
+
+        <div class="field">
+          <label>아이디</label>
+          <input type="text" id="usernameInput" placeholder="아이디 입력" maxlength="16" autocomplete="username">
+        </div>
+
+        <div class="field">
+          <label>비밀번호</label>
+          <input type="password" id="passwordInput" placeholder="6자 이상" onkeydown="handleEnter(event)" autocomplete="current-password">
+        </div>
+
+        <div id="registerFields" style="display:none">
+          <div class="field">
+            <label>비밀번호 확인</label>
+            <input type="password" id="passwordConfirmInput" placeholder="비밀번호를 다시 입력">
+          </div>
+          <div class="field">
+            <label>닉네임</label>
+            <input type="text" id="nicknameInput" placeholder="게임에서 표시될 이름" maxlength="12">
+          </div>
+          <div class="field">
+            <label>휴대폰 번호</label>
+            <input type="tel" id="phoneInput" placeholder="010-0000-0000" maxlength="13" oninput="formatPhone(this)">
+          </div>
+          <div class="field">
+            <label>추천인 코드</label>
+            <input type="text" id="referralInput" placeholder="추천인 코드 입력 (필수)" maxlength="16">
+          </div>
+        </div>
+
+        <p class="error-msg" id="authError"></p>
+        <button class="btn-login-submit" id="submitBtn" onclick="handleSubmit()">로그인</button>
       </div>
-
-      <div class="field">
-        <label>비밀번호</label>
-        <input type="password" id="passwordInput" placeholder="6자 이상" onkeydown="handleEnter(event)" autocomplete="current-password">
-      </div>
-
-      <!-- 회원가입 전용 필드 -->
-      <div id="registerFields" style="display:none">
-        <div class="field">
-          <label>비밀번호 확인</label>
-          <input type="password" id="passwordConfirmInput" placeholder="비밀번호를 다시 입력">
-        </div>
-        <div class="field">
-          <label>닉네임</label>
-          <input type="text" id="nicknameInput" placeholder="게임에서 표시될 이름" maxlength="12">
-        </div>
-        <div class="field">
-          <label>휴대폰 번호</label>
-          <input type="tel" id="phoneInput" placeholder="010-0000-0000" maxlength="13" oninput="formatPhone(this)">
-        </div>
-        <div class="field">
-          <label>추천인 코드</label>
-          <input type="text" id="referralInput" placeholder="추천인 아이디 입력 (필수)" maxlength="16">
-        </div>
-      </div>
-
-      <p class="error-msg" id="authError"></p>
-
-      <button class="btn-submit" id="submitBtn" onclick="handleSubmit()">로그인</button>
     </div>
   </div>
 
-  <!-- ───── 게임 화면 ───── -->
+  <!-- ══════════════════════════════
+       게임 화면
+  ══════════════════════════════ -->
   <div id="gameScreen">
-    <div class="user-bar">
-      <div class="user-greeting">안녕하세요, <span id="userNickname"></span>님!</div>
-      <button class="btn-logout" onclick="handleLogout()">로그아웃</button>
-    </div>
 
-    <h1>🎲 홀짝 게임</h1>
-    <p class="subtitle">숫자를 보고 홀수인지 짝수인지 맞춰보세요!</p>
-
-    <div class="card">
-      <div class="points-display">
-        <div class="points-label">보유 포인트</div>
-        <div class="points-value" id="pointsDisplay">0 P</div>
-        <button class="btn-recharge" onclick="recharge()">+ 포인트 충전 (10,000P)</button>
+    <!-- 헤더 -->
+    <header class="header">
+      <div class="header-logo">♠ KINGS</div>
+      <div class="header-user">
+        <div class="user-name-box"><span id="userNickname"></span> 님</div>
+        <div class="user-point-box" id="headerPoints">0 P</div>
+        <button class="btn-logout-top" onclick="handleLogout()">로그아웃</button>
       </div>
-    </div>
+    </header>
 
-    <div class="saving-indicator" id="savingIndicator"></div>
+    <!-- 서브 네비 -->
+    <nav class="subnav">
+      <button class="subnav-btn active">홀짝</button>
+      <button class="subnav-btn">사다리</button>
+      <button class="subnav-btn">달팽이</button>
+      <button class="subnav-btn">파워볼</button>
+      <button class="subnav-btn">스피드키노</button>
+    </nav>
 
-    <div class="card">
-      <div class="bet-section">
-        <div class="section-title">배팅 금액을 선택하세요</div>
-        <div class="bet-presets">
-          <button class="btn-preset" onclick="addBet(100)">+100</button>
-          <button class="btn-preset" onclick="addBet(500)">+500</button>
-          <button class="btn-preset" onclick="addBet(1000)">+1,000</button>
-          <button class="btn-preset" onclick="setBetAll()">전부</button>
+    <!-- 3단 레이아웃 -->
+    <div class="main-layout">
+
+      <!-- 좌측 사이드바 -->
+      <aside class="sidebar-left">
+        <div class="sidebar-section-title">GAME</div>
+        <div class="sidebar-menu-item active">홀짝 <span class="sidebar-badge">LIVE</span></div>
+        <div class="sidebar-menu-item">사다리</div>
+        <div class="sidebar-menu-item">달팽이</div>
+        <div class="sidebar-menu-item">파워볼</div>
+        <div class="sidebar-menu-item">스피드키노</div>
+        <div class="sidebar-section-title" style="margin-top:10px">MENU</div>
+        <div class="sidebar-menu-item">마이페이지</div>
+        <div class="sidebar-menu-item">배팅내역</div>
+        <div class="sidebar-menu-item">고객센터</div>
+      </aside>
+
+      <!-- 메인 콘텐츠 -->
+      <main class="main-content">
+        <div class="content-header">
+          <div class="content-title">홀짝 게임</div>
+          <div class="saving-indicator" id="savingIndicator"></div>
         </div>
-        <div class="bet-input-row">
-          <input class="bet-input" type="number" id="betInput" placeholder="0" min="1">
-          <button class="btn-reset-bet" onclick="resetBet()">초기화</button>
+
+        <div class="game-panel">
+          <div class="game-panel-header">
+            <div class="game-panel-title">🎲 홀짝 — 숫자를 보고 홀수/짝수를 맞춰보세요</div>
+            <div style="font-size:0.75rem;color:#888">배당 2.00배</div>
+          </div>
+          <div class="game-panel-body">
+
+            <!-- 결과 표시창 -->
+            <div class="result-display" id="resultArea">
+              <div class="idle-text">배팅 후 버튼을 눌러 게임을 시작하세요</div>
+            </div>
+
+            <!-- 홀/짝 버튼 -->
+            <div class="choice-row">
+              <button class="btn-odd" id="btnOdd" onclick="play('홀')">홀 (ODD)</button>
+              <button class="btn-even" id="btnEven" onclick="play('짝')">짝 (EVEN)</button>
+            </div>
+            <div class="odds-label">맞추면 배팅액 × 2배 지급 | 틀리면 배팅액 차감</div>
+
+          </div>
         </div>
-      </div>
+      </main>
 
-      <div class="choice-section">
-        <div class="section-title">홀수? 짝수? 골라보세요  •  배당 2배</div>
-        <div class="choice-buttons">
-          <button class="btn-choice btn-odd" id="btnOdd" onclick="play('홀')">홀 (ODD)</button>
-          <button class="btn-choice btn-even" id="btnEven" onclick="play('짝')">짝 (EVEN)</button>
+      <!-- 우측 배팅 슬립 -->
+      <aside class="sidebar-right">
+        <div class="slip-header">BETTING SLIP</div>
+        <div class="slip-body">
+
+          <div class="slip-point-row">
+            <div class="slip-point-label">보유 포인트</div>
+            <div class="slip-point-value" id="slipPoints">0 P</div>
+          </div>
+
+          <div class="slip-section-label">배팅 금액</div>
+          <div class="bet-quick-btns">
+            <button class="bet-quick-btn" onclick="addBet(1000)">+1,000</button>
+            <button class="bet-quick-btn" onclick="addBet(5000)">+5,000</button>
+            <button class="bet-quick-btn" onclick="addBet(10000)">+10,000</button>
+            <button class="bet-quick-btn" onclick="setBetAll()">MAX</button>
+          </div>
+
+          <div class="bet-input-row">
+            <input class="bet-input" type="number" id="betInput" placeholder="배팅 금액">
+            <button class="bet-reset-btn" onclick="resetBet()">초기화</button>
+          </div>
+
+          <hr class="slip-divider">
+
+          <div class="slip-summary">
+            <span class="label">배팅액</span>
+            <span class="value" id="summaryBet">0 P</span>
+          </div>
+          <div class="slip-summary">
+            <span class="label">예상 당첨금</span>
+            <span class="value gold" id="summaryWin">0 P</span>
+          </div>
+
+          <hr class="slip-divider">
+
+          <button class="btn-bet-now" id="btnOdd2" onclick="play('홀')">홀 배팅</button>
+          <button class="btn-bet-now" id="btnEven2" onclick="play('짝')" style="background:linear-gradient(90deg,#1a4a8a,#2a6ac8,#1a4a8a);color:#fff;margin-top:6px">짝 배팅</button>
+          <button class="btn-recharge-slip" onclick="recharge()" style="margin-top:8px">+ 포인트 충전 (10,000P)</button>
         </div>
-      </div>
 
-      <div class="result-area" id="resultArea">
-        <div class="idle-text">버튼을 눌러 게임을 시작하세요</div>
-      </div>
+        <!-- 최근 기록 -->
+        <div class="history-panel">
+          <div class="history-panel-title">최근 배팅 기록</div>
+          <div class="history-rows" id="historyList">
+            <div class="history-empty">기록 없음</div>
+          </div>
+        </div>
+      </aside>
 
-      <div class="odds-info">
-        <span>맞추면 배팅액 × 2배 지급</span>
-        <span>틀리면 배팅액 차감</span>
-      </div>
-    </div>
-
-    <div class="card history-card">
-      <div class="history-title">게임 기록</div>
-      <ul class="history-list" id="historyList">
-        <li class="history-empty">아직 게임 기록이 없습니다.</li>
-      </ul>
     </div>
   </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import {
-      getAuth,
-      createUserWithEmailAndPassword,
-      signInWithEmailAndPassword,
-      signOut,
-      onAuthStateChanged
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import {
-      getFirestore,
-      doc,
-      getDoc,
-      setDoc,
-      updateDoc
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    // ── Firebase 초기화 ──
     const firebaseConfig = {
       apiKey: "AIzaSyDJv5VYIt2xFrQmignCwSzuThAkULz1NW8",
       authDomain: "kings-44a9b.firebaseapp.com",
@@ -564,17 +820,25 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // ── 게임 상태 ──
     let points = 0;
     let gameHistory = [];
     let currentUid = null;
 
-    // ── 로그인 상태 감지 ──
+    // 배팅 입력 변화 감지 → 예상 당첨금 업데이트
+    document.getElementById('betInput').addEventListener('input', updateSummary);
+
+    function updateSummary() {
+      const bet = getBet();
+      document.getElementById('summaryBet').textContent = bet.toLocaleString() + ' P';
+      document.getElementById('summaryWin').textContent = (bet * 2).toLocaleString() + ' P';
+    }
+
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         currentUid = user.uid;
         document.getElementById('loginScreen').style.display = 'none';
         document.getElementById('gameScreen').style.display = 'flex';
+        document.getElementById('gameScreen').style.flexDirection = 'column';
         await loadUserData(user.uid);
       } else {
         currentUid = null;
@@ -583,7 +847,6 @@
       }
     });
 
-    // ── Firestore에서 유저 데이터 불러오기 ──
     async function loadUserData(uid) {
       try {
         const snap = await getDoc(doc(db, 'users', uid));
@@ -593,203 +856,145 @@
           document.getElementById('userNickname').textContent = data.nickname || data.username || '유저';
         } else {
           points = 10000;
-          document.getElementById('userNickname').textContent = auth.currentUser?.email?.split('@')[0] || '유저';
-          await setDoc(doc(db, 'users', uid), {
-            username: auth.currentUser?.email?.split('@')[0] || '',
-            nickname: '유저',
-            points: 10000,
-            createdAt: new Date()
-          });
+          const uname = auth.currentUser?.email?.split('@')[0] || '유저';
+          document.getElementById('userNickname').textContent = uname;
+          await setDoc(doc(db, 'users', uid), { username: uname, nickname: uname, points: 10000, createdAt: new Date() });
         }
         updatePointsDisplay();
-      } catch (e) {
+      } catch(e) {
         console.error('Firestore 오류:', e);
         points = 10000;
-        document.getElementById('userNickname').textContent = '유저';
         updatePointsDisplay();
       }
     }
 
-    // ── Firestore에 포인트 저장 ──
     async function savePoints() {
       if (!currentUid) return;
-      const indicator = document.getElementById('savingIndicator');
-      indicator.textContent = '저장 중...';
-      await updateDoc(doc(db, 'users', currentUid), { points });
-      indicator.textContent = '✓ 저장됨';
-      setTimeout(() => { indicator.textContent = ''; }, 1500);
+      const ind = document.getElementById('savingIndicator');
+      ind.textContent = '저장 중...';
+      try {
+        await updateDoc(doc(db, 'users', currentUid), { points });
+        ind.textContent = '✓ 저장됨';
+        setTimeout(() => { ind.textContent = ''; }, 1500);
+      } catch(e) { ind.textContent = ''; }
     }
 
-    // 아이디 → 내부 이메일로 변환 (사용자에게는 보이지 않음)
-    function toEmail(username) {
-      return username.toLowerCase() + '@kings.com';
+    function updatePointsDisplay() {
+      const txt = points.toLocaleString() + ' P';
+      document.getElementById('headerPoints').textContent = txt;
+      document.getElementById('slipPoints').textContent = txt;
     }
 
-    // 폰번호 자동 하이픈
-    window.formatPhone = function(input) {
-      let v = input.value.replace(/\D/g, '');
-      if (v.length <= 3) input.value = v;
-      else if (v.length <= 7) input.value = v.slice(0,3) + '-' + v.slice(3);
-      else input.value = v.slice(0,3) + '-' + v.slice(3,7) + '-' + v.slice(7,11);
+    function toEmail(u) { return u.toLowerCase() + '@kings.com'; }
+
+    window.formatPhone = function(el) {
+      let v = el.value.replace(/\D/g,'');
+      if (v.length <= 3) el.value = v;
+      else if (v.length <= 7) el.value = v.slice(0,3)+'-'+v.slice(3);
+      else el.value = v.slice(0,3)+'-'+v.slice(3,7)+'-'+v.slice(7,11);
     };
 
-    // ── 탭 전환 ──
     window.switchTab = function(tab) {
-      const isRegister = tab === 'register';
-      document.getElementById('tabLogin').classList.toggle('active', !isRegister);
-      document.getElementById('tabRegister').classList.toggle('active', isRegister);
-      document.getElementById('registerFields').style.display = isRegister ? 'block' : 'none';
-      document.getElementById('submitBtn').textContent = isRegister ? '회원가입' : '로그인';
+      const isReg = tab === 'register';
+      document.getElementById('tabLogin').classList.toggle('active', !isReg);
+      document.getElementById('tabRegister').classList.toggle('active', isReg);
+      document.getElementById('registerFields').style.display = isReg ? 'block' : 'none';
+      document.getElementById('submitBtn').textContent = isReg ? '회원가입' : '로그인';
       document.getElementById('authError').textContent = '';
     };
 
-    // ── Enter 키로 제출 ──
-    window.handleEnter = function(e) {
-      if (e.key === 'Enter') handleSubmit();
-    };
+    window.handleEnter = function(e) { if (e.key === 'Enter') handleSubmit(); };
 
-    // ── 로그인 / 회원가입 처리 ──
     window.handleSubmit = async function() {
-      const isRegister = document.getElementById('tabRegister').classList.contains('active');
+      const isReg = document.getElementById('tabRegister').classList.contains('active');
       const username = document.getElementById('usernameInput').value.trim();
       const password = document.getElementById('passwordInput').value;
       const btn = document.getElementById('submitBtn');
-      const errorEl = document.getElementById('authError');
-
-      errorEl.textContent = '';
-
-      if (!username || !password) {
-        errorEl.textContent = '아이디와 비밀번호를 입력해주세요.';
-        return;
-      }
-
-      if (!/^[a-zA-Z0-9가-힣_]{2,16}$/.test(username)) {
-        errorEl.textContent = '아이디는 2~16자, 한글/영문/숫자/_만 사용 가능합니다.';
-        return;
-      }
-
-      btn.disabled = true;
-      btn.textContent = '처리 중...';
-
-      const email = toEmail(username);
-
+      const errEl = document.getElementById('authError');
+      errEl.textContent = '';
+      if (!username || !password) { errEl.textContent = '아이디와 비밀번호를 입력해주세요.'; return; }
+      btn.disabled = true; btn.textContent = '처리 중...';
       try {
-        if (isRegister) {
-          const confirm  = document.getElementById('passwordConfirmInput').value;
+        if (isReg) {
+          const confirm = document.getElementById('passwordConfirmInput').value;
           const nickname = document.getElementById('nicknameInput').value.trim();
-          const phone    = document.getElementById('phoneInput').value.trim();
+          const phone = document.getElementById('phoneInput').value.trim();
           const referral = document.getElementById('referralInput').value.trim();
-
-          if (password !== confirm) { errorEl.textContent = '비밀번호가 일치하지 않습니다.'; return; }
-          if (!nickname) { errorEl.textContent = '닉네임을 입력해주세요.'; return; }
-          if (!/^010-\d{4}-\d{4}$/.test(phone)) { errorEl.textContent = '올바른 휴대폰 번호를 입력해주세요. (010-0000-0000)'; return; }
-          if (!referral) { errorEl.textContent = '추천인 코드를 입력해주세요.'; return; }
-          if (referral !== '1111') { errorEl.textContent = '유효하지 않은 추천인 코드입니다.'; return; }
-
-          const cred = await createUserWithEmailAndPassword(auth, email, password);
-          await setDoc(doc(db, 'users', cred.user.uid), {
-            username,
-            nickname,
-            phone,
-            referral,
-            points: 10000,
-            createdAt: new Date()
-          });
+          if (password !== confirm) { errEl.textContent = '비밀번호가 일치하지 않습니다.'; return; }
+          if (!nickname) { errEl.textContent = '닉네임을 입력해주세요.'; return; }
+          if (!/^010-\d{4}-\d{4}$/.test(phone)) { errEl.textContent = '올바른 휴대폰 번호를 입력해주세요.'; return; }
+          if (!referral) { errEl.textContent = '추천인 코드를 입력해주세요.'; return; }
+          if (referral !== '1111') { errEl.textContent = '유효하지 않은 추천인 코드입니다.'; return; }
+          const cred = await createUserWithEmailAndPassword(auth, toEmail(username), password);
+          await setDoc(doc(db, 'users', cred.user.uid), { username, nickname, phone, referral, points: 10000, createdAt: new Date() });
         } else {
-          await signInWithEmailAndPassword(auth, email, password);
+          await signInWithEmailAndPassword(auth, toEmail(username), password);
         }
-      } catch (e) {
-        console.error('Firebase 오류 코드:', e.code, e.message);
-        errorEl.textContent = parseAuthError(e.code);
+      } catch(e) {
+        console.error('Auth 오류:', e.code, e.message);
+        errEl.textContent = parseAuthError(e.code);
       } finally {
         btn.disabled = false;
-        btn.textContent = isRegister ? '회원가입' : '로그인';
+        btn.textContent = isReg ? '회원가입' : '로그인';
       }
     };
 
     function parseAuthError(code) {
-      const map = {
+      const m = {
         'auth/invalid-credential': '아이디 또는 비밀번호가 틀렸습니다.',
         'auth/user-not-found': '존재하지 않는 아이디입니다.',
         'auth/wrong-password': '비밀번호가 틀렸습니다.',
         'auth/email-already-in-use': '이미 사용 중인 아이디입니다.',
         'auth/weak-password': '비밀번호는 6자 이상이어야 합니다.',
         'auth/too-many-requests': '잠시 후 다시 시도해주세요.',
-        'auth/operation-not-allowed': 'Firebase 설정 필요: 이메일/비밀번호 로그인을 활성화해주세요.',
-        'auth/network-request-failed': '네트워크 오류입니다. 인터넷 연결을 확인해주세요.'
+        'auth/operation-not-allowed': 'Firebase 이메일 로그인을 활성화해주세요.',
       };
-      return map[code] ?? `오류가 발생했습니다. (${code})`;
+      return m[code] ?? `오류: ${code}`;
     }
 
-    // ── 로그아웃 ──
     window.handleLogout = async function() {
       await signOut(auth);
       gameHistory = [];
       renderHistory();
-      document.getElementById('resultArea').innerHTML = '<div class="idle-text">버튼을 눌러 게임을 시작하세요</div>';
+      document.getElementById('resultArea').innerHTML = '<div class="idle-text">배팅 후 버튼을 눌러 게임을 시작하세요</div>';
     };
 
-    // ── 포인트 표시 업데이트 ──
-    function updatePointsDisplay() {
-      document.getElementById('pointsDisplay').textContent = points.toLocaleString() + ' P';
-    }
-
-    // ── 배팅 관련 ──
     function getBet() {
-      const val = parseInt(document.getElementById('betInput').value, 10);
-      return isNaN(val) || val <= 0 ? 0 : val;
+      const v = parseInt(document.getElementById('betInput').value, 10);
+      return isNaN(v) || v <= 0 ? 0 : v;
     }
 
-    window.addBet = function(amount) {
-      document.getElementById('betInput').value = getBet() + amount;
-    };
-
-    window.setBetAll = function() {
-      document.getElementById('betInput').value = points;
-    };
-
-    window.resetBet = function() {
-      document.getElementById('betInput').value = '';
-    };
+    window.addBet = function(n) { document.getElementById('betInput').value = getBet() + n; updateSummary(); };
+    window.setBetAll = function() { document.getElementById('betInput').value = points; updateSummary(); };
+    window.resetBet = function() { document.getElementById('betInput').value = ''; updateSummary(); };
 
     window.recharge = async function() {
       points += 10000;
       updatePointsDisplay();
-      showMessage('10,000 포인트가 충전되었습니다!', '#fbbf24');
       await savePoints();
     };
 
-    function showMessage(msg, color) {
-      document.getElementById('resultArea').innerHTML =
-        `<div style="color:${color};font-size:1rem;">${msg}</div>`;
-    }
-
     function setButtons(disabled) {
-      document.getElementById('btnOdd').disabled = disabled;
-      document.getElementById('btnEven').disabled = disabled;
+      ['btnOdd','btnEven','btnOdd2','btnEven2'].forEach(id => {
+        document.getElementById(id).disabled = disabled;
+      });
     }
 
-    // ── 게임 플레이 ──
-    window.play = function(choice) {
+    window.play = async function(choice) {
       const bet = getBet();
-      if (bet <= 0) { showMessage('배팅 금액을 입력해주세요!', '#fbbf24'); return; }
-      if (bet > points) { showMessage('포인트가 부족합니다!', '#f87171'); return; }
-
+      if (bet <= 0) { alert('배팅 금액을 입력해주세요!'); return; }
+      if (bet > points) { alert('포인트가 부족합니다!'); return; }
       setButtons(true);
-
-      const resultArea = document.getElementById('resultArea');
-      let rollCount = 0;
-      resultArea.innerHTML = `<div class="result-number rolling" id="rollingNum">?</div>`;
-      const rollingEl = document.getElementById('rollingNum');
-
-      const rollInterval = setInterval(async () => {
+      const area = document.getElementById('resultArea');
+      area.innerHTML = '<div class="result-number rolling" id="rollingNum">?</div>';
+      const el = document.getElementById('rollingNum');
+      let count = 0;
+      const iv = setInterval(async () => {
         const r = Math.floor(Math.random() * 100) + 1;
-        rollingEl.textContent = r;
-        rollingEl.className = 'result-number rolling ' + (r % 2 === 1 ? 'odd' : 'even');
-        rollCount++;
-
-        if (rollCount >= 18) {
-          clearInterval(rollInterval);
+        el.textContent = r;
+        el.className = 'result-number rolling ' + (r % 2 === 1 ? 'odd' : 'even');
+        if (++count >= 18) {
+          clearInterval(iv);
           const final = Math.floor(Math.random() * 100) + 1;
           await showResult(choice, bet, final);
         }
@@ -798,42 +1003,35 @@
 
     async function showResult(choice, bet, number) {
       const isOdd = number % 2 === 1;
-      const numClass = isOdd ? 'odd' : 'even';
-      const resultTag = isOdd ? '홀' : '짝';
+      const cls = isOdd ? 'odd' : 'even';
+      const tag = isOdd ? '홀수' : '짝수';
       const isWin = (choice === '홀' && isOdd) || (choice === '짝' && !isOdd);
       const payout = isWin ? bet : -bet;
-
       points += payout;
       updatePointsDisplay();
-
-      document.getElementById('resultArea').innerHTML = `
-        <div class="result-number ${numClass}">${number}</div>
-        <div class="result-tag ${numClass}">${resultTag}수</div>
-        <div class="result-outcome ${isWin ? 'win' : 'lose'}">${isWin ? '🎉 WIN! 맞췄습니다!' : '😢 LOSE! 틀렸습니다'}</div>
+      const area = document.getElementById('resultArea');
+      area.innerHTML = `
+        <div class="result-number ${cls}">${number}</div>
+        <div class="result-tag ${cls}">${tag}</div>
+        <div class="result-outcome ${isWin ? 'win' : 'lose'}">${isWin ? '🎉 WIN!' : '😢 LOSE'}</div>
         <div class="result-change">${isWin ? '+' : ''}${payout.toLocaleString()} P</div>
       `;
-
-      gameHistory.unshift({ number, numClass, choice, bet, isWin, payout });
+      gameHistory.unshift({ number, cls, choice, bet, isWin, payout });
       renderHistory();
       setButtons(false);
-
+      resetBet();
       await savePoints();
     }
 
     function renderHistory() {
       const list = document.getElementById('historyList');
-      if (gameHistory.length === 0) {
-        list.innerHTML = '<li class="history-empty">아직 게임 기록이 없습니다.</li>';
-        return;
-      }
+      if (!gameHistory.length) { list.innerHTML = '<div class="history-empty">기록 없음</div>'; return; }
       list.innerHTML = gameHistory.slice(0, 20).map(h => `
-        <li class="history-item ${h.isWin ? 'win-item' : 'lose-item'}">
-          <span class="h-num ${h.numClass}">${h.number}</span>
-          <span class="h-info">${h.choice} 선택 / 배팅 ${h.bet.toLocaleString()}P</span>
-          <span class="h-result ${h.isWin ? 'win' : 'lose'}">
-            ${h.isWin ? '▲' : '▼'} ${Math.abs(h.payout).toLocaleString()}P
-          </span>
-        </li>
+        <div class="h-row ${h.isWin ? 'win' : 'lose'}">
+          <span class="h-num ${h.cls}">${h.number}</span>
+          <span class="h-info">${h.choice} / ${h.bet.toLocaleString()}P</span>
+          <span class="h-result ${h.isWin ? 'win' : 'lose'}">${h.isWin ? '▲' : '▼'}${Math.abs(h.payout).toLocaleString()}</span>
+        </div>
       `).join('');
     }
   </script>
