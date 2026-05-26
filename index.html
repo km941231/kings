@@ -436,20 +436,14 @@
         <button class="tab-btn" id="tabRegister" onclick="switchTab('register')">회원가입</button>
       </div>
 
-      <!-- 회원가입 전용 필드 -->
-      <div class="field" id="fieldNickname" style="display:none">
-        <label>닉네임</label>
-        <input type="text" id="nicknameInput" placeholder="게임에서 사용할 닉네임" maxlength="12">
-      </div>
-
       <div class="field">
-        <label>이메일</label>
-        <input type="email" id="emailInput" placeholder="example@email.com">
+        <label>아이디</label>
+        <input type="text" id="usernameInput" placeholder="아이디 입력" maxlength="16" autocomplete="username">
       </div>
 
       <div class="field">
         <label>비밀번호</label>
-        <input type="password" id="passwordInput" placeholder="6자 이상" onkeydown="handleEnter(event)">
+        <input type="password" id="passwordInput" placeholder="6자 이상" onkeydown="handleEnter(event)" autocomplete="current-password">
       </div>
 
       <!-- 회원가입 전용 필드 -->
@@ -581,7 +575,7 @@
       if (snap.exists()) {
         const data = snap.data();
         points = data.points ?? 10000;
-        document.getElementById('userNickname').textContent = data.nickname;
+        document.getElementById('userNickname').textContent = data.username;
         updatePointsDisplay();
       }
     }
@@ -596,12 +590,16 @@
       setTimeout(() => { indicator.textContent = ''; }, 1500);
     }
 
+    // 아이디 → 내부 이메일로 변환 (사용자에게는 보이지 않음)
+    function toEmail(username) {
+      return username.toLowerCase() + '@kings.game';
+    }
+
     // ── 탭 전환 ──
     window.switchTab = function(tab) {
       const isRegister = tab === 'register';
       document.getElementById('tabLogin').classList.toggle('active', !isRegister);
       document.getElementById('tabRegister').classList.toggle('active', isRegister);
-      document.getElementById('fieldNickname').style.display = isRegister ? 'block' : 'none';
       document.getElementById('fieldPasswordConfirm').style.display = isRegister ? 'block' : 'none';
       document.getElementById('submitBtn').textContent = isRegister ? '회원가입' : '로그인';
       document.getElementById('authError').textContent = '';
@@ -615,32 +613,36 @@
     // ── 로그인 / 회원가입 처리 ──
     window.handleSubmit = async function() {
       const isRegister = document.getElementById('tabRegister').classList.contains('active');
-      const email = document.getElementById('emailInput').value.trim();
+      const username = document.getElementById('usernameInput').value.trim();
       const password = document.getElementById('passwordInput').value;
       const btn = document.getElementById('submitBtn');
       const errorEl = document.getElementById('authError');
 
       errorEl.textContent = '';
 
-      if (!email || !password) {
-        errorEl.textContent = '이메일과 비밀번호를 입력해주세요.';
+      if (!username || !password) {
+        errorEl.textContent = '아이디와 비밀번호를 입력해주세요.';
+        return;
+      }
+
+      if (!/^[a-zA-Z0-9가-힣_]{2,16}$/.test(username)) {
+        errorEl.textContent = '아이디는 2~16자, 한글/영문/숫자/_만 사용 가능합니다.';
         return;
       }
 
       btn.disabled = true;
       btn.textContent = '처리 중...';
 
+      const email = toEmail(username);
+
       try {
         if (isRegister) {
-          const nickname = document.getElementById('nicknameInput').value.trim();
           const confirm = document.getElementById('passwordConfirmInput').value;
-          if (!nickname) { errorEl.textContent = '닉네임을 입력해주세요.'; return; }
           if (password !== confirm) { errorEl.textContent = '비밀번호가 일치하지 않습니다.'; return; }
 
           const cred = await createUserWithEmailAndPassword(auth, email, password);
           await setDoc(doc(db, 'users', cred.user.uid), {
-            email,
-            nickname,
+            username,
             points: 10000,
             createdAt: new Date()
           });
@@ -657,12 +659,11 @@
 
     function parseAuthError(code) {
       const map = {
-        'auth/invalid-credential': '이메일 또는 비밀번호가 틀렸습니다.',
-        'auth/user-not-found': '존재하지 않는 계정입니다.',
+        'auth/invalid-credential': '아이디 또는 비밀번호가 틀렸습니다.',
+        'auth/user-not-found': '존재하지 않는 아이디입니다.',
         'auth/wrong-password': '비밀번호가 틀렸습니다.',
-        'auth/email-already-in-use': '이미 사용 중인 이메일입니다.',
+        'auth/email-already-in-use': '이미 사용 중인 아이디입니다.',
         'auth/weak-password': '비밀번호는 6자 이상이어야 합니다.',
-        'auth/invalid-email': '올바른 이메일 형식이 아닙니다.',
         'auth/too-many-requests': '잠시 후 다시 시도해주세요.'
       };
       return map[code] ?? '오류가 발생했습니다. 다시 시도해주세요.';
