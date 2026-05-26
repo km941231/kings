@@ -738,7 +738,7 @@
     }
 
     /* ─── 사다리 게임 ─── */
-    .lg-layout { display: grid; grid-template-columns: 155px 1fr 165px; gap: 10px; }
+    .lg-layout { display: grid; grid-template-columns: 155px 1fr 175px; gap: 10px; }
     .lg-panel { background: #13192e; border: 1px solid #2a2a4a; border-radius: 6px; overflow: hidden; }
     .lg-panel-title {
       background: linear-gradient(90deg, #1a2240, #16213e);
@@ -747,6 +747,7 @@
     }
     .lg-sub-title { font-size: 0.72rem; color: #888; text-align: center; padding: 5px 8px; border-bottom: 1px solid #1a2030; }
 
+    /* 픽모음 */
     .lg-pick-item { display: flex; align-items: center; gap: 6px; padding: 7px 10px; border-bottom: 1px solid #1a2030; }
     .lg-pick-num {
       background: #c0392b; color: #fff; font-size: 0.68rem; font-weight: bold;
@@ -754,62 +755,85 @@
       justify-content: center; flex-shrink: 0;
     }
     .lg-pick-info { flex: 1; color: #777; font-size: 0.7rem; line-height: 1.5; }
-    .lg-pick-badge { font-size: 0.73rem; font-weight: bold; padding: 3px 8px; border-radius: 10px; flex-shrink: 0; }
-    .lg-pick-badge.hol { background: rgba(224,85,85,0.2); color: #e05555; border: 1px solid rgba(224,85,85,0.35); }
+    .lg-pick-badges { display: flex; flex-direction: column; gap: 3px; align-items: flex-end; }
+    .lg-pick-badge { font-size: 0.68rem; font-weight: bold; padding: 2px 6px; border-radius: 8px; white-space: nowrap; }
+    .lg-pick-badge.hol  { background: rgba(224,85,85,0.2);  color: #e05555; border: 1px solid rgba(224,85,85,0.35); }
     .lg-pick-badge.jjak { background: rgba(74,158,255,0.18); color: #4a9eff; border: 1px solid rgba(74,158,255,0.35); }
+    .lg-pick-badge.left { background: rgba(200,169,81,0.15); color: #c8a951; border: 1px solid rgba(200,169,81,0.3); }
+    .lg-pick-badge.three { background: rgba(74,222,128,0.15); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
 
-    .lg-game-title { text-align: center; font-size: 0.88rem; color: #c8a951; font-weight: bold; padding: 10px; border-bottom: 1px solid #1a2030; }
-    .lg-datetime { text-align: center; font-size: 0.72rem; color: #555; padding: 4px; }
-    .lg-canvas-wrap { display: flex; justify-content: center; padding: 6px 0; background: #0d0d1a; }
+    /* 게임 중앙 */
+    .lg-game-title { text-align: center; font-size: 0.88rem; color: #c8a951; font-weight: bold; padding: 9px; border-bottom: 1px solid #1a2030; }
+    .lg-datetime { text-align: center; font-size: 0.72rem; color: #555; padding: 3px; }
+    .lg-canvas-wrap { display: flex; justify-content: center; padding: 4px 0; background: #0d0d1a; }
 
-    .lg-stats { padding: 8px 12px; }
-    .lg-stat-row { display: flex; align-items: center; gap: 5px; margin-bottom: 5px; font-size: 0.72rem; }
-    .lg-stat-lbl { color: #888; width: 26px; text-align: center; flex-shrink: 0; font-size: 0.68rem; }
-    .lg-bar-track { flex: 1; height: 13px; background: #0d0d1a; border-radius: 2px; overflow: hidden; display: flex; }
-    .lg-bar-hol { background: #e05555; height: 100%; transition: width 0.5s; }
-    .lg-bar-jjak { background: #4a9eff; height: 100%; flex: 1; }
-    .lg-pct-hol { color: #e05555; font-size: 0.7rem; width: 36px; text-align: right; flex-shrink: 0; }
-    .lg-pct-jjak { color: #4a9eff; font-size: 0.7rem; width: 36px; flex-shrink: 0; }
+    /* 확률 바 */
+    .lg-stats { padding: 7px 12px; border-top: 1px solid #1a2030; }
+    .lg-stat-row { display: flex; align-items: center; gap: 5px; margin-bottom: 4px; font-size: 0.7rem; }
+    .lg-stat-lbl { color: #888; width: 28px; text-align: center; flex-shrink: 0; font-size: 0.65rem; }
+    .lg-bar-track { flex: 1; height: 12px; background: #0d0d1a; border-radius: 2px; overflow: hidden; display: flex; }
+    .lg-bar-a { height: 100%; transition: width 0.6s; }
+    .lg-bar-b { height: 100%; flex: 1; }
+    .lg-pct-a { font-size: 0.68rem; width: 36px; text-align: right; flex-shrink: 0; }
+    .lg-pct-b { font-size: 0.68rem; width: 36px; flex-shrink: 0; }
+
+    /* 배팅 버튼 */
+    .lg-bet-section { padding: 8px 12px 4px; border-top: 1px solid #2a2a4a; }
+    .lg-bet-label { font-size: 0.65rem; color: #666; margin-bottom: 5px; letter-spacing: 1px; }
+    .lg-bet-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px; }
+    .lg-bet-btn {
+      padding: 8px 4px; border: 2px solid transparent; border-radius: 4px;
+      font-size: 0.85rem; font-weight: bold; cursor: pointer; transition: all 0.18s; letter-spacing: 1px; background: transparent;
+    }
+    .lg-bet-btn.type-left  { border-color: #c8a951; color: #c8a951; }
+    .lg-bet-btn.type-right { border-color: #a0a0a0; color: #a0a0a0; }
+    .lg-bet-btn.type-three { border-color: #4ade80; color: #4ade80; }
+    .lg-bet-btn.type-four  { border-color: #f59e0b; color: #f59e0b; }
+    .lg-bet-btn.type-hol   { border-color: #e05555; color: #e05555; }
+    .lg-bet-btn.type-jjak  { border-color: #4a9eff; color: #4a9eff; }
+    .lg-bet-btn:hover { filter: brightness(1.25); }
+    .lg-bet-btn.selected { filter: brightness(1.3); }
+    .lg-bet-btn.selected.type-left  { background: rgba(200,169,81,0.25); }
+    .lg-bet-btn.selected.type-right { background: rgba(160,160,160,0.2); }
+    .lg-bet-btn.selected.type-three { background: rgba(74,222,128,0.2); }
+    .lg-bet-btn.selected.type-four  { background: rgba(245,158,11,0.2); }
+    .lg-bet-btn.selected.type-hol   { background: rgba(224,85,85,0.25); }
+    .lg-bet-btn.selected.type-jjak  { background: rgba(74,158,255,0.22); }
+    .lg-bet-btn:disabled { opacity: 0.28; cursor: not-allowed; filter: none; }
+    .lg-bet-status { text-align: center; padding: 3px; font-size: 0.7rem; color: #555; }
 
     .lg-countdown {
       text-align: center; background: linear-gradient(90deg, #0d0d1a, #13192e, #0d0d1a);
-      padding: 8px; font-size: 0.82rem; color: #c8a951; font-weight: bold;
+      padding: 7px; font-size: 0.82rem; color: #c8a951; font-weight: bold;
       letter-spacing: 1px; border-top: 1px solid #2a2a4a;
     }
 
-    .lg-bet-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 10px 12px; border-top: 1px solid #2a2a4a; }
-    .lg-bet-btn {
-      padding: 9px 6px; border: 2px solid transparent; border-radius: 4px;
-      font-size: 0.88rem; font-weight: bold; cursor: pointer; transition: all 0.2s; letter-spacing: 2px;
-    }
-    .lg-bet-btn.hol { background: rgba(224,85,85,0.12); border-color: #e05555; color: #e05555; }
-    .lg-bet-btn.jjak { background: rgba(74,158,255,0.12); border-color: #4a9eff; color: #4a9eff; }
-    .lg-bet-btn:hover { filter: brightness(1.2); }
-    .lg-bet-btn.selected.hol { background: rgba(224,85,85,0.3); }
-    .lg-bet-btn.selected.jjak { background: rgba(74,158,255,0.3); }
-    .lg-bet-btn:disabled { opacity: 0.3; cursor: not-allowed; filter: none; }
-    .lg-bet-status { text-align: center; padding: 4px; font-size: 0.7rem; color: #555; border-top: 1px solid #1a2030; }
-
+    /* 결과 목록 */
     .lg-result-header {
-      display: grid; grid-template-columns: 1fr 70px;
-      padding: 6px 12px; font-size: 0.7rem; color: #888;
-      border-bottom: 1px solid #2a2a4a; background: #0d0d1a;
+      display: grid; grid-template-columns: 1fr 50px 50px 40px;
+      padding: 5px 10px; font-size: 0.65rem; color: #888;
+      border-bottom: 1px solid #2a2a4a; background: #0d0d1a; text-align: center;
     }
+    .lg-result-header span:first-child { text-align: left; }
     .lg-result-item {
-      display: grid; grid-template-columns: 1fr 70px;
-      padding: 6px 12px; font-size: 0.75rem;
+      display: grid; grid-template-columns: 1fr 50px 50px 40px;
+      padding: 5px 10px; font-size: 0.72rem;
       border-bottom: 1px solid #1a2030; align-items: center;
     }
     .lg-result-item:last-child { border-bottom: none; }
-    .lg-result-round { color: #777; font-size: 0.72rem; }
-    .lg-result-badge {
+    .lg-result-round { color: #666; font-size: 0.68rem; }
+    .lg-badge {
       display: inline-flex; align-items: center; justify-content: center;
-      width: 32px; height: 22px; border-radius: 11px; font-size: 0.72rem; font-weight: bold;
+      height: 20px; border-radius: 10px; font-size: 0.68rem; font-weight: bold; width: 36px;
     }
-    .lg-result-badge.hol { background: #e05555; color: #fff; }
-    .lg-result-badge.jjak { background: #4a9eff; color: #fff; }
-    .lg-result-badge.wait { background: #2a2a4a; color: #555; font-size: 0.62rem; }
-    .lg-result-list { max-height: 420px; overflow-y: auto; }
+    .lg-badge.hol   { background: #e05555; color: #fff; }
+    .lg-badge.jjak  { background: #4a9eff; color: #fff; }
+    .lg-badge.left  { background: #c8a951; color: #000; }
+    .lg-badge.right { background: #555; color: #ccc; }
+    .lg-badge.three { background: #4ade80; color: #000; }
+    .lg-badge.four  { background: #f59e0b; color: #000; }
+    .lg-badge.wait  { background: #2a2a4a; color: #555; font-size: 0.6rem; width: auto; padding: 0 6px; }
+    .lg-result-list { max-height: 430px; overflow-y: auto; }
     .lg-result-list::-webkit-scrollbar { width: 3px; }
     .lg-result-list::-webkit-scrollbar-thumb { background: #c8a951; }
   </style>
@@ -970,7 +994,7 @@
             <!-- 왼쪽: 픽모음 -->
             <div class="lg-panel">
               <div class="lg-panel-title">픽모음</div>
-              <div class="lg-sub-title">인기픽 모음</div>
+              <div class="lg-sub-title">최근 회차 결과</div>
               <div id="lgPickList"></div>
             </div>
 
@@ -979,31 +1003,69 @@
               <div class="lg-game-title">스피드 사다리</div>
               <div class="lg-datetime" id="lgDatetime">—</div>
               <div class="lg-canvas-wrap">
-                <canvas id="lgCanvas" width="260" height="310"></canvas>
+                <canvas id="lgCanvas" width="280" height="320"></canvas>
               </div>
+
+              <!-- 확률 바 3개 -->
               <div class="lg-stats">
                 <div class="lg-stat-row">
-                  <span class="lg-pct-hol" id="lgPctHolL">—</span>
+                  <span class="lg-pct-a" id="lgPctLeft" style="color:#c8a951">—</span>
                   <div class="lg-bar-track">
-                    <div class="lg-bar-hol" id="lgBarHol" style="width:50%"></div>
-                    <div class="lg-bar-jjak"></div>
+                    <div class="lg-bar-a" id="lgBarLeft" style="width:50%;background:#c8a951"></div>
+                    <div class="lg-bar-b" style="background:#555"></div>
+                  </div>
+                  <span class="lg-stat-lbl">좌우</span>
+                  <span class="lg-pct-b" id="lgPctRight" style="color:#888">—</span>
+                </div>
+                <div class="lg-stat-row">
+                  <span class="lg-pct-a" id="lgPctThree" style="color:#4ade80">—</span>
+                  <div class="lg-bar-track">
+                    <div class="lg-bar-a" id="lgBarThree" style="width:50%;background:#4ade80"></div>
+                    <div class="lg-bar-b" style="background:#f59e0b"></div>
+                  </div>
+                  <span class="lg-stat-lbl">줄수</span>
+                  <span class="lg-pct-b" id="lgPctFour" style="color:#f59e0b">—</span>
+                </div>
+                <div class="lg-stat-row">
+                  <span class="lg-pct-a" id="lgPctHol" style="color:#e05555">—</span>
+                  <div class="lg-bar-track">
+                    <div class="lg-bar-a" id="lgBarHol" style="width:50%;background:#e05555"></div>
+                    <div class="lg-bar-b" style="background:#4a9eff"></div>
                   </div>
                   <span class="lg-stat-lbl">홀짝</span>
-                  <span class="lg-pct-jjak" id="lgPctJjakR">—</span>
+                  <span class="lg-pct-b" id="lgPctJjak" style="color:#4a9eff">—</span>
                 </div>
               </div>
-              <div class="lg-bet-row">
-                <button class="lg-bet-btn hol" id="lgBtnHol" onclick="selectLGBet('홀')">홀</button>
-                <button class="lg-bet-btn jjak" id="lgBtnJjak" onclick="selectLGBet('짝')">짝</button>
+
+              <!-- 배팅 버튼 3쌍 -->
+              <div class="lg-bet-section">
+                <div class="lg-bet-label">좌 / 우</div>
+                <div class="lg-bet-row">
+                  <button class="lg-bet-btn type-left"  id="lgBtnLeft"  onclick="selectLGBet('side','좌')">좌</button>
+                  <button class="lg-bet-btn type-right" id="lgBtnRight" onclick="selectLGBet('side','우')">우</button>
+                </div>
+                <div class="lg-bet-label">3줄 / 4줄</div>
+                <div class="lg-bet-row">
+                  <button class="lg-bet-btn type-three" id="lgBtn3"     onclick="selectLGBet('line','3줄')">3줄</button>
+                  <button class="lg-bet-btn type-four"  id="lgBtn4"     onclick="selectLGBet('line','4줄')">4줄</button>
+                </div>
+                <div class="lg-bet-label">홀 / 짝</div>
+                <div class="lg-bet-row">
+                  <button class="lg-bet-btn type-hol"  id="lgBtnHol"  onclick="selectLGBet('hj','홀')">홀</button>
+                  <button class="lg-bet-btn type-jjak" id="lgBtnJjak" onclick="selectLGBet('hj','짝')">짝</button>
+                </div>
+                <div class="lg-bet-status" id="lgBetStatus">배팅을 선택하고 금액을 입력하세요</div>
               </div>
-              <div class="lg-bet-status" id="lgBetStatus">배팅을 선택하세요</div>
+
               <div class="lg-countdown" id="lgCountdown">—</div>
             </div>
 
             <!-- 오른쪽: 회차별 결과 -->
             <div class="lg-panel">
               <div class="lg-panel-title">회차별 결과</div>
-              <div class="lg-result-header"><span>회차</span><span>결과</span></div>
+              <div class="lg-result-header">
+                <span>회차</span><span>좌/우</span><span>줄수</span><span>결과</span>
+              </div>
               <div class="lg-result-list" id="lgResultList"></div>
             </div>
 
@@ -1260,11 +1322,9 @@
     window.selectGame = function(game) {
       document.getElementById('panelSelect').style.display  = game === ''       ? '' : 'none';
       document.getElementById('panelLadder').style.display  = game === 'ladder' ? '' : 'none';
-
       document.querySelectorAll('.sidebar-menu-item').forEach(el => el.classList.remove('active'));
       if (game === '')       document.getElementById('menuHolJjak').classList.add('active');
       if (game === 'ladder') document.getElementById('menuLadder').classList.add('active');
-
       if (game === 'ladder') initLadderGame();
     };
 
@@ -1273,14 +1333,15 @@
     // ═══════════════════════════════════════
     const LG = {
       ctx: null, animFrame: null, timer: null,
-      round: 0, betChoice: null, isAnimating: false,
-      pendingAnimate: false
+      round: 0, isAnimating: false,
+      bet: { side: null, line: null, hj: null }  // 3가지 독립 배팅
     };
 
+    // 시드 기반 랜덤 (동일 라운드 → 동일 결과)
     function lgHash(n) {
-      let h = n ^ 0xdeadbeef;
-      h = Math.imul(h ^ (h >>> 16), 0x45d9f3b);
-      h = Math.imul(h ^ (h >>> 15), 0xc2b2ae35);
+      let h = (n ^ 0xdeadbeef) >>> 0;
+      h = Math.imul(h ^ (h >>> 16), 0x45d9f3b) >>> 0;
+      h = Math.imul(h ^ (h >>> 15), 0xc2b2ae35) >>> 0;
       return ((h ^ (h >>> 16)) >>> 0) / 0xffffffff;
     }
 
@@ -1289,150 +1350,183 @@
       return d.getHours() * 60 + d.getMinutes() + 1;
     }
 
+    // 라운드 결과 계산
+    // - 좌/우: 캐릭터 출발 위치
+    // - 3줄/4줄: 가로줄 개수 (4개 위치 중 3개 또는 전부)
+    // - 홀/짝: 가로줄 수 홀짝성 * 출발 위치로 결정
     function getLGResult(round) {
-      const bars = Array.from({ length: 5 }, (_, i) => lgHash(round * 1000 + i * 137 + 7) > 0.5);
-      const startLeft = lgHash(round * 777 + 99) > 0.5;
+      const startLeft = lgHash(round * 777 + 99) > 0.5;      // 좌(true)/우(false)
+      const isThree   = lgHash(round * 333 + 55) > 0.5;      // 3줄(true)/4줄(false)
+      const numBars   = isThree ? 3 : 4;
+
+      // 4개 위치 중 활성 막대 결정
+      const bars = [true, true, true, true];
+      if (isThree) {
+        // 빠진 위치는 시드로 결정
+        bars[Math.floor(lgHash(round * 555 + 33) * 4)] = false;
+      }
+
+      // 경로 추적: 홀수 교차 → 반대편, 짝수 교차 → 같은 편
       let posLeft = startLeft;
       bars.forEach(b => { if (b) posLeft = !posLeft; });
-      return { bars, startLeft, result: posLeft ? '홀' : '짝' };
+
+      return {
+        startLeft, numBars, bars,
+        endsLeft: posLeft,
+        side:   startLeft ? '좌' : '우',
+        line:   numBars + '줄',
+        result: posLeft ? '홀' : '짝'
+      };
     }
 
-    function lgStats(beforeRound, n = 50) {
-      let hol = 0;
-      for (let i = 1; i <= n; i++) hol += getLGResult(beforeRound - i).result === '홀' ? 1 : 0;
-      return { holPct: (hol / n * 100).toFixed(2), jjakPct: ((n - hol) / n * 100).toFixed(2) };
-    }
+    // ── 캔버스 그리기 ──
+    const LGC = { W:280, H:320, LX:78, RX:202, ROWS:[82,122,162,202], TOP:30, BOT:272 };
 
-    function lgDraw(bars, startLeft, charX, charY) {
+    function lgDraw(data, charX, charY) {
       const c = LG.ctx;
-      const W = 260, H = 310;
-      const LX = 72, RX = 188;
-      const ROWS = [75, 113, 151, 189, 227];
-      const TOP = 28, BOT = 268;
+      const { W, H, LX, RX, ROWS, TOP, BOT } = LGC;
+      const { bars, startLeft } = data;
 
       c.clearRect(0, 0, W, H);
-      c.fillStyle = '#0d0d1a';
-      c.fillRect(0, 0, W, H);
+      c.fillStyle = '#0d0d1a'; c.fillRect(0, 0, W, H);
 
-      // poles
+      // 수직 기둥
       c.strokeStyle = '#4a5568'; c.lineWidth = 5;
-      [[LX],[RX]].forEach(([x]) => {
+      [LX, RX].forEach(x => {
         c.beginPath(); c.moveTo(x, TOP); c.lineTo(x, BOT); c.stroke();
       });
 
-      // rungs
-      c.strokeStyle = '#c8a951'; c.lineWidth = 3;
+      // 가로줄 (막대)
       bars.forEach((b, i) => {
         if (!b) return;
+        c.strokeStyle = '#c8a951'; c.lineWidth = 3;
         c.beginPath(); c.moveTo(LX, ROWS[i]); c.lineTo(RX, ROWS[i]); c.stroke();
       });
 
-      // X circles at top
-      [LX, RX].forEach((x, idx) => {
-        const active = idx === 0 ? startLeft : !startLeft;
-        c.fillStyle = active ? '#555' : '#2a2a4a';
-        c.beginPath(); c.arc(x, TOP - 14, 13, 0, Math.PI * 2); c.fill();
-        c.strokeStyle = active ? '#888' : '#444'; c.lineWidth = 1.5;
-        c.stroke();
-        c.strokeStyle = active ? '#ccc' : '#555'; c.lineWidth = 2;
+      // X 원 (출발 위치 표시)
+      [{ x: LX, isStart: startLeft }, { x: RX, isStart: !startLeft }].forEach(({ x, isStart }) => {
+        c.fillStyle = isStart ? '#6b7280' : '#1f2937';
+        c.beginPath(); c.arc(x, TOP - 15, 13, 0, Math.PI * 2); c.fill();
+        c.strokeStyle = isStart ? '#9ca3af' : '#374151'; c.lineWidth = 1.5; c.stroke();
+        c.strokeStyle = isStart ? '#e5e7eb' : '#4b5563'; c.lineWidth = 2;
         c.beginPath();
-        c.moveTo(x - 5, TOP - 19); c.lineTo(x + 5, TOP - 9);
-        c.moveTo(x + 5, TOP - 19); c.lineTo(x - 5, TOP - 9);
+        c.moveTo(x-5, TOP-20); c.lineTo(x+5, TOP-10);
+        c.moveTo(x+5, TOP-20); c.lineTo(x-5, TOP-10);
         c.stroke();
       });
 
-      // 홀/짝 at bottom
-      [[LX, '홀', '#e05555'], [RX, '짝', '#4a9eff']].forEach(([x, lbl, col]) => {
+      // 출발 라벨 (좌/우)
+      c.font = 'bold 10px Malgun Gothic, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle';
+      c.fillStyle = startLeft ? '#c8a951' : '#888';
+      c.fillText('좌', LX, TOP - 33);
+      c.fillStyle = !startLeft ? '#c8a951' : '#888';
+      c.fillText('우', RX, TOP - 33);
+
+      // 홀/짝 원 (하단)
+      [[LX,'홀','#e05555'], [RX,'짝','#4a9eff']].forEach(([x, lbl, col]) => {
         c.fillStyle = col;
-        c.beginPath(); c.arc(x, BOT + 18, 16, 0, Math.PI * 2); c.fill();
-        c.fillStyle = '#fff'; c.font = 'bold 12px Malgun Gothic, sans-serif';
+        c.beginPath(); c.arc(x, BOT + 18, 17, 0, Math.PI * 2); c.fill();
+        c.fillStyle = '#fff'; c.font = 'bold 13px Malgun Gothic, sans-serif';
         c.textAlign = 'center'; c.textBaseline = 'middle';
         c.fillText(lbl, x, BOT + 18);
       });
 
-      // character
+      // 줄수 표시
+      c.fillStyle = '#888'; c.font = '11px Malgun Gothic, sans-serif';
+      c.textAlign = 'center';
+      c.fillText(`${bars.filter(Boolean).length}줄`, W/2, ROWS[1]);
+
+      // 캐릭터
       if (charX !== null) {
         c.fillStyle = '#c8a951';
         c.beginPath(); c.arc(charX, charY, 11, 0, Math.PI * 2); c.fill();
-        c.fillStyle = '#0d0d1a'; c.font = 'bold 11px sans-serif';
+        c.fillStyle = '#000'; c.font = 'bold 11px sans-serif';
         c.textAlign = 'center'; c.textBaseline = 'middle';
         c.fillText('▼', charX, charY);
       }
     }
 
+    // ── 애니메이션 ──
     function lgAnimate(round, onDone) {
       if (LG.animFrame) cancelAnimationFrame(LG.animFrame);
       LG.isAnimating = true;
-      const { bars, startLeft } = getLGResult(round);
-      const LX = 72, RX = 188;
-      const ROWS = [75, 113, 151, 189, 227];
-      const TOP = 28, BOT = 268;
+      const data = getLGResult(round);
+      const { bars, startLeft } = data;
+      const { LX, RX, ROWS, TOP, BOT } = LGC;
 
+      // 경로 계산
       const path = [];
       let cx = startLeft ? LX : RX;
-      path.push({ x: cx, y: TOP - 14 });
+      path.push({ x: cx, y: TOP - 15 });
       ROWS.forEach((ry, i) => {
         path.push({ x: cx, y: ry });
         if (bars[i]) { cx = cx === LX ? RX : LX; path.push({ x: cx, y: ry }); }
       });
       path.push({ x: cx, y: BOT });
 
-      const totalDist = path.reduce((acc, pt, i) => {
-        if (i === 0) return 0;
-        return acc + Math.hypot(pt.x - path[i-1].x, pt.y - path[i-1].y);
-      }, 0);
-      const speed = totalDist / 2800; // px per ms
+      const totalDist = path.reduce((s, p, i) =>
+        i === 0 ? 0 : s + Math.hypot(p.x - path[i-1].x, p.y - path[i-1].y), 0);
+      const speed = totalDist / 2600;
 
       let seg = 0, t = 0, last = null;
-
       function frame(ts) {
         if (!last) last = ts;
-        const dt = Math.min(ts - last, 50);
-        last = ts;
-
+        const dt = Math.min(ts - last, 50); last = ts;
         if (seg >= path.length - 1) {
-          lgDraw(bars, startLeft, path[path.length-1].x, path[path.length-1].y);
+          lgDraw(data, path[path.length-1].x, path[path.length-1].y);
           LG.isAnimating = false;
           if (onDone) onDone();
           return;
         }
-
-        const from = path[seg], to = path[seg+1];
-        const segDist = Math.hypot(to.x - from.x, to.y - from.y) || 1;
-        t += (speed * dt) / segDist;
+        const fr = path[seg], to = path[seg+1];
+        const sd = Math.hypot(to.x - fr.x, to.y - fr.y) || 1;
+        t += speed * dt / sd;
         if (t >= 1) { t = 0; seg++; }
-
-        const px = from.x + (to.x - from.x) * t;
-        const py = from.y + (to.y - from.y) * t;
-        lgDraw(bars, startLeft, px, py);
+        lgDraw(data, fr.x + (to.x-fr.x)*t, fr.y + (to.y-fr.y)*t);
         LG.animFrame = requestAnimationFrame(frame);
       }
       LG.animFrame = requestAnimationFrame(frame);
     }
 
+    // ── 통계 계산 ──
+    function lgCalcStats(cur, n = 60) {
+      let left=0, three=0, hol=0;
+      for (let i=1; i<=n; i++) {
+        const d = getLGResult(cur - i);
+        if (d.startLeft) left++;
+        if (d.numBars === 3) three++;
+        if (d.result === '홀') hol++;
+      }
+      const p = (v) => (v/n*100).toFixed(1);
+      return {
+        leftPct: p(left), rightPct: p(n-left),
+        threePct: p(three), fourPct: p(n-three),
+        holPct: p(hol), jjakPct: p(n-hol)
+      };
+    }
+
+    // ── UI 렌더 ──
     function lgNow() {
-      const d = new Date();
-      const p = n => String(n).padStart(2,'0');
+      const d = new Date(), p = n => String(n).padStart(2,'0');
       return `${d.getFullYear()}.${p(d.getMonth()+1)}.${p(d.getDate())} - ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
     }
 
     function renderLGPickList() {
       const cur = getLGRound();
+      const mo = new Date().getMonth()+1, dy = new Date().getDate();
       let html = '';
-      for (let i = 1; i <= 5; i++) {
+      for (let i = 1; i <= 7; i++) {
         const r = cur - i;
-        const { result } = getLGResult(r);
-        const stats = lgStats(r, 30);
-        const pct = result === '홀' ? stats.holPct : stats.jjakPct;
-        html += `
-          <div class="lg-pick-item">
-            <div class="lg-pick-num">${i}</div>
-            <div class="lg-pick-info">
-              ${new Date().getMonth()+1}월 ${new Date().getDate()}일: ${r}회차<br>
-              확률 ${pct}%
-            </div>
-            <span class="lg-pick-badge ${result === '홀' ? 'hol' : 'jjak'}">${result}</span>
-          </div>`;
+        const d = getLGResult(r);
+        html += `<div class="lg-pick-item">
+          <div class="lg-pick-num">${i}</div>
+          <div class="lg-pick-info">${mo}월 ${dy}일<br>${r}회차</div>
+          <div class="lg-pick-badges">
+            <span class="lg-pick-badge ${d.startLeft ? 'left' : ''}" style="${!d.startLeft ? 'background:rgba(160,160,160,0.15);color:#999;border:1px solid rgba(160,160,160,0.3)' : ''}">${d.side}</span>
+            <span class="lg-pick-badge three" style="${d.numBars===4 ? 'background:rgba(245,158,11,0.15);color:#f59e0b;border:1px solid rgba(245,158,11,0.3)' : ''}">${d.line}</span>
+            <span class="lg-pick-badge ${d.result==='홀'?'hol':'jjak'}">${d.result}</span>
+          </div>
+        </div>`;
       }
       const el = document.getElementById('lgPickList');
       if (el) el.innerHTML = html;
@@ -1442,15 +1536,21 @@
       const cur = getLGRound();
       const mo = new Date().getMonth()+1, dy = new Date().getDate();
       let html = `<div class="lg-result-item">
-        <span class="lg-result-round">${mo}월 ${dy}일 - ${cur+1}</span>
-        <span class="lg-result-badge wait">대기 중</span>
+        <span class="lg-result-round">${mo}.${dy} - ${cur}</span>
+        <span class="lg-badge wait" style="width:auto;padding:0 4px">대기</span>
+        <span></span><span></span>
       </div>`;
-      for (let i = 0; i < 14; i++) {
+      for (let i = 1; i <= 16; i++) {
         const r = cur - i;
-        const { result } = getLGResult(r);
+        const d = getLGResult(r);
+        const sideCls = d.startLeft ? 'left' : 'right';
+        const lineCls = d.numBars === 3 ? 'three' : 'four';
+        const hjCls   = d.result === '홀' ? 'hol' : 'jjak';
         html += `<div class="lg-result-item">
-          <span class="lg-result-round">${mo}월 ${dy}일 - ${r}</span>
-          <span class="lg-result-badge ${result === '홀' ? 'hol' : 'jjak'}">${result}</span>
+          <span class="lg-result-round">${mo}.${dy} - ${r}</span>
+          <span class="lg-badge ${sideCls}">${d.side}</span>
+          <span class="lg-badge ${lineCls}">${d.line}</span>
+          <span class="lg-badge ${hjCls}">${d.result}</span>
         </div>`;
       }
       const el = document.getElementById('lgResultList');
@@ -1458,96 +1558,124 @@
     }
 
     function updateLGStats() {
-      const cur = getLGRound();
-      const { holPct, jjakPct } = lgStats(cur, 50);
-      const hEl = document.getElementById('lgPctHolL');
-      const jEl = document.getElementById('lgPctJjakR');
-      const bEl = document.getElementById('lgBarHol');
-      if (hEl) hEl.textContent = holPct + '%';
-      if (jEl) jEl.textContent = jjakPct + '%';
-      if (bEl) bEl.style.width = holPct + '%';
+      const s = lgCalcStats(getLGRound());
+      const set = (id, val) => { const e = document.getElementById(id); if (e) e.textContent = val + '%'; };
+      const setW = (id, val) => { const e = document.getElementById(id); if (e) e.style.width = val + '%'; };
+      set('lgPctLeft', s.leftPct);  set('lgPctRight', s.rightPct);
+      set('lgPctThree', s.threePct); set('lgPctFour', s.fourPct);
+      set('lgPctHol', s.holPct);   set('lgPctJjak', s.jjakPct);
+      setW('lgBarLeft', s.leftPct); setW('lgBarThree', s.threePct); setW('lgBarHol', s.holPct);
     }
 
-    function updateLGBetLock(locked) {
-      const h = document.getElementById('lgBtnHol');
-      const j = document.getElementById('lgBtnJjak');
+    function lgSetBetLock(locked) {
+      ['lgBtnLeft','lgBtnRight','lgBtn3','lgBtn4','lgBtnHol','lgBtnJjak'].forEach(id => {
+        const e = document.getElementById(id);
+        if (e) e.disabled = locked || LG.isAnimating;
+      });
       const s = document.getElementById('lgBetStatus');
-      if (!h) return;
-      h.disabled = locked || LG.isAnimating;
-      j.disabled = locked || LG.isAnimating;
-      if (s) s.textContent = locked ? '⛔ 배팅 마감' : (LG.betChoice ? `선택: ${LG.betChoice}` : '배팅을 선택하세요');
+      if (!s) return;
+      if (locked) { s.textContent = '⛔ 배팅 마감'; s.style.color = '#e05555'; return; }
+      s.style.color = '#555';
+      const picks = [LG.bet.side, LG.bet.line, LG.bet.hj].filter(Boolean);
+      s.textContent = picks.length ? `선택: ${picks.join(' · ')}` : '배팅을 선택하고 금액을 입력하세요';
     }
 
+    // ── 초기화 ──
     function initLadderGame() {
       if (LG.timer) clearInterval(LG.timer);
-      const canvas = document.getElementById('lgCanvas');
-      LG.ctx = canvas.getContext('2d');
+      if (LG.animFrame) cancelAnimationFrame(LG.animFrame);
+      LG.ctx = document.getElementById('lgCanvas').getContext('2d');
       LG.round = getLGRound();
+      LG.bet = { side: null, line: null, hj: null };
+      LG.isAnimating = false;
 
       renderLGPickList();
       renderLGResultList();
       updateLGStats();
-
-      const initData = getLGResult(LG.round);
-      lgDraw(initData.bars, initData.startLeft, null, null);
+      lgDraw(getLGResult(LG.round), null, null);
 
       LG.timer = setInterval(() => {
         const newRound = getLGRound();
         const secs = 60 - new Date().getSeconds();
-
         const dtEl = document.getElementById('lgDatetime');
         if (dtEl) dtEl.textContent = lgNow();
-
         const cdEl = document.getElementById('lgCountdown');
         if (cdEl) {
           const mm = String(Math.floor((secs-1)/60)).padStart(2,'0');
           const ss = String((secs-1)%60).padStart(2,'0');
           cdEl.textContent = `${mm}:${ss} 후 ${newRound}회차 추첨 시작`;
         }
-
-        updateLGBetLock(secs <= 8);
+        lgSetBetLock(secs <= 8);
 
         if (newRound !== LG.round && !LG.isAnimating) {
-          const prevRound = LG.round;
+          const prev = LG.round;
           LG.round = newRound;
 
-          lgAnimate(prevRound, () => {
-            const { result } = getLGResult(prevRound);
-            if (LG.betChoice) {
-              const won = LG.betChoice === result;
-              const bet = getBet();
-              if (bet > 0 && bet <= points) {
-                const payout = won ? Math.floor(bet * 1.95) : -bet;
-                points += payout;
-                gameHistory.unshift({ number: result, cls: result === '홀' ? 'odd' : 'even', choice: LG.betChoice, bet, payout: won ? payout : bet, isWin: won });
-                updatePointsDisplay();
-                savePoints();
-                renderHistory();
+          lgAnimate(prev, () => {
+            const d = getLGResult(prev);
+            const bet = getBet();
+            if (bet > 0 && bet <= points) {
+              // 각 카테고리별 독립 정산
+              let totalPayout = 0;
+              let anyBet = false;
+              if (LG.bet.side) {
+                anyBet = true;
+                totalPayout += LG.bet.side === d.side ? Math.floor(bet * 0.95) : -bet;
               }
-              LG.betChoice = null;
-              document.getElementById('lgBtnHol').classList.remove('selected');
-              document.getElementById('lgBtnJjak').classList.remove('selected');
+              if (LG.bet.line) {
+                anyBet = true;
+                totalPayout += LG.bet.line === d.line ? Math.floor(bet * 0.95) : -bet;
+              }
+              if (LG.bet.hj) {
+                anyBet = true;
+                totalPayout += LG.bet.hj === d.result ? Math.floor(bet * 0.95) : -bet;
+              }
+              if (anyBet) {
+                points += totalPayout;
+                const won = totalPayout > 0;
+                gameHistory.unshift({
+                  number: d.result, cls: d.result === '홀' ? 'odd' : 'even',
+                  choice: [LG.bet.side, LG.bet.line, LG.bet.hj].filter(Boolean).join('/'),
+                  bet: bet * [LG.bet.side, LG.bet.line, LG.bet.hj].filter(Boolean).length,
+                  payout: Math.abs(totalPayout), isWin: won
+                });
+                updatePointsDisplay(); savePoints(); renderHistory();
+              }
             }
+            // 배팅 초기화
+            LG.bet = { side: null, line: null, hj: null };
+            ['lgBtnLeft','lgBtnRight','lgBtn3','lgBtn4','lgBtnHol','lgBtnJjak']
+              .forEach(id => { const e = document.getElementById(id); if (e) e.classList.remove('selected'); });
+            resetBet();
 
             setTimeout(() => {
-              const d = getLGResult(LG.round);
-              lgDraw(d.bars, d.startLeft, null, null);
-              renderLGResultList();
-              renderLGPickList();
-              updateLGStats();
+              lgDraw(getLGResult(LG.round), null, null);
+              renderLGResultList(); renderLGPickList(); updateLGStats();
             }, 1800);
           });
         }
       }, 1000);
     }
 
-    window.selectLGBet = function(choice) {
-      if (document.getElementById('lgBtnHol').disabled) return;
-      LG.betChoice = choice;
-      document.getElementById('lgBtnHol').classList.toggle('selected', choice === '홀');
-      document.getElementById('lgBtnJjak').classList.toggle('selected', choice === '짝');
-      const s = document.getElementById('lgBetStatus');
-      if (s) s.textContent = `선택: ${choice}`;
+    // ── 배팅 선택 ──
+    window.selectLGBet = function(category, value) {
+      if (document.getElementById('lgBtnHol')?.disabled) return;
+      LG.bet[category] = LG.bet[category] === value ? null : value; // 토글
+
+      // 버튼 selected 상태 업데이트
+      const map = {
+        side: { left: 'lgBtnLeft', right: 'lgBtnRight', '좌': 'lgBtnLeft', '우': 'lgBtnRight' },
+        line: { '3줄': 'lgBtn3', '4줄': 'lgBtn4' },
+        hj:   { '홀': 'lgBtnHol', '짝': 'lgBtnJjak' }
+      };
+      // 같은 카테고리 버튼 2개 중 선택된 것만 selected
+      const pairs = { side: ['lgBtnLeft','lgBtnRight'], line: ['lgBtn3','lgBtn4'], hj: ['lgBtnHol','lgBtnJjak'] };
+      pairs[category].forEach(id => document.getElementById(id)?.classList.remove('selected'));
+      if (LG.bet[category]) {
+        const selId = Object.entries(map[category]).find(([k]) => k === value)?.[1];
+        if (selId) document.getElementById(selId)?.classList.add('selected');
+      }
+      lgSetBetLock(false);
     };
 
     function renderHistory() {
