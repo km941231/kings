@@ -996,13 +996,14 @@
           points = data.points ?? 10000;
           document.getElementById('userNickname').textContent = data.nickname || data.username || '유저';
         } else {
-          // Firestore 문서가 없는 경우 (가입 오류 등)
           const uname = auth.currentUser?.email?.split('@')[0] || '유저';
           currentUserData = { username: uname, nickname: uname, phone: '—', referral: '—', points: 10000 };
           points = 10000;
           document.getElementById('userNickname').textContent = uname;
           await setDoc(doc(db, 'users', uid), currentUserData);
         }
+        // 내정보 페이지에서 사용할 수 있도록 저장
+        sessionStorage.setItem('userData', JSON.stringify({ ...currentUserData, points }));
         updatePointsDisplay();
       } catch(e) {
         console.error('Firestore 오류:', e);

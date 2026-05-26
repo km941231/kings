@@ -282,25 +282,37 @@
     onAuthStateChanged(auth, async (user) => {
       document.getElementById('loadingScreen').style.display = 'none';
       if (!user) {
-        window.location.href = '/';
+        window.location.href = 'index.html';
         return;
       }
       document.getElementById('mainScreen').style.display = 'flex';
 
+      // sessionStorage에서 먼저 빠르게 표시
+      const cached = sessionStorage.getItem('userData');
+      if (cached) {
+        fillInfo(JSON.parse(cached));
+      }
+
+      // Firestore에서 최신 데이터 읽기
       try {
         const snap = await getDoc(doc(db, 'users', user.uid));
         if (snap.exists()) {
           const d = snap.data();
-          document.getElementById('infoUsername').textContent = d.username  || '—';
-          document.getElementById('infoNickname').textContent = d.nickname  || '—';
-          document.getElementById('infoPhone').textContent    = d.phone     || '—';
-          document.getElementById('infoReferral').textContent = d.referral  || '없음';
-          document.getElementById('infoPoints').textContent   = (d.points ?? 0).toLocaleString() + ' P';
+          fillInfo(d);
+          sessionStorage.setItem('userData', JSON.stringify(d));
         }
       } catch(e) {
-        console.error(e);
+        console.error('Firestore 오류:', e);
       }
     });
+
+    function fillInfo(d) {
+      document.getElementById('infoUsername').textContent  = d.username  || '—';
+      document.getElementById('infoNickname').textContent  = d.nickname  || '—';
+      document.getElementById('infoPhone').textContent     = d.phone     || '—';
+      document.getElementById('infoReferral').textContent  = d.referral  || '없음';
+      document.getElementById('infoPoints').textContent    = ((d.points ?? 0)).toLocaleString() + ' P';
+    }
 
     window.changePassword = async function() {
       const currentPw  = document.getElementById('currentPw').value;
