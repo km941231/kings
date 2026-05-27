@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KINGS - 홀짝</title>
+  <title>KINGS</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -884,7 +884,7 @@
     <div class="login-wrap">
       <div class="login-logo-area">
         <h1>♠ KINGS</h1>
-        <p>홀짝 게임 — 로그인하고 시작하세요</p>
+        <p>로그인하고 시작하세요</p>
       </div>
 
       <div class="login-card">
@@ -979,8 +979,7 @@
 
     <!-- 서브 네비 -->
     <nav class="subnav">
-      <button class="subnav-btn active">홀짝</button>
-      <button class="subnav-btn">사다리</button>
+      <button class="subnav-btn active">사다리</button>
       <button class="subnav-btn">달팽이</button>
       <button class="subnav-btn">파워볼</button>
       <button class="subnav-btn">스피드키노</button>
@@ -992,7 +991,6 @@
       <!-- 좌측 사이드바 -->
       <aside class="sidebar-left">
         <div class="sidebar-section-title">GAME</div>
-        <div class="sidebar-menu-item" id="menuHolJjak" onclick="selectGame('')">홀짝 <span class="sidebar-badge">LIVE</span></div>
         <div class="sidebar-menu-item" id="menuLadder" onclick="selectGame('ladder')">사다리 <span class="sidebar-badge">LIVE</span></div>
         <div class="sidebar-menu-item">달팽이</div>
         <div class="sidebar-menu-item">파워볼</div>
@@ -1063,7 +1061,7 @@
                     <div class="lg-bar-a" id="lgBarHol" style="width:50%;background:#e05555"></div>
                     <div class="lg-bar-b" style="background:#4a9eff"></div>
                   </div>
-                  <span class="lg-stat-lbl">홀짝</span>
+                  <span class="lg-stat-lbl">홀/짝</span>
                   <span class="lg-pct-b" id="lgPctJjak" style="color:#4a9eff">—</span>
                 </div>
               </div>
@@ -1359,10 +1357,9 @@
     // 게임 선택
     // ═══════════════════════════════════════
     window.selectGame = function(game) {
-      document.getElementById('panelSelect').style.display  = game === ''       ? '' : 'none';
+      document.getElementById('panelSelect').style.display  = game === 'ladder' ? 'none' : '';
       document.getElementById('panelLadder').style.display  = game === 'ladder' ? '' : 'none';
       document.querySelectorAll('.sidebar-menu-item').forEach(el => el.classList.remove('active'));
-      if (game === '')       document.getElementById('menuHolJjak').classList.add('active');
       if (game === 'ladder') document.getElementById('menuLadder').classList.add('active');
       if (game === 'ladder') initLadderGame();
     };
@@ -1639,7 +1636,7 @@
         el.innerHTML = `<div class="cart-confirmed">✓ 배팅 확정됨<br><span style="font-size:0.72rem;opacity:0.8">${sel.join(' × ')} — ${multi}배 / ${LG.confirmedAmount.toLocaleString()}P</span></div>`;
         return;
       }
-      const catLabel = { side: '좌우', line: '줄수', hj: '홀짝' };
+      const catLabel = { side: '좌우', line: '줄수', hj: '홀/짝' };
       const entries = Object.entries(LG.bet).filter(([, v]) => v);
       if (!entries.length) {
         el.innerHTML = '<div class="cart-empty">선택된 배팅 없음</div>';
