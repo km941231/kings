@@ -1119,7 +1119,7 @@
             <div class="cart-empty">선택된 배팅 없음</div>
           </div>
 
-          <div class="slip-section-label">항목당 배팅 금액</div>
+          <div class="slip-section-label">배팅 금액</div>
           <div class="bet-quick-btns">
             <button class="bet-quick-btn" id="qbtn1000" onclick="addBet(1000)">+1,000</button>
             <button class="bet-quick-btn" id="qbtn5000" onclick="addBet(5000)">+5,000</button>
@@ -1135,11 +1135,11 @@
           <hr class="slip-divider">
 
           <div class="slip-summary">
-            <span class="label">총 배팅액</span>
+            <span class="label">배팅액</span>
             <span class="value" id="summaryBet">0 P</span>
           </div>
           <div class="slip-summary">
-            <span class="label">최대 당첨금</span>
+            <span class="label">예상 당첨금</span>
             <span class="value gold" id="summaryWin">0 P</span>
           </div>
 
@@ -1191,10 +1191,9 @@
     function updateSummary() {
       const bet = getBet();
       const numSel = [LG.bet.side, LG.bet.line, LG.bet.hj].filter(Boolean).length;
-      const total = bet * (numSel || 1);
-      const maxWin = Math.floor(bet * 1.95) * (numSel || 1);
-      document.getElementById('summaryBet').textContent = total.toLocaleString() + ' P';
-      document.getElementById('summaryWin').textContent = maxWin.toLocaleString() + ' P';
+      const multiplier = Math.pow(1.95, numSel || 1);
+      document.getElementById('summaryBet').textContent = bet.toLocaleString() + ' P';
+      document.getElementById('summaryWin').textContent = Math.floor(bet * multiplier).toLocaleString() + ' P';
     }
 
     onAuthStateChanged(auth, async (user) => {
@@ -1634,21 +1633,31 @@
       const el = document.getElementById('lgCartItems');
       if (!el) return;
       if (LG.confirmed && LG.confirmedBetOptions) {
-        const sel = [LG.confirmedBetOptions.side, LG.confirmedBetOptions.line, LG.confirmedBetOptions.hj].filter(Boolean);
-        el.innerHTML = `<div class="cart-confirmed">✓ 배팅 확정됨<br><span style="font-size:0.72rem;opacity:0.8">${sel.join(' · ')} — 항목당 ${LG.confirmedAmount.toLocaleString()}P</span></div>`;
+        const opts = LG.confirmedBetOptions;
+        const sel = [opts.side, opts.line, opts.hj].filter(Boolean);
+        const multi = Math.pow(1.95, sel.length).toFixed(2);
+        el.innerHTML = `<div class="cart-confirmed">✓ 배팅 확정됨<br><span style="font-size:0.72rem;opacity:0.8">${sel.join(' × ')} — ${multi}배 / ${LG.confirmedAmount.toLocaleString()}P</span></div>`;
         return;
       }
       const catLabel = { side: '좌우', line: '줄수', hj: '홀짝' };
-      const items = Object.entries(LG.bet)
-        .filter(([, v]) => v)
-        .map(([cat, val]) => `<div class="cart-item">
+      const entries = Object.entries(LG.bet).filter(([, v]) => v);
+      if (!entries.length) {
+        el.innerHTML = '<div class="cart-empty">선택된 배팅 없음</div>';
+        return;
+      }
+      const items = entries.map(([cat, val]) => `<div class="cart-item">
           <div class="cart-item-left">
             <span class="cart-item-name">${val}</span>
             <span class="cart-item-odds">1.95배 (${catLabel[cat]})</span>
           </div>
           <button class="cart-item-remove" onclick="removeLGBet('${cat}')">✕</button>
         </div>`);
-      el.innerHTML = items.length ? items.join('') : '<div class="cart-empty">선택된 배팅 없음</div>';
+      const numSel = entries.length;
+      const multi = Math.pow(1.95, numSel).toFixed(2);
+      const multiLine = numSel > 1
+        ? `<div style="padding:5px 10px;font-size:0.75rem;color:#c8a951;border-top:1px solid #2a2a4a;text-align:right">복합배당: ${'1.95 × '.repeat(numSel).replace(/ × $/,'')} = <strong>${multi}배</strong></div>`
+        : '';
+      el.innerHTML = items.join('') + multiLine;
     }
 
     window.removeLGBet = function(cat) {
@@ -1674,8 +1683,7 @@
         if (s) { s.textContent = '⚠ 배팅 금액을 입력하세요'; s.style.color = '#e05555'; }
         return;
       }
-      const totalCost = bet * selected.length;
-      if (totalCost > points) {
+      if (bet > points) {
         const s = document.getElementById('lgBetStatus');
         if (s) { s.textContent = '⚠ 포인트가 부족합니다'; s.style.color = '#e05555'; }
         return;
@@ -1683,7 +1691,7 @@
       LG.confirmed = true;
       LG.confirmedAmount = bet;
       LG.confirmedBetOptions = { ...LG.bet };
-      points -= totalCost;
+      points -= bet;
       updatePointsDisplay();
       await savePoints();
       ['lgBtnLeft','lgBtnRight','lgBtn3','lgBtn4','lgBtnHol','lgBtnJjak'].forEach(id => {
@@ -1753,21 +1761,20 @@
 
             if (LG.confirmed && LG.confirmedBetOptions) {
               const bet = LG.confirmedAmount;
-              let totalPayout = 0;
-              if (LG.confirmedBetOptions.side)
-                totalPayout += LG.confirmedBetOptions.side === d.side ? Math.floor(bet * 1.95) : 0;
-              if (LG.confirmedBetOptions.line)
-                totalPayout += LG.confirmedBetOptions.line === d.line ? Math.floor(bet * 1.95) : 0;
-              if (LG.confirmedBetOptions.hj)
-                totalPayout += LG.confirmedBetOptions.hj === d.result ? Math.floor(bet * 1.95) : 0;
-              const numSel = [LG.confirmedBetOptions.side, LG.confirmedBetOptions.line, LG.confirmedBetOptions.hj].filter(Boolean).length;
-              const totalDeducted = bet * numSel;
-              const netChange = totalPayout - totalDeducted;
+              const opts = LG.confirmedBetOptions;
+              const numSel = [opts.side, opts.line, opts.hj].filter(Boolean).length;
+              const allCorrect =
+                (!opts.side || opts.side === d.side) &&
+                (!opts.line || opts.line === d.line) &&
+                (!opts.hj   || opts.hj   === d.result);
+              const multiplier = Math.pow(1.95, numSel);
+              const totalPayout = allCorrect ? Math.floor(bet * multiplier) : 0;
+              const netChange = totalPayout - bet;
               points += totalPayout;
               gameHistory.unshift({
                 number: d.result, cls: d.result === '홀' ? 'odd' : 'even',
-                choice: [LG.confirmedBetOptions.side, LG.confirmedBetOptions.line, LG.confirmedBetOptions.hj].filter(Boolean).join('/'),
-                bet: totalDeducted, payout: totalPayout, netChange, isWin: netChange >= 0
+                choice: [opts.side, opts.line, opts.hj].filter(Boolean).join(' × '),
+                bet, payout: totalPayout, netChange, isWin: allCorrect
               });
               updatePointsDisplay(); savePoints(); renderHistory();
             }
