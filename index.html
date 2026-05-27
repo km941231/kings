@@ -1390,6 +1390,8 @@
       const { bars, startLeft } = data;
 
       c.clearRect(0, 0, W, H);
+      c.shadowBlur = 0;
+      c.shadowColor = 'transparent';
 
       // ── 배경 ──
       const bgGrad = c.createLinearGradient(0, 0, 0, H);
@@ -1509,15 +1511,22 @@
 
       // ── 캐릭터 (공) ──
       if (charX !== null && charY !== null) {
-        const g = c.createRadialGradient(charX - 4, charY - 4, 1, charX, charY, 14);
-        g.addColorStop(0, '#ffe868'); g.addColorStop(0.55, '#c8a030'); g.addColorStop(1, '#7a5a10');
-        c.shadowColor = 'rgba(210,170,50,0.9)'; c.shadowBlur = 22;
-        c.fillStyle = g;
-        c.beginPath(); c.arc(charX, charY, 14, 0, Math.PI * 2); c.fill();
-        c.shadowBlur = 0;
+        // 글로우 (shadow 대신 라디얼 그라디언트로 잔상 방지)
+        const gGlow = c.createRadialGradient(charX, charY, 6, charX, charY, 26);
+        gGlow.addColorStop(0, 'rgba(210,160,30,0.45)');
+        gGlow.addColorStop(1, 'rgba(210,160,30,0)');
+        c.fillStyle = gGlow;
+        c.beginPath(); c.arc(charX, charY, 26, 0, Math.PI * 2); c.fill();
 
+        // 공 본체
+        const g = c.createRadialGradient(charX - 4, charY - 4, 1, charX, charY, 13);
+        g.addColorStop(0, '#ffe868'); g.addColorStop(0.55, '#c8a030'); g.addColorStop(1, '#7a5a10');
+        c.fillStyle = g;
+        c.beginPath(); c.arc(charX, charY, 13, 0, Math.PI * 2); c.fill();
+
+        // 하이라이트
         c.fillStyle = 'rgba(255,255,220,0.4)';
-        c.beginPath(); c.arc(charX - 4, charY - 4, 5, 0, Math.PI * 2); c.fill();
+        c.beginPath(); c.arc(charX - 4, charY - 4, 4, 0, Math.PI * 2); c.fill();
       }
     }
 
