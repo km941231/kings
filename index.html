@@ -1814,6 +1814,19 @@
       if (LG.confirmed || document.getElementById('lgBtnHol')?.disabled) return;
       LG.bet[category] = LG.bet[category] === value ? null : value;
 
+      // 홀/짝 ↔ 좌우/줄수 상호 배타: 새로 선택했을 때 반대 그룹 초기화
+      if (LG.bet[category]) {
+        if (category === 'hj') {
+          LG.bet.side = null; LG.bet.line = null;
+          ['lgBtnLeft','lgBtnRight','lgBtn3','lgBtn4'].forEach(id =>
+            document.getElementById(id)?.classList.remove('selected'));
+        } else {
+          LG.bet.hj = null;
+          ['lgBtnHol','lgBtnJjak'].forEach(id =>
+            document.getElementById(id)?.classList.remove('selected'));
+        }
+      }
+
       const map = {
         side: { '좌': 'lgBtnLeft', '우': 'lgBtnRight' },
         line: { '3줄': 'lgBtn3', '4줄': 'lgBtn4' },
