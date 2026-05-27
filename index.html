@@ -850,6 +850,42 @@
     .lg-result-list::-webkit-scrollbar { width: 3px; }
     .lg-result-list::-webkit-scrollbar-thumb { background: #c8a951; }
 
+    /* 오늘의 게임 히스토리 */
+    .lg-history-section { margin-top: 10px; background: #13192e; border: 1px solid #2a2a4a; border-radius: 6px; overflow: hidden; }
+    .lg-history-tabs { display: flex; border-bottom: 1px solid #2a2a4a; }
+    .lg-history-tab {
+      flex: 1; text-align: center; padding: 10px 4px;
+      font-size: 0.82rem; color: #777; cursor: pointer;
+      border-right: 1px solid #2a2a4a; transition: all 0.15s;
+    }
+    .lg-history-tab:last-child { border-right: none; }
+    .lg-history-tab.active { background: #1a2240; color: #c8a951; font-weight: bold; }
+    .lg-history-tab:hover:not(.active) { background: #161e30; color: #bbb; }
+    .lg-history-grid {
+      display: flex; gap: 3px; padding: 10px 10px 6px;
+      overflow-x: auto; min-height: 60px; align-items: flex-start;
+    }
+    .lg-history-grid::-webkit-scrollbar { height: 4px; }
+    .lg-history-grid::-webkit-scrollbar-thumb { background: #c8a951; border-radius: 2px; }
+    .lg-hcol { display: flex; flex-direction: column; gap: 3px; flex-shrink: 0; }
+    .lg-hcell {
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.5rem; font-weight: bold; color: #fff; flex-shrink: 0;
+      letter-spacing: -0.5px;
+    }
+    .lg-hcell.h-left  { background: #2980b9; }
+    .lg-hcell.h-right { background: #c0392b; }
+    .lg-hcell.h-three { background: #27ae60; }
+    .lg-hcell.h-four  { background: #d35400; }
+    .lg-hcell.h-hol   { background: #c0392b; }
+    .lg-hcell.h-jjak  { background: #2980b9; }
+    .lg-hcell.h-l3    { background: #2471a3; }
+    .lg-hcell.h-l4    { background: #7d3c98; }
+    .lg-hcell.h-r3    { background: #d35400; }
+    .lg-hcell.h-r4    { background: #c0392b; }
+    .lg-history-empty { color: #444; font-size: 0.8rem; text-align: center; padding: 16px; width: 100%; }
+
     /* 배팅 버튼 배당 표시 */
     .lg-bet-odds { display: block; font-size: 0.6rem; font-weight: normal; opacity: 0.75; margin-top: 2px; letter-spacing: 0; }
 
@@ -1060,8 +1096,22 @@
               <div class="lg-result-list" id="lgResultList"></div>
             </div>
 
+          </div><!-- /.lg-layout -->
+
+          <!-- 오늘의 게임 기록 -->
+          <div class="lg-history-section">
+            <div class="lg-history-tabs">
+              <div class="lg-history-tab active" data-tab="side"   onclick="setHistoryTab('side')">출발</div>
+              <div class="lg-history-tab"        data-tab="line"   onclick="setHistoryTab('line')">줄수</div>
+              <div class="lg-history-tab"        data-tab="result" onclick="setHistoryTab('result')">결과</div>
+              <div class="lg-history-tab"        data-tab="combo"  onclick="setHistoryTab('combo')">출발+줄수</div>
+            </div>
+            <div class="lg-history-grid" id="lgHistoryGrid">
+              <div class="lg-history-empty">게임 기록 로딩 중...</div>
+            </div>
           </div>
-        </div>
+
+        </div><!-- /#panelLadder -->
       </main>
 
       <!-- 우측 배팅 슬립 -->
@@ -1760,6 +1810,7 @@
 
       renderLGResultList();
       renderLGCart();
+      renderLGHistory();
       lgDraw(getLGResult(LG.round), null, null, true); // 추첨 전: 숨김 상태
 
       LG.timer = setInterval(() => {
@@ -1826,6 +1877,7 @@
             setTimeout(() => {
               lgDraw(getLGResult(LG.round), null, null, true);
               renderLGResultList();
+              renderLGHistory();
             }, 1800);
           });
         }
@@ -1864,6 +1916,55 @@
       renderLGCart();
       updateSummary();
       lgSetBetLock(false);
+    };
+
+    // ── 오늘의 게임 히스토리 (비드로드) ──
+    let lgHistoryTab = 'side';
+
+    function getHistoryCell(d) {
+      if (lgHistoryTab === 'side')   return { cls: d.startLeft ? 'h-left' : 'h-right' };
+      if (lgHistoryTab === 'line')   return { cls: d.numBars === 3 ? 'h-three' : 'h-four' };
+      if (lgHistoryTab === 'result') return { cls: d.result === '홀' ? 'h-hol' : 'h-jjak' };
+      // combo: 출발+줄수
+      const key = (d.startLeft ? 'l' : 'r') + d.numBars;
+      return { cls: { l3:'h-l3', l4:'h-l4', r3:'h-r3', r4:'h-r4' }[key] };
+    }
+
+    function renderLGHistory() {
+      const grid = document.getElementById('lgHistoryGrid');
+      if (!grid) return;
+      const cur = getLGRound();
+      if (cur <= 1) { grid.innerHTML = '<div class="lg-history-empty">아직 게임 기록이 없습니다</div>'; return; }
+
+      // 오늘 완료된 전체 회차 결과
+      const columns = [];
+      for (let r = 1; r < cur; r++) {
+        const d = getLGResult(r);
+        const { cls } = getHistoryCell(d);
+        const last = columns[columns.length - 1];
+        if (!last || last.cls !== cls) {
+          columns.push({ cls, items: [r] });
+        } else {
+          last.items.push(r);
+        }
+      }
+
+      grid.innerHTML = columns.map(col =>
+        `<div class="lg-hcol">${col.items.map(r =>
+          `<div class="lg-hcell ${col.cls}">${r}</div>`
+        ).join('')}</div>`
+      ).join('');
+
+      // 최신 회차로 자동 스크롤
+      requestAnimationFrame(() => { grid.scrollLeft = grid.scrollWidth; });
+    }
+
+    window.setHistoryTab = function(tab) {
+      lgHistoryTab = tab;
+      document.querySelectorAll('.lg-history-tab').forEach(el =>
+        el.classList.toggle('active', el.dataset.tab === tab)
+      );
+      renderLGHistory();
     };
 
     function renderHistory() {
