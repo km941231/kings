@@ -1025,7 +1025,7 @@
               <div class="lg-game-title">스피드 사다리</div>
               <div class="lg-datetime" id="lgDatetime">—</div>
               <div class="lg-canvas-wrap">
-                <canvas id="lgCanvas" width="280" height="320"></canvas>
+                <canvas id="lgCanvas" width="300" height="380"></canvas>
               </div>
 
               <!-- 배팅 버튼 3쌍 -->
@@ -1381,7 +1381,7 @@
     }
 
     // ── 캔버스 그리기 ──
-    const LGC = { W:280, H:320, LX:78, RX:202, ROWS:[82,122,162,202], TOP:30, BOT:272 };
+    const LGC = { W:300, H:380, LX:80, RX:220, ROWS:[100,148,196,244], TOP:52, BOT:298 };
 
     // pending=true : 추첨 전 — 출발위치·가로줄 숨김
     function lgDraw(data, charX, charY, pending = false) {
@@ -1390,77 +1390,134 @@
       const { bars, startLeft } = data;
 
       c.clearRect(0, 0, W, H);
-      c.fillStyle = '#0d0d1a'; c.fillRect(0, 0, W, H);
 
-      // 수직 기둥
-      c.strokeStyle = '#4a5568'; c.lineWidth = 5;
+      // ── 배경 ──
+      const bgGrad = c.createLinearGradient(0, 0, 0, H);
+      bgGrad.addColorStop(0, '#080c18');
+      bgGrad.addColorStop(1, '#0c1020');
+      c.fillStyle = bgGrad;
+      c.fillRect(0, 0, W, H);
+      c.strokeStyle = '#1a2035';
+      c.lineWidth = 1;
+      c.strokeRect(0.5, 0.5, W - 1, H - 1);
+
+      // ── 수직 기둥 ──
       [LX, RX].forEach(x => {
+        c.shadowColor = '#1e2a50'; c.shadowBlur = 14;
+        c.strokeStyle = '#2a3660'; c.lineWidth = 10; c.lineCap = 'butt';
         c.beginPath(); c.moveTo(x, TOP); c.lineTo(x, BOT); c.stroke();
-      });
 
+        c.shadowBlur = 0;
+        c.strokeStyle = '#3c4e7a'; c.lineWidth = 5;
+        c.beginPath(); c.moveTo(x, TOP); c.lineTo(x, BOT); c.stroke();
+
+        c.strokeStyle = '#5a6e9a'; c.lineWidth = 1.5;
+        c.beginPath(); c.moveTo(x - 1.5, TOP); c.lineTo(x - 1.5, BOT); c.stroke();
+      });
+      c.shadowBlur = 0;
+
+      // ── 가로줄 ──
       if (!pending) {
-        // 추첨 중/후: 가로줄 표시
         bars.forEach((b, i) => {
           if (!b) return;
-          c.strokeStyle = '#c8a951'; c.lineWidth = 3;
-          c.beginPath(); c.moveTo(LX, ROWS[i]); c.lineTo(RX, ROWS[i]); c.stroke();
+          const y = ROWS[i];
+          c.shadowColor = 'rgba(200,169,81,0.55)'; c.shadowBlur = 16;
+          c.strokeStyle = '#d4a835'; c.lineWidth = 6; c.lineCap = 'round';
+          c.beginPath(); c.moveTo(LX, y); c.lineTo(RX, y); c.stroke();
+
+          c.shadowBlur = 0;
+          c.strokeStyle = '#f0d060'; c.lineWidth = 2;
+          c.beginPath(); c.moveTo(LX + 4, y - 1); c.lineTo(RX - 4, y - 1); c.stroke();
         });
       } else {
-        // 추첨 전: 가로줄 위치에 점선(? 표시)만
-        ROWS.forEach(ry => {
-          c.strokeStyle = '#2a2a4a'; c.lineWidth = 2;
-          c.setLineDash([5, 5]);
-          c.beginPath(); c.moveTo(LX, ry); c.lineTo(RX, ry); c.stroke();
-          c.setLineDash([]);
+        c.setLineDash([7, 8]);
+        ROWS.forEach(y => {
+          c.strokeStyle = '#1c2540'; c.lineWidth = 2; c.lineCap = 'round';
+          c.beginPath(); c.moveTo(LX + 12, y); c.lineTo(RX - 12, y); c.stroke();
         });
+        c.setLineDash([]);
       }
+      c.shadowBlur = 0;
 
-      // X 원 — pending이면 양쪽 동일하게 표시
+      // ── 시작 원 (X 표시) ──
       [LX, RX].forEach((x, idx) => {
         const isStart = !pending && (idx === 0 ? startLeft : !startLeft);
-        c.fillStyle = isStart ? '#6b7280' : '#1f2937';
-        c.beginPath(); c.arc(x, TOP - 15, 13, 0, Math.PI * 2); c.fill();
-        c.strokeStyle = isStart ? '#9ca3af' : '#374151'; c.lineWidth = 1.5; c.stroke();
-        c.strokeStyle = isStart ? '#e5e7eb' : '#4b5563'; c.lineWidth = 2;
+        const cy = TOP - 20;
+
+        const g = c.createRadialGradient(x - 4, cy - 4, 1, x, cy, 16);
+        if (isStart) {
+          g.addColorStop(0, '#5a6a90'); g.addColorStop(1, '#202e50');
+        } else {
+          g.addColorStop(0, '#161c2e'); g.addColorStop(1, '#0c1020');
+        }
+        c.shadowColor = isStart ? '#3a4a7a' : 'transparent';
+        c.shadowBlur = isStart ? 10 : 0;
+        c.fillStyle = g;
+        c.beginPath(); c.arc(x, cy, 16, 0, Math.PI * 2); c.fill();
+        c.shadowBlur = 0;
+
+        c.strokeStyle = isStart ? '#506080' : '#1e2838';
+        c.lineWidth = 1.5;
+        c.beginPath(); c.arc(x, cy, 16, 0, Math.PI * 2); c.stroke();
+
+        const r = 6;
+        c.strokeStyle = isStart ? '#c8d8f0' : '#283848';
+        c.lineWidth = 2.5; c.lineCap = 'round';
         c.beginPath();
-        c.moveTo(x-5, TOP-20); c.lineTo(x+5, TOP-10);
-        c.moveTo(x+5, TOP-20); c.lineTo(x-5, TOP-10);
+        c.moveTo(x - r, cy - r); c.lineTo(x + r, cy + r);
+        c.moveTo(x + r, cy - r); c.lineTo(x - r, cy + r);
         c.stroke();
       });
 
-      // 출발 라벨 — pending이면 ?로 표시
-      c.font = 'bold 10px Malgun Gothic, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle';
+      // ── 좌/우 라벨 ──
+      c.font = 'bold 13px Malgun Gothic, sans-serif';
+      c.textAlign = 'center'; c.textBaseline = 'middle';
       if (pending) {
-        c.fillStyle = '#444'; c.fillText('?', LX, TOP - 33);
-        c.fillStyle = '#444'; c.fillText('?', RX, TOP - 33);
+        c.fillStyle = '#2a3a54';
+        c.fillText('?', LX, TOP - 44); c.fillText('?', RX, TOP - 44);
       } else {
-        c.fillStyle = startLeft ? '#c8a951' : '#555'; c.fillText('좌', LX, TOP - 33);
-        c.fillStyle = !startLeft ? '#c8a951' : '#555'; c.fillText('우', RX, TOP - 33);
+        c.fillStyle = startLeft  ? '#e8c84a' : '#3a4e68'; c.fillText('좌', LX, TOP - 44);
+        c.fillStyle = !startLeft ? '#e8c84a' : '#3a4e68'; c.fillText('우', RX, TOP - 44);
       }
 
-      // 홀/짝 원 (하단) — 항상 표시
-      [[LX,'홀','#e05555'], [RX,'짝','#4a9eff']].forEach(([x, lbl, col]) => {
-        c.fillStyle = col;
-        c.beginPath(); c.arc(x, BOT + 18, 17, 0, Math.PI * 2); c.fill();
-        c.fillStyle = '#fff'; c.font = 'bold 13px Malgun Gothic, sans-serif';
-        c.textAlign = 'center'; c.textBaseline = 'middle';
-        c.fillText(lbl, x, BOT + 18);
-      });
-
-      // 줄수 — pending이면 숨김
+      // ── 줄 수 라벨 ──
       if (!pending) {
-        c.fillStyle = '#666'; c.font = '11px Malgun Gothic, sans-serif';
+        c.fillStyle = '#3c5068'; c.font = '11px Malgun Gothic, sans-serif';
         c.textAlign = 'center';
-        c.fillText(`${bars.filter(Boolean).length}줄`, W/2, ROWS[1]);
+        c.fillText(`${bars.filter(Boolean).length}줄`, W / 2, ROWS[1] - 16);
       }
 
-      // 캐릭터
-      if (charX !== null) {
-        c.fillStyle = '#c8a951';
-        c.beginPath(); c.arc(charX, charY, 11, 0, Math.PI * 2); c.fill();
-        c.fillStyle = '#000'; c.font = 'bold 11px sans-serif';
+      // ── 도착 원 (홀/짝) ──
+      [[LX, '홀', '#9a1f1f', '#e05555'], [RX, '짝', '#1448a0', '#4a9eff']].forEach(([x, lbl, dark, light]) => {
+        const cy = BOT + 26;
+        const g = c.createRadialGradient(x - 6, cy - 6, 2, x, cy, 24);
+        g.addColorStop(0, light); g.addColorStop(1, dark);
+        c.shadowColor = lbl === '홀' ? 'rgba(224,85,85,0.5)' : 'rgba(74,158,255,0.5)';
+        c.shadowBlur = 16;
+        c.fillStyle = g;
+        c.beginPath(); c.arc(x, cy, 24, 0, Math.PI * 2); c.fill();
+        c.shadowBlur = 0;
+
+        c.strokeStyle = 'rgba(255,255,255,0.15)'; c.lineWidth = 1;
+        c.beginPath(); c.arc(x, cy, 19, 0, Math.PI * 2); c.stroke();
+
+        c.fillStyle = '#fff'; c.font = 'bold 16px Malgun Gothic, sans-serif';
         c.textAlign = 'center'; c.textBaseline = 'middle';
-        c.fillText('▼', charX, charY);
+        c.fillText(lbl, x, cy);
+      });
+      c.shadowBlur = 0;
+
+      // ── 캐릭터 (공) ──
+      if (charX !== null && charY !== null) {
+        const g = c.createRadialGradient(charX - 4, charY - 4, 1, charX, charY, 14);
+        g.addColorStop(0, '#ffe868'); g.addColorStop(0.55, '#c8a030'); g.addColorStop(1, '#7a5a10');
+        c.shadowColor = 'rgba(210,170,50,0.9)'; c.shadowBlur = 22;
+        c.fillStyle = g;
+        c.beginPath(); c.arc(charX, charY, 14, 0, Math.PI * 2); c.fill();
+        c.shadowBlur = 0;
+
+        c.fillStyle = 'rgba(255,255,220,0.4)';
+        c.beginPath(); c.arc(charX - 4, charY - 4, 5, 0, Math.PI * 2); c.fill();
       }
     }
 
