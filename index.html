@@ -1174,7 +1174,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs, addDoc, query, orderBy, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDJv5VYIt2xFrQmignCwSzuThAkULz1NW8",
@@ -1214,6 +1214,7 @@
         document.getElementById('gameScreen').style.display = 'flex';
         document.getElementById('gameScreen').style.flexDirection = 'column';
         await loadUserData(user.uid);
+        await loadBetHistory();
       } else {
         currentUid = null;
         document.getElementById('loginScreen').style.display = 'flex';
@@ -1258,6 +1259,30 @@
         ind.textContent = '✓ 저장됨';
         setTimeout(() => { ind.textContent = ''; }, 1500);
       } catch(e) { ind.textContent = ''; }
+    }
+
+    async function saveBet(betData) {
+      if (!currentUid) return;
+      try {
+        await addDoc(collection(db, 'users', currentUid, 'bets'), {
+          ...betData,
+          timestamp: serverTimestamp()
+        });
+      } catch(e) { console.error('배팅 저장 오류:', e); }
+    }
+
+    async function loadBetHistory() {
+      if (!currentUid) return;
+      try {
+        const q = query(
+          collection(db, 'users', currentUid, 'bets'),
+          orderBy('timestamp', 'desc'),
+          limit(50)
+        );
+        const snap = await getDocs(q);
+        gameHistory = snap.docs.map(d => d.data());
+        renderHistory();
+      } catch(e) { console.error('배팅 기록 불러오기 오류:', e); }
     }
 
     function updatePointsDisplay() {
@@ -1845,12 +1870,15 @@
               const totalPayout = allCorrect ? Math.floor(bet * multiplier) : 0;
               const netChange = totalPayout - bet;
               points += totalPayout;
-              gameHistory.unshift({
+              const betRecord = {
                 number: d.result, cls: d.result === '홀' ? 'odd' : 'even',
                 choice: [opts.side, opts.line, opts.hj].filter(Boolean).join(' × '),
-                bet, payout: totalPayout, netChange, isWin: allCorrect
-              });
+                bet, payout: totalPayout, netChange, isWin: allCorrect,
+                round: prev
+              };
+              gameHistory.unshift(betRecord);
               updatePointsDisplay(); savePoints(); renderHistory();
+              saveBet(betRecord);
             }
 
             // 배팅 초기화
