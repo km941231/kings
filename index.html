@@ -738,7 +738,7 @@
     }
 
     /* ─── 사다리 게임 ─── */
-    .lg-layout { display: grid; grid-template-columns: 155px 1fr 175px; gap: 10px; }
+    .lg-layout { display: grid; grid-template-columns: 1fr 175px; gap: 10px; }
     .lg-panel { background: #13192e; border: 1px solid #2a2a4a; border-radius: 6px; overflow: hidden; }
     .lg-panel-title {
       background: linear-gradient(90deg, #1a2240, #16213e);
@@ -1020,50 +1020,12 @@
         <div id="panelLadder" style="display:none">
           <div class="lg-layout">
 
-            <!-- 왼쪽: 픽모음 -->
-            <div class="lg-panel">
-              <div class="lg-panel-title">픽모음</div>
-              <div class="lg-sub-title">최근 회차 결과</div>
-              <div id="lgPickList"></div>
-            </div>
-
             <!-- 가운데: 게임 -->
             <div class="lg-panel">
               <div class="lg-game-title">스피드 사다리</div>
               <div class="lg-datetime" id="lgDatetime">—</div>
               <div class="lg-canvas-wrap">
                 <canvas id="lgCanvas" width="280" height="320"></canvas>
-              </div>
-
-              <!-- 확률 바 3개 -->
-              <div class="lg-stats">
-                <div class="lg-stat-row">
-                  <span class="lg-pct-a" id="lgPctLeft" style="color:#c8a951">—</span>
-                  <div class="lg-bar-track">
-                    <div class="lg-bar-a" id="lgBarLeft" style="width:50%;background:#c8a951"></div>
-                    <div class="lg-bar-b" style="background:#555"></div>
-                  </div>
-                  <span class="lg-stat-lbl">좌우</span>
-                  <span class="lg-pct-b" id="lgPctRight" style="color:#888">—</span>
-                </div>
-                <div class="lg-stat-row">
-                  <span class="lg-pct-a" id="lgPctThree" style="color:#4ade80">—</span>
-                  <div class="lg-bar-track">
-                    <div class="lg-bar-a" id="lgBarThree" style="width:50%;background:#4ade80"></div>
-                    <div class="lg-bar-b" style="background:#f59e0b"></div>
-                  </div>
-                  <span class="lg-stat-lbl">줄수</span>
-                  <span class="lg-pct-b" id="lgPctFour" style="color:#f59e0b">—</span>
-                </div>
-                <div class="lg-stat-row">
-                  <span class="lg-pct-a" id="lgPctHol" style="color:#e05555">—</span>
-                  <div class="lg-bar-track">
-                    <div class="lg-bar-a" id="lgBarHol" style="width:50%;background:#e05555"></div>
-                    <div class="lg-bar-b" style="background:#4a9eff"></div>
-                  </div>
-                  <span class="lg-stat-lbl">홀/짝</span>
-                  <span class="lg-pct-b" id="lgPctJjak" style="color:#4a9eff">—</span>
-                </div>
               </div>
 
               <!-- 배팅 버튼 3쌍 -->
@@ -1730,9 +1692,7 @@
       LG.bet = { side: null, line: null, hj: null };
       LG.isAnimating = false;
 
-      renderLGPickList();
       renderLGResultList();
-      updateLGStats();
       renderLGCart();
       lgDraw(getLGResult(LG.round), null, null, true); // 추첨 전: 숨김 상태
 
@@ -1799,7 +1759,7 @@
 
             setTimeout(() => {
               lgDraw(getLGResult(LG.round), null, null, true);
-              renderLGResultList(); renderLGPickList(); updateLGStats();
+              renderLGResultList();
             }, 1800);
           });
         }
