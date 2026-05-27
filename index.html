@@ -849,6 +849,24 @@
     .lg-result-list { max-height: 430px; overflow-y: auto; }
     .lg-result-list::-webkit-scrollbar { width: 3px; }
     .lg-result-list::-webkit-scrollbar-thumb { background: #c8a951; }
+
+    /* 배팅 버튼 배당 표시 */
+    .lg-bet-odds { display: block; font-size: 0.6rem; font-weight: normal; opacity: 0.75; margin-top: 2px; letter-spacing: 0; }
+
+    /* 배팅 카트 */
+    .cart-items { display: flex; flex-direction: column; gap: 4px; min-height: 34px; margin-bottom: 8px; }
+    .cart-item {
+      display: flex; justify-content: space-between; align-items: center;
+      background: #0d0d1a; border: 1px solid #2a2a4a;
+      border-radius: 3px; padding: 5px 10px;
+    }
+    .cart-item-left { display: flex; flex-direction: column; }
+    .cart-item-name { color: #fff; font-weight: bold; font-size: 0.82rem; }
+    .cart-item-odds { color: #c8a951; font-size: 0.7rem; }
+    .cart-item-remove { background: none; border: none; color: #555; cursor: pointer; font-size: 0.85rem; padding: 0 2px; transition: color 0.15s; }
+    .cart-item-remove:hover { color: #e05555; }
+    .cart-empty { color: #444; font-size: 0.77rem; text-align: center; padding: 6px 0; border: 1px dashed #2a2a4a; border-radius: 3px; }
+    .cart-confirmed { background: rgba(74,222,128,0.08); border: 1px solid rgba(74,222,128,0.3); border-radius: 4px; padding: 8px; font-size: 0.78rem; color: #4ade80; text-align: center; }
   </style>
 </head>
 <body>
@@ -1054,20 +1072,20 @@
               <div class="lg-bet-section">
                 <div class="lg-bet-label">좌 / 우</div>
                 <div class="lg-bet-row">
-                  <button class="lg-bet-btn type-left"  id="lgBtnLeft"  onclick="selectLGBet('side','좌')">좌</button>
-                  <button class="lg-bet-btn type-right" id="lgBtnRight" onclick="selectLGBet('side','우')">우</button>
+                  <button class="lg-bet-btn type-left"  id="lgBtnLeft"  onclick="selectLGBet('side','좌')">좌<span class="lg-bet-odds">1.95배</span></button>
+                  <button class="lg-bet-btn type-right" id="lgBtnRight" onclick="selectLGBet('side','우')">우<span class="lg-bet-odds">1.95배</span></button>
                 </div>
                 <div class="lg-bet-label">3줄 / 4줄</div>
                 <div class="lg-bet-row">
-                  <button class="lg-bet-btn type-three" id="lgBtn3"     onclick="selectLGBet('line','3줄')">3줄</button>
-                  <button class="lg-bet-btn type-four"  id="lgBtn4"     onclick="selectLGBet('line','4줄')">4줄</button>
+                  <button class="lg-bet-btn type-three" id="lgBtn3"     onclick="selectLGBet('line','3줄')">3줄<span class="lg-bet-odds">1.95배</span></button>
+                  <button class="lg-bet-btn type-four"  id="lgBtn4"     onclick="selectLGBet('line','4줄')">4줄<span class="lg-bet-odds">1.95배</span></button>
                 </div>
                 <div class="lg-bet-label">홀 / 짝</div>
                 <div class="lg-bet-row">
-                  <button class="lg-bet-btn type-hol"  id="lgBtnHol"  onclick="selectLGBet('hj','홀')">홀</button>
-                  <button class="lg-bet-btn type-jjak" id="lgBtnJjak" onclick="selectLGBet('hj','짝')">짝</button>
+                  <button class="lg-bet-btn type-hol"  id="lgBtnHol"  onclick="selectLGBet('hj','홀')">홀<span class="lg-bet-odds">1.95배</span></button>
+                  <button class="lg-bet-btn type-jjak" id="lgBtnJjak" onclick="selectLGBet('hj','짝')">짝<span class="lg-bet-odds">1.95배</span></button>
                 </div>
-                <div class="lg-bet-status" id="lgBetStatus">배팅을 선택하고 금액을 입력하세요</div>
+                <div class="lg-bet-status" id="lgBetStatus">배팅 항목을 선택하세요</div>
               </div>
 
               <div class="lg-countdown" id="lgCountdown">—</div>
@@ -1096,12 +1114,17 @@
             <div class="slip-point-value" id="slipPoints">0 P</div>
           </div>
 
-          <div class="slip-section-label">배팅 금액</div>
+          <div class="slip-section-label">선택한 배팅</div>
+          <div id="lgCartItems" class="cart-items">
+            <div class="cart-empty">선택된 배팅 없음</div>
+          </div>
+
+          <div class="slip-section-label">항목당 배팅 금액</div>
           <div class="bet-quick-btns">
-            <button class="bet-quick-btn" onclick="addBet(1000)">+1,000</button>
-            <button class="bet-quick-btn" onclick="addBet(5000)">+5,000</button>
-            <button class="bet-quick-btn" onclick="addBet(10000)">+10,000</button>
-            <button class="bet-quick-btn" onclick="setBetAll()">MAX</button>
+            <button class="bet-quick-btn" id="qbtn1000" onclick="addBet(1000)">+1,000</button>
+            <button class="bet-quick-btn" id="qbtn5000" onclick="addBet(5000)">+5,000</button>
+            <button class="bet-quick-btn" id="qbtn10000" onclick="addBet(10000)">+10,000</button>
+            <button class="bet-quick-btn" id="qbtnMax" onclick="setBetAll()">MAX</button>
           </div>
 
           <div class="bet-input-row">
@@ -1112,17 +1135,18 @@
           <hr class="slip-divider">
 
           <div class="slip-summary">
-            <span class="label">배팅액</span>
+            <span class="label">총 배팅액</span>
             <span class="value" id="summaryBet">0 P</span>
           </div>
           <div class="slip-summary">
-            <span class="label">예상 당첨금</span>
+            <span class="label">최대 당첨금</span>
             <span class="value gold" id="summaryWin">0 P</span>
           </div>
 
           <hr class="slip-divider">
 
-          <button class="btn-recharge-slip" onclick="recharge()">+ 포인트 충전 (10,000P)</button>
+          <button class="btn-bet-now" id="btnBetConfirm" onclick="confirmLGBet()">배팅하기</button>
+          <button class="btn-recharge-slip" style="margin-top:8px" onclick="recharge()">+ 포인트 충전 (10,000P)</button>
         </div>
 
         <!-- 최근 기록 -->
@@ -1166,8 +1190,11 @@
 
     function updateSummary() {
       const bet = getBet();
-      document.getElementById('summaryBet').textContent = bet.toLocaleString() + ' P';
-      document.getElementById('summaryWin').textContent = (bet * 2).toLocaleString() + ' P';
+      const numSel = [LG.bet.side, LG.bet.line, LG.bet.hj].filter(Boolean).length;
+      const total = bet * (numSel || 1);
+      const maxWin = Math.floor(bet * 1.95) * (numSel || 1);
+      document.getElementById('summaryBet').textContent = total.toLocaleString() + ' P';
+      document.getElementById('summaryWin').textContent = maxWin.toLocaleString() + ' P';
     }
 
     onAuthStateChanged(auth, async (user) => {
@@ -1347,7 +1374,10 @@
     const LG = {
       ctx: null, animFrame: null, timer: null,
       round: 0, isAnimating: false,
-      bet: { side: null, line: null, hj: null }  // 3가지 독립 배팅
+      bet: { side: null, line: null, hj: null },
+      confirmed: false,
+      confirmedAmount: 0,
+      confirmedBetOptions: null
     };
 
     // 시드 기반 랜덤 (동일 라운드 → 동일 결과)
@@ -1600,17 +1630,90 @@
       setW('lgBarLeft', s.leftPct); setW('lgBarThree', s.threePct); setW('lgBarHol', s.holPct);
     }
 
+    function renderLGCart() {
+      const el = document.getElementById('lgCartItems');
+      if (!el) return;
+      if (LG.confirmed && LG.confirmedBetOptions) {
+        const sel = [LG.confirmedBetOptions.side, LG.confirmedBetOptions.line, LG.confirmedBetOptions.hj].filter(Boolean);
+        el.innerHTML = `<div class="cart-confirmed">✓ 배팅 확정됨<br><span style="font-size:0.72rem;opacity:0.8">${sel.join(' · ')} — 항목당 ${LG.confirmedAmount.toLocaleString()}P</span></div>`;
+        return;
+      }
+      const catLabel = { side: '좌우', line: '줄수', hj: '홀짝' };
+      const items = Object.entries(LG.bet)
+        .filter(([, v]) => v)
+        .map(([cat, val]) => `<div class="cart-item">
+          <div class="cart-item-left">
+            <span class="cart-item-name">${val}</span>
+            <span class="cart-item-odds">1.95배 (${catLabel[cat]})</span>
+          </div>
+          <button class="cart-item-remove" onclick="removeLGBet('${cat}')">✕</button>
+        </div>`);
+      el.innerHTML = items.length ? items.join('') : '<div class="cart-empty">선택된 배팅 없음</div>';
+    }
+
+    window.removeLGBet = function(cat) {
+      LG.bet[cat] = null;
+      const pairs = { side: ['lgBtnLeft','lgBtnRight'], line: ['lgBtn3','lgBtn4'], hj: ['lgBtnHol','lgBtnJjak'] };
+      pairs[cat].forEach(id => document.getElementById(id)?.classList.remove('selected'));
+      renderLGCart();
+      updateSummary();
+      lgSetBetLock(false);
+    };
+
+    window.confirmLGBet = async function() {
+      if (LG.confirmed) return;
+      const selected = [LG.bet.side, LG.bet.line, LG.bet.hj].filter(Boolean);
+      if (!selected.length) {
+        const s = document.getElementById('lgBetStatus');
+        if (s) { s.textContent = '⚠ 배팅 항목을 먼저 선택하세요'; s.style.color = '#e05555'; }
+        return;
+      }
+      const bet = getBet();
+      if (!bet) {
+        const s = document.getElementById('lgBetStatus');
+        if (s) { s.textContent = '⚠ 배팅 금액을 입력하세요'; s.style.color = '#e05555'; }
+        return;
+      }
+      const totalCost = bet * selected.length;
+      if (totalCost > points) {
+        const s = document.getElementById('lgBetStatus');
+        if (s) { s.textContent = '⚠ 포인트가 부족합니다'; s.style.color = '#e05555'; }
+        return;
+      }
+      LG.confirmed = true;
+      LG.confirmedAmount = bet;
+      LG.confirmedBetOptions = { ...LG.bet };
+      points -= totalCost;
+      updatePointsDisplay();
+      await savePoints();
+      ['lgBtnLeft','lgBtnRight','lgBtn3','lgBtn4','lgBtnHol','lgBtnJjak'].forEach(id => {
+        const e = document.getElementById(id); if (e) e.disabled = true;
+      });
+      document.getElementById('betInput').disabled = true;
+      ['qbtn1000','qbtn5000','qbtn10000','qbtnMax'].forEach(id => {
+        const e = document.getElementById(id); if (e) e.disabled = true;
+      });
+      const confirmBtn = document.getElementById('btnBetConfirm');
+      if (confirmBtn) { confirmBtn.disabled = true; confirmBtn.textContent = '배팅 완료'; }
+      renderLGCart();
+      const s = document.getElementById('lgBetStatus');
+      if (s) { s.textContent = '✅ 배팅 완료! 추첨을 기다리세요.'; s.style.color = '#4ade80'; }
+    };
+
     function lgSetBetLock(locked) {
+      if (LG.confirmed) return;
       ['lgBtnLeft','lgBtnRight','lgBtn3','lgBtn4','lgBtnHol','lgBtnJjak'].forEach(id => {
         const e = document.getElementById(id);
         if (e) e.disabled = locked || LG.isAnimating;
       });
+      const confirmBtn = document.getElementById('btnBetConfirm');
+      if (confirmBtn) confirmBtn.disabled = locked || LG.isAnimating;
       const s = document.getElementById('lgBetStatus');
       if (!s) return;
       if (locked) { s.textContent = '⛔ 배팅 마감'; s.style.color = '#e05555'; return; }
       s.style.color = '#555';
       const picks = [LG.bet.side, LG.bet.line, LG.bet.hj].filter(Boolean);
-      s.textContent = picks.length ? `선택: ${picks.join(' · ')}` : '배팅을 선택하고 금액을 입력하세요';
+      s.textContent = picks.length ? `선택: ${picks.join(' · ')}` : '배팅 항목을 선택하세요';
     }
 
     // ── 초기화 ──
@@ -1625,6 +1728,7 @@
       renderLGPickList();
       renderLGResultList();
       updateLGStats();
+      renderLGCart();
       lgDraw(getLGResult(LG.round), null, null, true); // 추첨 전: 숨김 상태
 
       LG.timer = setInterval(() => {
@@ -1644,45 +1748,53 @@
           const prev = LG.round;
           LG.round = newRound;
 
-          lgAnimate(prev, () => {
+          lgAnimate(prev, async () => {
             const d = getLGResult(prev);
-            const bet = getBet();
-            if (bet > 0 && bet <= points) {
-              // 각 카테고리별 독립 정산
+
+            if (LG.confirmed && LG.confirmedBetOptions) {
+              const bet = LG.confirmedAmount;
               let totalPayout = 0;
-              let anyBet = false;
-              if (LG.bet.side) {
-                anyBet = true;
-                totalPayout += LG.bet.side === d.side ? Math.floor(bet * 0.95) : -bet;
-              }
-              if (LG.bet.line) {
-                anyBet = true;
-                totalPayout += LG.bet.line === d.line ? Math.floor(bet * 0.95) : -bet;
-              }
-              if (LG.bet.hj) {
-                anyBet = true;
-                totalPayout += LG.bet.hj === d.result ? Math.floor(bet * 0.95) : -bet;
-              }
-              if (anyBet) {
-                points += totalPayout;
-                const won = totalPayout > 0;
-                gameHistory.unshift({
-                  number: d.result, cls: d.result === '홀' ? 'odd' : 'even',
-                  choice: [LG.bet.side, LG.bet.line, LG.bet.hj].filter(Boolean).join('/'),
-                  bet: bet * [LG.bet.side, LG.bet.line, LG.bet.hj].filter(Boolean).length,
-                  payout: Math.abs(totalPayout), isWin: won
-                });
-                updatePointsDisplay(); savePoints(); renderHistory();
-              }
+              if (LG.confirmedBetOptions.side)
+                totalPayout += LG.confirmedBetOptions.side === d.side ? Math.floor(bet * 1.95) : 0;
+              if (LG.confirmedBetOptions.line)
+                totalPayout += LG.confirmedBetOptions.line === d.line ? Math.floor(bet * 1.95) : 0;
+              if (LG.confirmedBetOptions.hj)
+                totalPayout += LG.confirmedBetOptions.hj === d.result ? Math.floor(bet * 1.95) : 0;
+              const numSel = [LG.confirmedBetOptions.side, LG.confirmedBetOptions.line, LG.confirmedBetOptions.hj].filter(Boolean).length;
+              const totalDeducted = bet * numSel;
+              const netChange = totalPayout - totalDeducted;
+              points += totalPayout;
+              gameHistory.unshift({
+                number: d.result, cls: d.result === '홀' ? 'odd' : 'even',
+                choice: [LG.confirmedBetOptions.side, LG.confirmedBetOptions.line, LG.confirmedBetOptions.hj].filter(Boolean).join('/'),
+                bet: totalDeducted, payout: totalPayout, netChange, isWin: netChange >= 0
+              });
+              updatePointsDisplay(); savePoints(); renderHistory();
             }
+
             // 배팅 초기화
             LG.bet = { side: null, line: null, hj: null };
-            ['lgBtnLeft','lgBtnRight','lgBtn3','lgBtn4','lgBtnHol','lgBtnJjak']
-              .forEach(id => { const e = document.getElementById(id); if (e) e.classList.remove('selected'); });
+            LG.confirmed = false;
+            LG.confirmedAmount = 0;
+            LG.confirmedBetOptions = null;
+            ['lgBtnLeft','lgBtnRight','lgBtn3','lgBtn4','lgBtnHol','lgBtnJjak'].forEach(id => {
+              const e = document.getElementById(id);
+              if (e) { e.classList.remove('selected'); e.disabled = false; }
+            });
+            const betInp = document.getElementById('betInput');
+            if (betInp) betInp.disabled = false;
+            ['qbtn1000','qbtn5000','qbtn10000','qbtnMax'].forEach(id => {
+              const e = document.getElementById(id); if (e) e.disabled = false;
+            });
+            const confirmBtn = document.getElementById('btnBetConfirm');
+            if (confirmBtn) { confirmBtn.disabled = false; confirmBtn.textContent = '배팅하기'; }
             resetBet();
+            renderLGCart();
+            const s = document.getElementById('lgBetStatus');
+            if (s) { s.textContent = '배팅 항목을 선택하세요'; s.style.color = '#555'; }
 
             setTimeout(() => {
-              lgDraw(getLGResult(LG.round), null, null, true); // 다음 회차: 다시 숨김 상태
+              lgDraw(getLGResult(LG.round), null, null, true);
               renderLGResultList(); renderLGPickList(); updateLGStats();
             }, 1800);
           });
@@ -1692,22 +1804,22 @@
 
     // ── 배팅 선택 ──
     window.selectLGBet = function(category, value) {
-      if (document.getElementById('lgBtnHol')?.disabled) return;
-      LG.bet[category] = LG.bet[category] === value ? null : value; // 토글
+      if (LG.confirmed || document.getElementById('lgBtnHol')?.disabled) return;
+      LG.bet[category] = LG.bet[category] === value ? null : value;
 
-      // 버튼 selected 상태 업데이트
       const map = {
-        side: { left: 'lgBtnLeft', right: 'lgBtnRight', '좌': 'lgBtnLeft', '우': 'lgBtnRight' },
+        side: { '좌': 'lgBtnLeft', '우': 'lgBtnRight' },
         line: { '3줄': 'lgBtn3', '4줄': 'lgBtn4' },
         hj:   { '홀': 'lgBtnHol', '짝': 'lgBtnJjak' }
       };
-      // 같은 카테고리 버튼 2개 중 선택된 것만 selected
       const pairs = { side: ['lgBtnLeft','lgBtnRight'], line: ['lgBtn3','lgBtn4'], hj: ['lgBtnHol','lgBtnJjak'] };
       pairs[category].forEach(id => document.getElementById(id)?.classList.remove('selected'));
       if (LG.bet[category]) {
-        const selId = Object.entries(map[category]).find(([k]) => k === value)?.[1];
+        const selId = map[category][value];
         if (selId) document.getElementById(selId)?.classList.add('selected');
       }
+      renderLGCart();
+      updateSummary();
       lgSetBetLock(false);
     };
 
@@ -1718,7 +1830,7 @@
         <div class="h-row ${h.isWin ? 'win' : 'lose'}">
           <span class="h-num ${h.cls}">${h.number}</span>
           <span class="h-info">${h.choice} / ${h.bet.toLocaleString()}P</span>
-          <span class="h-result ${h.isWin ? 'win' : 'lose'}">${h.isWin ? '▲' : '▼'}${Math.abs(h.payout).toLocaleString()}</span>
+          <span class="h-result ${h.isWin ? 'win' : 'lose'}">${h.netChange >= 0 ? '+' : ''}${h.netChange.toLocaleString()}</span>
         </div>
       `).join('');
     }
