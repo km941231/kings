@@ -1230,6 +1230,13 @@ body {
     font-size: 0.74rem; color: #9aa4bd; text-align: right; margin-bottom: 1px;
   }
   .lg-mbb-points span { color: #c8a951; font-weight: bold; }
+  .lg-mbb-info {
+    display: flex; justify-content: space-between; align-items: center;
+    background: #0a0e1c; border: 1px solid #2a3660; border-radius: 5px;
+    padding: 6px 10px;
+  }
+  .lg-mbb-choice { color: #fff; font-weight: bold; font-size: 0.82rem; }
+  .lg-mbb-round { color: #c8a951; font-size: 0.74rem; font-weight: bold; }
   .lg-mbb-quick { display: flex; gap: 5px; }
   .lg-mbb-quick button {
     flex: 1; background: #1a2240; border: 1px solid #2a3660; color: #c8d0e8;

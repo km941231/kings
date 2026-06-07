@@ -251,6 +251,10 @@
     <!-- 모바일 하단 고정 배팅 바 -->
     <div class="lg-mobile-betbar" id="lgMobileBetBar">
       <div class="lg-mbb-points">보유 포인트 <span id="lgMobPoints">0 P</span></div>
+      <div class="lg-mbb-info">
+        <span class="lg-mbb-choice" id="lgMobChoice">선택 항목 없음</span>
+        <span class="lg-mbb-round" id="lgMobRound">-회차</span>
+      </div>
       <div class="lg-mbb-quick">
         <button onclick="addBet(10000)">+1만</button>
         <button onclick="addBet(50000)">+5만</button>
@@ -309,6 +313,13 @@
       }
       const mobInp = document.getElementById('lgMobBetInput');
       if (mobInp) mobInp.disabled = locked || LG.confirmed;
+      const choiceEl = document.getElementById('lgMobChoice');
+      if (choiceEl) {
+        const picks = [LG.bet.side, LG.bet.line, LG.bet.hj].filter(Boolean);
+        choiceEl.textContent = picks.length ? picks.join(' · ') : '선택 항목 없음';
+      }
+      const roundEl = document.getElementById('lgMobRound');
+      if (roundEl) roundEl.textContent = (LG.round || '-') + '회차';
     }
 
     onAuthStateChanged(auth, async (user) => {
