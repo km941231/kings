@@ -527,6 +527,12 @@
 
     window.confirmPDTBet = async function() {
       if (PDT.confirmed) return;
+      // 마감 하드 가드: 남은 시간 10초 이하면 배팅 불가
+      if (new Date().getSeconds() >= 50) {
+        const s = document.getElementById('pdtBetStatus');
+        if (s) { s.textContent = '⛔ 배팅이 마감되었습니다'; s.style.color='#e05555'; }
+        return;
+      }
       if (!PDT.bet) {
         const s = document.getElementById('pdtBetStatus');
         if (s) { s.textContent = '⚠ 드래곤/타이거/타이를 선택하세요'; s.style.color='#e05555'; } return;

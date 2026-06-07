@@ -733,6 +733,12 @@
 
     window.confirmLGBet = async function() {
       if (LG.confirmed) return;
+      // 마감 하드 가드: 남은 시간 10초 이하면 배팅 불가
+      if (60 - new Date().getSeconds() <= 10) {
+        const s = document.getElementById('lgBetStatus');
+        if (s) { s.textContent = '⛔ 배팅이 마감되었습니다'; s.style.color = '#e05555'; }
+        return;
+      }
       const selected = [LG.bet.side, LG.bet.line, LG.bet.hj].filter(Boolean);
       if (!selected.length) {
         const s = document.getElementById('lgBetStatus');
@@ -834,7 +840,7 @@
           const ss = String((secs-1)%60).padStart(2,'0');
           cdEl.textContent = `${mm}:${ss} 후 ${newRound}회차 추첨 시작`;
         }
-        lgSetBetLock(secs <= 8);
+        lgSetBetLock(secs <= 10);
         if (newRound !== LG.round && !LG.isAnimating) {
           const prev = LG.round;
           LG.round = newRound;

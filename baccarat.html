@@ -582,6 +582,12 @@
 
     window.confirmBacBet = async function() {
       if (BAC.confirmed) return;
+      // 마감 하드 가드: 남은 시간 10초 이하면 배팅 불가
+      if (new Date().getSeconds() >= 50) {
+        const s = document.getElementById('bacBetStatus');
+        if (s) { s.textContent = '⛔ 배팅이 마감되었습니다'; s.style.color='#e05555'; }
+        return;
+      }
       if (!BAC.bet) {
         const s = document.getElementById('bacBetStatus'); if(s){s.textContent='⚠ 배팅 항목을 선택하세요';s.style.color='#e05555';} return;
       }
