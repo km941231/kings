@@ -758,6 +758,14 @@
       gameHistory.unshift(lgPending);
       renderHistory();
       updateMobBetBar();
+      const numSel = [lgOpts.side, lgOpts.line, lgOpts.hj].filter(Boolean).length;
+      const expWin = Math.floor(bet * Math.pow(1.95, numSel));
+      window.kingsAlert(
+        `<b style="color:#c8a951">${lgChoiceLabel}</b><br>` +
+        `배팅액 <b>${bet.toLocaleString()}P</b><br>` +
+        `예상 당첨금 <b style="color:#4ade80">${expWin.toLocaleString()}P</b>`,
+        '✅ 배팅 완료'
+      );
       saveBet(lgPending).then(id => { if (id) lgPending._docId = id; });
     };
 

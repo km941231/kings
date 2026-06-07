@@ -123,3 +123,27 @@ document.addEventListener('click', function(e) {
     document.querySelectorAll('.subnav-category').forEach(el => el.classList.remove('open'));
   }
 });
+
+// ── 공용 알림 모달 ─────────────────────────────────────────────
+// window.kingsAlert(메시지, 제목) — 확인 버튼을 누르면 닫힘
+window.kingsAlert = function(message, title) {
+  let ov = document.getElementById('kingsModalOverlay');
+  if (!ov) {
+    ov = document.createElement('div');
+    ov.id = 'kingsModalOverlay';
+    ov.className = 'kings-modal-overlay';
+    ov.innerHTML =
+      '<div class="kings-modal">' +
+        '<div class="kings-modal-title" id="kingsModalTitle"></div>' +
+        '<div class="kings-modal-msg" id="kingsModalMsg"></div>' +
+        '<button class="kings-modal-btn" id="kingsModalBtn">확인</button>' +
+      '</div>';
+    document.body.appendChild(ov);
+    const close = () => ov.classList.remove('show');
+    ov.addEventListener('click', e => { if (e.target === ov) close(); });
+    document.getElementById('kingsModalBtn').addEventListener('click', close);
+  }
+  document.getElementById('kingsModalTitle').textContent = title || '알림';
+  document.getElementById('kingsModalMsg').innerHTML = message;
+  ov.classList.add('show');
+};

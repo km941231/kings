@@ -1189,6 +1189,32 @@ body {
   .sidebar-right { border-left: none; border-top: 1px solid #2a2a4a; }
 }
 
+/* ─── 공용 알림 모달 ─── */
+.kings-modal-overlay {
+  display: none; position: fixed; inset: 0; z-index: 1000;
+  background: rgba(0,0,0,0.62); align-items: center; justify-content: center;
+  padding: 20px;
+}
+.kings-modal-overlay.show { display: flex; }
+.kings-modal {
+  background: #141a30; border: 1px solid #c8a951; border-radius: 10px;
+  padding: 22px 20px 18px; max-width: 320px; width: 100%; text-align: center;
+  box-shadow: 0 12px 44px rgba(0,0,0,0.6);
+  animation: kingsModalIn 0.18s ease;
+}
+@keyframes kingsModalIn {
+  from { opacity: 0; transform: translateY(-10px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.kings-modal-title { font-size: 1rem; font-weight: bold; color: #c8a951; margin-bottom: 10px; }
+.kings-modal-msg { font-size: 0.88rem; color: #d8dcea; line-height: 1.55; margin-bottom: 18px; }
+.kings-modal-btn {
+  background: linear-gradient(135deg, #d4af37, #c8a951); color: #1a1a1a;
+  border: none; border-radius: 6px; padding: 11px 0; width: 100%;
+  font-size: 0.92rem; font-weight: bold; font-family: inherit; cursor: pointer;
+}
+.kings-modal-btn:hover { opacity: 0.9; }
+
 /* ─── 모바일 하단 고정 배팅 바 (사다리) ─── */
 .lg-mobile-betbar { display: none; }
 @media (max-width: 900px) {
