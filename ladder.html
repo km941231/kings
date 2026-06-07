@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KINGS - 사다리</title>
+  <link rel="stylesheet" href="common.css">
+</head>
+<body>
+
+  <!-- 로딩 화면 -->
+  <div id="loadingScreen">
+    <div class="loading-logo">♠ KINGS</div>
+    <div class="loading-spinner"></div>
+  </div>
+
+  <!-- 로그인 화면 -->
+  <div id="loginScreen" style="display:none">
+    <div class="login-wrap">
+      <div class="login-logo-area">
+        <h1>♠ KINGS</h1>
+        <p>로그인하고 시작하세요</p>
+      </div>
+      <div class="login-card">
+        <div class="tab-row">
+          <button class="tab-btn active" id="tabLogin" onclick="switchTab('login')">로그인</button>
+          <button class="tab-btn" id="tabRegister" onclick="switchTab('register')">회원가입</button>
+        </div>
+        <div class="field">
+          <label>아이디</label>
+          <input type="text" id="usernameInput" placeholder="아이디 입력" maxlength="16" autocomplete="username">
+        </div>
+        <div class="field">
+          <label>비밀번호</label>
+          <input type="password" id="passwordInput" placeholder="6자 이상" onkeydown="handleEnter(event)" autocomplete="current-password">
+        </div>
+        <div id="registerFields" style="display:none">
+          <div class="field">
+            <label>비밀번호 확인</label>
+            <input type="password" id="passwordConfirmInput" placeholder="비밀번호를 다시 입력">
+          </div>
+          <div class="field">
+            <label>닉네임</label>
+            <input type="text" id="nicknameInput" placeholder="게임에서 표시될 이름" maxlength="12">
+          </div>
+          <div class="field">
+            <label>휴대폰 번호</label>
+            <input type="tel" id="phoneInput" placeholder="010-0000-0000" maxlength="13" oninput="formatPhone(this)">
+          </div>
+          <div class="field">
+            <label>추천인 코드</label>
+            <input type="text" id="referralInput" placeholder="추천인 코드 입력 (필수)" maxlength="16">
+          </div>
+        </div>
+        <p class="error-msg" id="authError"></p>
+        <button class="btn-login-submit" id="submitBtn" onclick="handleSubmit()">로그인</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 게임 화면 -->
+  <div id="gameScreen">
+
+    <!-- 헤더 -->
+    <header class="header">
+      <a class="header-logo" href="index.html" style="text-decoration:none;color:inherit">♠ KINGS</a>
+      <div class="header-user">
+        <div class="user-point-box" id="headerPoints">0 P</div>
+        <div class="myinfo-nickname" id="userNickname">—</div>
+        <button class="btn-myinfo" onclick="location.href='myinfo.html'">👤 내정보</button>
+        <button class="btn-myinfo" id="btnAdmin" style="display:none;border-color:#e05555;color:#e05555;background:#1a0d0d" onclick="location.href='admin.html'">⚙ 관리자</button>
+        <button class="btn-logout-top" onclick="handleLogout()">로그아웃</button>
+      </div>
+      <button class="btn-hamburger" id="btnHamburger" onclick="toggleMobileMenu()">☰</button>
+    </header>
+
+    <!-- 모바일 드로어 메뉴 -->
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay" onclick="closeMobileMenu()">
+      <div class="mobile-menu-drawer" onclick="event.stopPropagation()">
+        <div class="mob-user-row">
+          <div>
+            <div class="mob-user-sub">환영합니다</div>
+            <div class="mob-user-name" id="mobNickname">—</div>
+          </div>
+          <div class="user-point-box" id="mobPoints" style="font-size:0.8rem">0 P</div>
+        </div>
+        <div class="mob-section-title">GAME</div>
+        <a class="mob-item active" href="ladder.html">사다리 <span class="sidebar-badge">LIVE</span></a>
+        <div class="mob-section-title">CASINO</div>
+        <a class="mob-item" href="dragon.html">드래곤타이거 <span class="sidebar-badge">LIVE</span></a>
+        <a class="mob-item" href="pdragon.html">파워 드래곤타이거 <span class="sidebar-badge">LIVE</span></a>
+        <a class="mob-item" href="baccarat.html">바카라 <span class="sidebar-badge">LIVE</span></a>
+        <a class="mob-item" href="blackjack.html">블랙잭 <span class="sidebar-badge">LIVE</span></a>
+        <div class="mob-section-title">MENU</div>
+        <a class="mob-item" href="bethistory.html">배팅내역</a>
+        <div class="mob-actions">
+          <button class="btn-myinfo" id="mobBtnAdmin" style="display:none;border-color:#e05555;color:#e05555;background:#1a0d0d" onclick="location.href='admin.html'">⚙ 관리자</button>
+          <button class="btn-myinfo" onclick="location.href='myinfo.html'">👤 내정보</button>
+          <button class="btn-logout-top" style="flex:1;text-align:center" onclick="handleLogout()">로그아웃</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 서브 네비 -->
+    <nav class="subnav">
+      <div class="subnav-category" id="catGame">
+        <button class="subnav-cat-btn active" onclick="toggleSubnav('game')">게임 <span class="subnav-arrow">▼</span></button>
+        <div class="subnav-dropdown">
+          <a class="subnav-drop-item active" href="ladder.html">사다리 <span class="sidebar-badge">LIVE</span></a>
+        </div>
+      </div>
+      <div class="subnav-category" id="catCasino">
+        <button class="subnav-cat-btn" onclick="toggleSubnav('casino')">카지노 <span class="subnav-arrow">▼</span></button>
+        <div class="subnav-dropdown">
+          <a class="subnav-drop-item" href="dragon.html">드래곤타이거 <span class="sidebar-badge">LIVE</span></a>
+          <a class="subnav-drop-item" href="pdragon.html">파워 드래곤타이거 <span class="sidebar-badge">LIVE</span></a>
+          <a class="subnav-drop-item" href="baccarat.html">바카라 <span class="sidebar-badge">LIVE</span></a>
+          <a class="subnav-drop-item" href="blackjack.html">블랙잭 <span class="sidebar-badge">LIVE</span></a>
+        </div>
+      </div>
+      <div class="subnav-category" id="catMenu">
+        <button class="subnav-cat-btn" onclick="toggleSubnav('menu')">메뉴 <span class="subnav-arrow">▼</span></button>
+        <div class="subnav-dropdown"><a class="subnav-drop-item" href="bethistory.html">배팅내역</a></div>
+      </div>
+    </nav>
+
+    <!-- 3단 레이아웃 -->
+    <div class="main-layout">
+
+      <!-- 좌측 사이드바 -->
+      <aside class="sidebar-left">
+        <div class="sidebar-section-title">GAME</div>
+        <a class="sidebar-menu-item active" href="ladder.html">사다리 <span class="sidebar-badge">LIVE</span></a>
+        <div class="sidebar-section-title" style="margin-top:10px">CASINO</div>
+        <a class="sidebar-menu-item" href="dragon.html">드래곤타이거 <span class="sidebar-badge">LIVE</span></a>
+        <a class="sidebar-menu-item" href="pdragon.html">파워 드래곤타이거 <span class="sidebar-badge">LIVE</span></a>
+        <a class="sidebar-menu-item" href="baccarat.html">바카라 <span class="sidebar-badge">LIVE</span></a>
+        <a class="sidebar-menu-item" href="blackjack.html">블랙잭 <span class="sidebar-badge">LIVE</span></a>
+      </aside>
+
+      <!-- 메인 콘텐츠 -->
+      <main class="main-content">
+        <div class="content-header">
+          <div class="content-title">사다리</div>
+          <div class="saving-indicator" id="savingIndicator"></div>
+        </div>
+
+        <!-- 사다리 게임 -->
+        <div id="panelLadder">
+          <div class="lg-layout">
+            <!-- 가운데: 게임 -->
+            <div class="lg-panel">
+              <div class="lg-game-title">스피드 사다리</div>
+              <div class="lg-datetime" id="lgDatetime">—</div>
+              <div class="lg-canvas-wrap">
+                <canvas id="lgCanvas" width="300" height="380"></canvas>
+              </div>
+              <div class="lg-bet-section">
+                <div class="lg-bet-label">좌 / 우</div>
+                <div class="lg-bet-row">
+                  <button class="lg-bet-btn type-left"  id="lgBtnLeft"  onclick="selectLGBet('side','좌')">좌<span class="lg-bet-odds">1.95배</span></button>
+                  <button class="lg-bet-btn type-right" id="lgBtnRight" onclick="selectLGBet('side','우')">우<span class="lg-bet-odds">1.95배</span></button>
+                </div>
+                <div class="lg-bet-label">3줄 / 4줄</div>
+                <div class="lg-bet-row">
+                  <button class="lg-bet-btn type-three" id="lgBtn3"     onclick="selectLGBet('line','3줄')">3줄<span class="lg-bet-odds">1.95배</span></button>
+                  <button class="lg-bet-btn type-four"  id="lgBtn4"     onclick="selectLGBet('line','4줄')">4줄<span class="lg-bet-odds">1.95배</span></button>
+                </div>
+                <div class="lg-bet-label">홀 / 짝</div>
+                <div class="lg-bet-row">
+                  <button class="lg-bet-btn type-hol"  id="lgBtnHol"  onclick="selectLGBet('hj','홀')">홀<span class="lg-bet-odds">1.95배</span></button>
+                  <button class="lg-bet-btn type-jjak" id="lgBtnJjak" onclick="selectLGBet('hj','짝')">짝<span class="lg-bet-odds">1.95배</span></button>
+                </div>
+                <div class="lg-bet-status" id="lgBetStatus">배팅 항목을 선택하세요</div>
+              </div>
+              <div class="lg-countdown" id="lgCountdown">—</div>
+            </div>
+            <!-- 오른쪽: 회차별 결과 -->
+            <div class="lg-panel">
+              <div class="lg-panel-title">회차별 결과</div>
+              <div class="lg-result-header">
+                <span>회차</span><span>결과</span>
+              </div>
+              <div class="lg-result-list" id="lgResultList"></div>
+            </div>
+          </div>
+
+          <!-- 오늘의 게임 기록 -->
+          <div class="lg-history-section">
+            <div class="lg-history-tabs">
+              <div class="lg-history-tab active" data-tab="side"   onclick="setHistoryTab('side')">출발</div>
+              <div class="lg-history-tab"        data-tab="line"   onclick="setHistoryTab('line')">줄수</div>
+              <div class="lg-history-tab"        data-tab="result" onclick="setHistoryTab('result')">결과</div>
+              <div class="lg-history-tab"        data-tab="combo"  onclick="setHistoryTab('combo')">출발+줄수</div>
+            </div>
+            <div class="lg-history-grid" id="lgHistoryGrid">
+              <div class="lg-history-empty">게임 기록 로딩 중...</div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- 우측 배팅 슬립 -->
+      <aside class="sidebar-right">
+        <div class="slip-header">BETTING SLIP</div>
+        <div class="slip-body">
+          <div class="slip-point-row">
+            <div class="slip-point-label">보유 포인트</div>
+            <div class="slip-point-value" id="slipPoints">0 P</div>
+          </div>
+          <div class="slip-section-label">선택한 배팅</div>
+          <div id="lgCartItems" class="cart-items">
+            <div class="cart-empty">선택된 배팅 없음</div>
+          </div>
+          <div class="slip-section-label">배팅 금액</div>
+          <div class="bet-quick-btns">
+            <button class="bet-quick-btn" id="qbtn5000" onclick="addBet(5000)">+5,000</button>
+            <button class="bet-quick-btn" id="qbtn10000" onclick="addBet(10000)">+10,000</button>
+            <button class="bet-quick-btn" id="qbtn30000" onclick="addBet(30000)">+30,000</button>
+            <button class="bet-quick-btn" id="qbtn50000" onclick="addBet(50000)">+50,000</button>
+            <button class="bet-quick-btn" id="qbtn100000" onclick="addBet(100000)">+100,000</button>
+            <button class="bet-quick-btn" id="qbtnMax" onclick="setBetAll()">MAX</button>
+          </div>
+          <div class="bet-input-row">
+            <input class="bet-input" type="number" id="betInput" placeholder="배팅 금액">
+            <button class="bet-reset-btn" onclick="resetBet()">초기화</button>
+          </div>
+          <hr class="slip-divider">
+          <div class="slip-summary">
+            <span class="label">배팅액</span>
+            <span class="value" id="summaryBet">0 P</span>
+          </div>
+          <div class="slip-summary">
+            <span class="label">예상 당첨금</span>
+            <span class="value gold" id="summaryWin">0 P</span>
+          </div>
+          <hr class="slip-divider">
+          <button class="btn-bet-now" id="btnBetConfirm" onclick="confirmLGBet()">배팅하기</button>
+          <button class="btn-recharge-slip" style="margin-top:8px" onclick="recharge()">+ 포인트 충전 (10,000P)</button>
+        </div>
+        <div class="history-panel">
+          <div class="history-panel-title">최근 배팅 기록</div>
+          <div class="history-rows" id="historyList">
+            <div class="history-empty">기록 없음</div>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+
+    <!-- 모바일 하단 고정 배팅 바 -->
+    <div class="lg-mobile-betbar" id="lgMobileBetBar">
+      <div class="lg-mbb-quick">
+        <button onclick="addBet(10000)">+1만</button>
+        <button onclick="addBet(50000)">+5만</button>
+        <button onclick="addBet(100000)">+10만</button>
+        <button onclick="setBetAll()">MAX</button>
+        <button onclick="resetBet()">초기화</button>
+      </div>
+      <div class="lg-mbb-row">
+        <input type="number" id="lgMobBetInput" placeholder="배팅 금액" inputmode="numeric">
+        <button class="lg-mbb-confirm" id="lgMobConfirm" onclick="confirmLGBet()">배팅하기</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { auth, db, onAuthStateChanged, doc, getDoc, setDoc, updateDoc,
+             collection, getDocs, addDoc, query, orderBy, serverTimestamp, signOut }
+      from './common.js';
+    import { writeBatch } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    let points = 0;
+    let gameHistory = [];
+    let currentUid = null;
+    let currentUserData = {};
+
+    document.getElementById('betInput').addEventListener('input', updateSummary);
+    // 모바일 하단 바 입력 → 메인 입력칸과 동기화
+    document.getElementById('lgMobBetInput').addEventListener('input', () => {
+      document.getElementById('betInput').value = document.getElementById('lgMobBetInput').value;
+      updateSummary();
+    });
+
+    function updateSummary() {
+      const bet = getBet();
+      const numSel = [LG.bet.side, LG.bet.line, LG.bet.hj].filter(Boolean).length;
+      const multiplier = Math.pow(1.95, numSel || 1);
+      document.getElementById('summaryBet').textContent = bet.toLocaleString() + ' P';
+      document.getElementById('summaryWin').textContent = Math.floor(bet * multiplier).toLocaleString() + ' P';
+      // 모바일 바 입력칸도 같은 값으로 (단, 그 칸에 직접 입력 중일 땐 건드리지 않음)
+      const mob = document.getElementById('lgMobBetInput');
+      if (mob && document.activeElement !== mob) mob.value = document.getElementById('betInput').value;
+      updateMobBetBar();
+    }
+
+    // 모바일 하단 배팅 바 표시/숨김 및 버튼 상태 갱신
+    function updateMobBetBar() {
+      const bar = document.getElementById('lgMobileBetBar');
+      if (!bar) return;
+      const anySel = !!(LG.bet.side || LG.bet.line || LG.bet.hj);
+      bar.classList.toggle('show', anySel && !LG.confirmed);
+      const locked = !!document.getElementById('btnBetConfirm')?.disabled;
+      const btn = document.getElementById('lgMobConfirm');
+      if (btn) {
+        btn.disabled = locked || LG.confirmed;
+        btn.textContent = LG.confirmed ? '배팅 완료' : '배팅하기';
+      }
+      const mobInp = document.getElementById('lgMobBetInput');
+      if (mobInp) mobInp.disabled = locked || LG.confirmed;
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      document.getElementById('loadingScreen').style.display = 'none';
+      if (user) {
+        currentUid = user.uid;
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('gameScreen').style.display = 'flex';
+        document.getElementById('gameScreen').style.flexDirection = 'column';
+        await loadUserData(user.uid);
+        await loadBetHistory();
+        localStorage.setItem('lastGame', 'ladder');
+        initLadderGame();
+      } else {
+        currentUid = null;
+        document.getElementById('loginScreen').style.display = 'flex';
+        document.getElementById('gameScreen').style.display = 'none';
+      }
+    });
+
+    async function loadUserData(uid) {
+      try {
+        const snap = await getDoc(doc(db, 'users', uid));
+        if (snap.exists()) {
+          const data = snap.data();
+          currentUserData = data;
+          points = data.points ?? 10000;
+          const nick = data.nickname || data.username || '유저';
+          document.getElementById('userNickname').textContent = nick;
+          document.getElementById('mobNickname').textContent  = nick;
+          if (data.isAdmin) {
+            document.getElementById('btnAdmin').style.display = 'flex';
+            const m = document.getElementById('mobBtnAdmin'); if (m) m.style.display = 'flex';
+          }
+        } else {
+          const uname = auth.currentUser?.email?.split('@')[0] || '유저';
+          currentUserData = { username: uname, nickname: uname, phone: '—', referral: '—', points: 10000 };
+          points = 10000;
+          document.getElementById('userNickname').textContent = uname;
+          document.getElementById('mobNickname').textContent  = uname;
+          await setDoc(doc(db, 'users', uid), currentUserData);
+        }
+        sessionStorage.setItem('userData', JSON.stringify({ ...currentUserData, points }));
+        updatePointsDisplay();
+      } catch(e) {
+        console.error('Firestore 오류:', e);
+        points = 10000;
+        updatePointsDisplay();
+      }
+    }
+
+    async function savePoints() {
+      if (!currentUid) return;
+      const ind = document.getElementById('savingIndicator');
+      ind.textContent = '저장 중...';
+      try {
+        await updateDoc(doc(db, 'users', currentUid), { points });
+        ind.textContent = '✓ 저장됨';
+        setTimeout(() => { ind.textContent = ''; }, 1500);
+      } catch(e) { ind.textContent = ''; }
+    }
+
+    async function saveBet(betData) {
+      if (!currentUid) return null;
+      try {
+        const ref = await addDoc(collection(db, 'users', currentUid, 'bets'), {
+          ...betData,
+          timestamp: serverTimestamp()
+        });
+        return ref.id;
+      } catch(e) { console.error('배팅 저장 오류:', e); return null; }
+    }
+
+    async function updateBetRecord(docId, data) {
+      if (!currentUid || !docId) return;
+      try {
+        await updateDoc(doc(db, 'users', currentUid, 'bets', docId), data);
+      } catch(e) { console.error('배팅 업데이트 오류:', e); }
+    }
+
+    async function loadBetHistory() {
+      if (!currentUid) return;
+      try {
+        const q = query(collection(db, 'users', currentUid, 'bets'), orderBy('timestamp', 'desc'));
+        const snap = await getDocs(q);
+        gameHistory = snap.docs.map(d => ({ _docId: d.id, ...d.data() }));
+        await settleOldPendingBets();
+        renderHistory();
+      } catch(e) { console.error('배팅 기록 불러오기 오류:', e); }
+    }
+
+    async function settleOldPendingBets() {
+      const curRound = getLGRound();
+      let pointsDelta = 0;
+      for (const h of gameHistory) {
+        if (h.status !== 'pending') continue;
+        if (!h.round || h.round >= curRound) continue;
+        if (h.gameType === 'ladder') {
+          const d = getLGResult(h.round);
+          const resultCls = d.result === '홀' ? 'odd' : 'even';
+          const choiceParts = h.choice ? h.choice.split(' × ') : [];
+          const allCorrect =
+            (!choiceParts.some(p => p==='좌'||p==='우') || choiceParts.includes(d.side)) &&
+            (!choiceParts.some(p => p==='3줄'||p==='4줄') || choiceParts.includes(d.line)) &&
+            (!choiceParts.some(p => p==='홀'||p==='짝') || choiceParts.includes(d.result));
+          const payout = allCorrect ? Math.floor(h.bet * Math.pow(1.95, choiceParts.length)) : 0;
+          h.number = d.result; h.cls = resultCls; h.payout = payout; h.netChange = payout-h.bet; h.isWin = allCorrect; h.status = 'settled';
+          if (h._docId) updateBetRecord(h._docId, { number:d.result, cls:resultCls, payout, netChange:payout-h.bet, isWin:allCorrect, status:'settled' });
+          pointsDelta += payout;
+        }
+      }
+      if (pointsDelta > 0) {
+        points += pointsDelta;
+        updatePointsDisplay();
+        await savePoints();
+      }
+    }
+
+    function updatePointsDisplay() {
+      const txt = points.toLocaleString() + ' P';
+      document.getElementById('headerPoints').textContent = txt;
+      document.getElementById('slipPoints').textContent   = txt;
+      const mob = document.getElementById('mobPoints');
+      if (mob) mob.textContent = txt;
+    }
+
+    window.handleLogout = async function() {
+      await signOut(auth);
+      gameHistory = [];
+      renderHistory();
+    };
+
+    function getBet() {
+      const v = parseInt(document.getElementById('betInput').value, 10);
+      return isNaN(v) || v <= 0 ? 0 : v;
+    }
+
+    window.addBet = function(n) { document.getElementById('betInput').value = getBet() + n; updateSummary(); };
+    window.setBetAll = function() { document.getElementById('betInput').value = points; updateSummary(); };
+    window.resetBet = function() { document.getElementById('betInput').value = ''; updateSummary(); };
+    window.recharge = async function() { points += 10000; updatePointsDisplay(); await savePoints(); };
+
+    function renderHistory() {
+      const list = document.getElementById('historyList');
+      if (!gameHistory.length) { list.innerHTML = '<div class="history-empty">기록 없음</div>'; return; }
+      list.innerHTML = gameHistory.slice(0, 20).map(h => {
+        const isPending = h.status === 'pending';
+        return `<div class="h-row ${isPending ? '' : h.isWin ? 'win' : 'lose'}">
+          <span class="h-num ${h.cls||''}">${isPending ? '?' : h.number}</span>
+          <span class="h-info">${h.choice} / ${(h.bet||0).toLocaleString()}P</span>
+          <span class="h-result ${isPending ? '' : h.isWin ? 'win' : 'lose'}">${isPending ? '대기중' : (h.netChange >= 0 ? '+' : '') + (h.netChange||0).toLocaleString()}</span>
+        </div>`;
+      }).join('');
+    }
+
+    // ═══════════════════════════════════════
+    // 사다리 게임
+    // ═══════════════════════════════════════
+    const LG = {
+      ctx: null, animFrame: null, timer: null,
+      round: 0, isAnimating: false,
+      bet: { side: null, line: null, hj: null },
+      confirmed: false,
+      confirmedAmount: 0,
+      confirmedBetOptions: null
+    };
+
+    function lgHash(n) {
+      let h = (n ^ 0xdeadbeef) >>> 0;
+      h = Math.imul(h ^ (h >>> 16), 0x45d9f3b) >>> 0;
+      h = Math.imul(h ^ (h >>> 15), 0xc2b2ae35) >>> 0;
+      return ((h ^ (h >>> 16)) >>> 0) / 0xffffffff;
+    }
+
+    function getLGRound() {
+      const d = new Date();
+      return d.getHours() * 60 + d.getMinutes() + 1;
+    }
+
+    function getLGResult(round) {
+      const startLeft = lgHash(round * 777 + 99) > 0.5;
+      const isThree   = lgHash(round * 333 + 55) > 0.5;
+      const numBars   = isThree ? 3 : 4;
+      const bars = [true, true, true, true];
+      if (isThree) {
+        bars[Math.floor(lgHash(round * 555 + 33) * 4)] = false;
+      }
+      let posLeft = startLeft;
+      bars.forEach(b => { if (b) posLeft = !posLeft; });
+      return {
+        startLeft, numBars, bars,
+        endsLeft: posLeft,
+        side:   startLeft ? '좌' : '우',
+        line:   numBars + '줄',
+        result: posLeft ? '홀' : '짝'
+      };
+    }
+
+    const LGC = { W:300, H:380, LX:80, RX:220, ROWS:[100,148,196,244], TOP:52, BOT:298 };
+
+    function lgDraw(data, charX, charY, pending = false) {
+      const c = LG.ctx;
+      const { W, H, LX, RX, ROWS, TOP, BOT } = LGC;
+      const { bars, startLeft } = data;
+      c.clearRect(0, 0, W, H);
+      c.shadowBlur = 0; c.shadowColor = 'transparent';
+      const bgGrad = c.createLinearGradient(0, 0, 0, H);
+      bgGrad.addColorStop(0, '#080c18'); bgGrad.addColorStop(1, '#0c1020');
+      c.fillStyle = bgGrad; c.fillRect(0, 0, W, H);
+      c.strokeStyle = '#1a2035'; c.lineWidth = 1; c.strokeRect(0.5, 0.5, W - 1, H - 1);
+      [LX, RX].forEach(x => {
+        c.shadowColor = '#1e2a50'; c.shadowBlur = 14;
+        c.strokeStyle = '#2a3660'; c.lineWidth = 10; c.lineCap = 'butt';
+        c.beginPath(); c.moveTo(x, TOP); c.lineTo(x, BOT); c.stroke();
+        c.shadowBlur = 0;
+        c.strokeStyle = '#3c4e7a'; c.lineWidth = 5;
+        c.beginPath(); c.moveTo(x, TOP); c.lineTo(x, BOT); c.stroke();
+        c.strokeStyle = '#5a6e9a'; c.lineWidth = 1.5;
+        c.beginPath(); c.moveTo(x - 1.5, TOP); c.lineTo(x - 1.5, BOT); c.stroke();
+      });
+      c.shadowBlur = 0;
+      if (!pending) {
+        bars.forEach((b, i) => {
+          if (!b) return;
+          const y = ROWS[i];
+          c.shadowColor = 'rgba(200,169,81,0.55)'; c.shadowBlur = 16;
+          c.strokeStyle = '#d4a835'; c.lineWidth = 6; c.lineCap = 'round';
+          c.beginPath(); c.moveTo(LX, y); c.lineTo(RX, y); c.stroke();
+          c.shadowBlur = 0;
+          c.strokeStyle = '#f0d060'; c.lineWidth = 2;
+          c.beginPath(); c.moveTo(LX + 4, y - 1); c.lineTo(RX - 4, y - 1); c.stroke();
+        });
+      } else {
+        c.setLineDash([7, 8]);
+        ROWS.forEach(y => {
+          c.strokeStyle = '#1c2540'; c.lineWidth = 2; c.lineCap = 'round';
+          c.beginPath(); c.moveTo(LX + 12, y); c.lineTo(RX - 12, y); c.stroke();
+        });
+        c.setLineDash([]);
+      }
+      c.shadowBlur = 0;
+      [LX, RX].forEach((x, idx) => {
+        const isStart = !pending && (idx === 0 ? startLeft : !startLeft);
+        const cy = TOP - 20;
+        const g = c.createRadialGradient(x - 4, cy - 4, 1, x, cy, 16);
+        if (isStart) { g.addColorStop(0, '#5a6a90'); g.addColorStop(1, '#202e50'); }
+        else { g.addColorStop(0, '#161c2e'); g.addColorStop(1, '#0c1020'); }
+        c.shadowColor = isStart ? '#3a4a7a' : 'transparent';
+        c.shadowBlur = isStart ? 10 : 0;
+        c.fillStyle = g;
+        c.beginPath(); c.arc(x, cy, 16, 0, Math.PI * 2); c.fill();
+        c.shadowBlur = 0;
+        c.strokeStyle = isStart ? '#506080' : '#1e2838'; c.lineWidth = 1.5;
+        c.beginPath(); c.arc(x, cy, 16, 0, Math.PI * 2); c.stroke();
+        const r = 6;
+        c.strokeStyle = isStart ? '#c8d8f0' : '#283848'; c.lineWidth = 2.5; c.lineCap = 'round';
+        c.beginPath();
+        c.moveTo(x - r, cy - r); c.lineTo(x + r, cy + r);
+        c.moveTo(x + r, cy - r); c.lineTo(x - r, cy + r);
+        c.stroke();
+      });
+      c.font = 'bold 13px Malgun Gothic, sans-serif';
+      c.textAlign = 'center'; c.textBaseline = 'middle';
+      if (pending) {
+        c.fillStyle = '#2a3a54';
+        c.fillText('?', LX, TOP - 44); c.fillText('?', RX, TOP - 44);
+      } else {
+        c.fillStyle = startLeft  ? '#e8c84a' : '#3a4e68'; c.fillText('좌', LX, TOP - 44);
+        c.fillStyle = !startLeft ? '#e8c84a' : '#3a4e68'; c.fillText('우', RX, TOP - 44);
+      }
+      if (!pending) {
+        c.fillStyle = '#3c5068'; c.font = '11px Malgun Gothic, sans-serif';
+        c.textAlign = 'center';
+        c.fillText(`${bars.filter(Boolean).length}줄`, W / 2, ROWS[1] - 16);
+      }
+      [[LX, '홀', '#9a1f1f', '#e05555'], [RX, '짝', '#1448a0', '#4a9eff']].forEach(([x, lbl, dark, light]) => {
+        const cy = BOT + 26;
+        const g = c.createRadialGradient(x - 6, cy - 6, 2, x, cy, 24);
+        g.addColorStop(0, light); g.addColorStop(1, dark);
+        c.shadowColor = lbl === '홀' ? 'rgba(224,85,85,0.5)' : 'rgba(74,158,255,0.5)';
+        c.shadowBlur = 16; c.fillStyle = g;
+        c.beginPath(); c.arc(x, cy, 24, 0, Math.PI * 2); c.fill();
+        c.shadowBlur = 0;
+        c.strokeStyle = 'rgba(255,255,255,0.15)'; c.lineWidth = 1;
+        c.beginPath(); c.arc(x, cy, 19, 0, Math.PI * 2); c.stroke();
+        c.fillStyle = '#fff'; c.font = 'bold 16px Malgun Gothic, sans-serif';
+        c.textAlign = 'center'; c.textBaseline = 'middle';
+        c.fillText(lbl, x, cy);
+      });
+      c.shadowBlur = 0;
+      if (charX !== null && charY !== null) {
+        const gGlow = c.createRadialGradient(charX, charY, 6, charX, charY, 26);
+        gGlow.addColorStop(0, 'rgba(210,160,30,0.45)'); gGlow.addColorStop(1, 'rgba(210,160,30,0)');
+        c.fillStyle = gGlow; c.beginPath(); c.arc(charX, charY, 26, 0, Math.PI * 2); c.fill();
+        const g = c.createRadialGradient(charX - 4, charY - 4, 1, charX, charY, 13);
+        g.addColorStop(0, '#ffe868'); g.addColorStop(0.55, '#c8a030'); g.addColorStop(1, '#7a5a10');
+        c.fillStyle = g; c.beginPath(); c.arc(charX, charY, 13, 0, Math.PI * 2); c.fill();
+        c.fillStyle = 'rgba(255,255,220,0.4)';
+        c.beginPath(); c.arc(charX - 4, charY - 4, 4, 0, Math.PI * 2); c.fill();
+      }
+    }
+
+    function lgAnimate(round, onDone) {
+      if (LG.animFrame) cancelAnimationFrame(LG.animFrame);
+      LG.isAnimating = true;
+      const data = getLGResult(round);
+      const { bars, startLeft } = data;
+      const { LX, RX, ROWS, TOP, BOT } = LGC;
+      const path = [];
+      let cx = startLeft ? LX : RX;
+      path.push({ x: cx, y: TOP - 15 });
+      ROWS.forEach((ry, i) => {
+        path.push({ x: cx, y: ry });
+        if (bars[i]) { cx = cx === LX ? RX : LX; path.push({ x: cx, y: ry }); }
+      });
+      path.push({ x: cx, y: BOT });
+      const totalDist = path.reduce((s, p, i) =>
+        i === 0 ? 0 : s + Math.hypot(p.x - path[i-1].x, p.y - path[i-1].y), 0);
+      const speed = totalDist / 2600;
+      let seg = 0, t = 0, last = null;
+      function frame(ts) {
+        if (!last) last = ts;
+        const dt = Math.min(ts - last, 50); last = ts;
+        if (seg >= path.length - 1) {
+          lgDraw(data, path[path.length-1].x, path[path.length-1].y);
+          LG.isAnimating = false;
+          if (onDone) onDone();
+          return;
+        }
+        const fr = path[seg], to = path[seg+1];
+        const sd = Math.hypot(to.x - fr.x, to.y - fr.y) || 1;
+        t += speed * dt / sd;
+        if (t >= 1) { t = 0; seg++; }
+        lgDraw(data, fr.x + (to.x-fr.x)*t, fr.y + (to.y-fr.y)*t);
+        LG.animFrame = requestAnimationFrame(frame);
+      }
+      LG.animFrame = requestAnimationFrame(frame);
+    }
+
+    function lgNow() {
+      const d = new Date(), p = n => String(n).padStart(2,'0');
+      return `${d.getFullYear()}.${p(d.getMonth()+1)}.${p(d.getDate())} - ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+    }
+
+    function makeLGBadge(d) {
+      const hjCls  = d.result === '홀' ? 'hol' : 'jjak';
+      const posCls = d.startLeft ? 'left' : 'right';
+      return `<div class="lg-res-wrap">
+        <div class="lg-res-big ${hjCls}">${d.result}</div>
+        <div class="lg-res-small ${posCls}">${d.numBars}</div>
+      </div>`;
+    }
+
+    function renderLGResultList() {
+      const cur = getLGRound();
+      const mo = new Date().getMonth()+1, dy = new Date().getDate();
+      let html = `<div class="lg-result-item">
+        <span class="lg-result-round">${mo}.${dy} - ${cur}</span>
+        <div class="lg-res-wrap"><div class="lg-res-big wait">대기 중</div></div>
+      </div>`;
+      for (let i = 1; i <= 18; i++) {
+        const r = cur - i;
+        const d = getLGResult(r);
+        html += `<div class="lg-result-item">
+          <span class="lg-result-round">${mo}.${dy} - ${r}</span>
+          ${makeLGBadge(d)}
+        </div>`;
+      }
+      const el = document.getElementById('lgResultList');
+      if (el) el.innerHTML = html;
+    }
+
+    function renderLGCart() {
+      const el = document.getElementById('lgCartItems');
+      if (!el) return;
+      if (LG.confirmed && LG.confirmedBetOptions) {
+        const opts = LG.confirmedBetOptions;
+        const sel = [opts.side, opts.line, opts.hj].filter(Boolean);
+        const multi = Math.pow(1.95, sel.length).toFixed(2);
+        el.innerHTML = `<div class="cart-confirmed">✓ 배팅 확정됨<br><span style="font-size:0.72rem;opacity:0.8">${sel.join(' × ')} — ${multi}배 / ${LG.confirmedAmount.toLocaleString()}P</span></div>`;
+        return;
+      }
+      const catLabel = { side: '좌우', line: '줄수', hj: '홀/짝' };
+      const entries = Object.entries(LG.bet).filter(([, v]) => v);
+      if (!entries.length) { el.innerHTML = '<div class="cart-empty">선택된 배팅 없음</div>'; return; }
+      const items = entries.map(([cat, val]) => `<div class="cart-item">
+          <div class="cart-item-left">
+            <span class="cart-item-name">${val}</span>
+            <span class="cart-item-odds">1.95배 (${catLabel[cat]})</span>
+          </div>
+          <button class="cart-item-remove" onclick="removeLGBet('${cat}')">✕</button>
+        </div>`);
+      const numSel = entries.length;
+      const multi = Math.pow(1.95, numSel).toFixed(2);
+      const multiLine = numSel > 1
+        ? `<div style="padding:5px 10px;font-size:0.75rem;color:#c8a951;border-top:1px solid #2a2a4a;text-align:right">복합배당: ${'1.95 × '.repeat(numSel).replace(/ × $/,'')} = <strong>${multi}배</strong></div>`
+        : '';
+      el.innerHTML = items.join('') + multiLine;
+    }
+
+    window.removeLGBet = function(cat) {
+      LG.bet[cat] = null;
+      const pairs = { side: ['lgBtnLeft','lgBtnRight'], line: ['lgBtn3','lgBtn4'], hj: ['lgBtnHol','lgBtnJjak'] };
+      pairs[cat].forEach(id => document.getElementById(id)?.classList.remove('selected'));
+      renderLGCart(); updateSummary(); lgSetBetLock(false);
+    };
+
+    window.confirmLGBet = async function() {
+      if (LG.confirmed) return;
+      const selected = [LG.bet.side, LG.bet.line, LG.bet.hj].filter(Boolean);
+      if (!selected.length) {
+        const s = document.getElementById('lgBetStatus');
+        if (s) { s.textContent = '⚠ 배팅 항목을 먼저 선택하세요'; s.style.color = '#e05555'; }
+        return;
+      }
+      const bet = getBet();
+      if (!bet) {
+        const s = document.getElementById('lgBetStatus');
+        if (s) { s.textContent = '⚠ 배팅 금액을 입력하세요'; s.style.color = '#e05555'; }
+        return;
+      }
+      if (bet > points) {
+        const s = document.getElementById('lgBetStatus');
+        if (s) { s.textContent = '⚠ 포인트가 부족합니다'; s.style.color = '#e05555'; }
+        return;
+      }
+      LG.confirmed = true;
+      LG.confirmedAmount = bet;
+      LG.confirmedBetOptions = { ...LG.bet };
+      points -= bet;
+      updatePointsDisplay();
+      await savePoints();
+      ['lgBtnLeft','lgBtnRight','lgBtn3','lgBtn4','lgBtnHol','lgBtnJjak'].forEach(id => {
+        const e = document.getElementById(id); if (e) e.disabled = true;
+      });
+      document.getElementById('betInput').disabled = true;
+      ['qbtn5000','qbtn10000','qbtn30000','qbtn50000','qbtn100000','qbtnMax'].forEach(id => {
+        const e = document.getElementById(id); if (e) e.disabled = true;
+      });
+      const confirmBtn = document.getElementById('btnBetConfirm');
+      if (confirmBtn) { confirmBtn.disabled = true; confirmBtn.textContent = '배팅 완료'; }
+      renderLGCart();
+      const s = document.getElementById('lgBetStatus');
+      if (s) { s.textContent = '✅ 배팅 완료! 추첨을 기다리세요.'; s.style.color = '#4ade80'; }
+      const lgOpts = LG.confirmedBetOptions;
+      const lgChoiceLabel = [lgOpts.side, lgOpts.line, lgOpts.hj].filter(Boolean).join(' × ');
+      const lgPending = { gameType:'ladder', gameName:'사다리', choice:lgChoiceLabel, number:'-', cls:'', bet, payout:0, netChange:-bet, isWin:false, round:LG.round, createdAt:new Date(), status:'pending' };
+      gameHistory.unshift(lgPending);
+      renderHistory();
+      updateMobBetBar();
+      saveBet(lgPending).then(id => { if (id) lgPending._docId = id; });
+    };
+
+    function lgSetBetLock(locked) {
+      if (LG.confirmed) return;
+      ['lgBtnLeft','lgBtnRight','lgBtn3','lgBtn4','lgBtnHol','lgBtnJjak'].forEach(id => {
+        const e = document.getElementById(id);
+        if (e) e.disabled = locked || LG.isAnimating;
+      });
+      const confirmBtn = document.getElementById('btnBetConfirm');
+      if (confirmBtn) confirmBtn.disabled = locked || LG.isAnimating;
+      const s = document.getElementById('lgBetStatus');
+      if (!s) return;
+      if (locked) { s.textContent = '⛔ 배팅 마감'; s.style.color = '#e05555'; return; }
+      s.style.color = '#555';
+      const picks = [LG.bet.side, LG.bet.line, LG.bet.hj].filter(Boolean);
+      s.textContent = picks.length ? `선택: ${picks.join(' · ')}` : '배팅 항목을 선택하세요';
+      updateMobBetBar();
+    }
+
+    function initLadderGame() {
+      if (LG.timer) clearInterval(LG.timer);
+      if (LG.animFrame) cancelAnimationFrame(LG.animFrame);
+      LG.ctx = document.getElementById('lgCanvas').getContext('2d');
+      LG.round = getLGRound();
+      if (!LG.confirmed) { LG.bet = { side: null, line: null, hj: null }; }
+      LG.isAnimating = false;
+      renderLGResultList(); renderLGCart(); renderLGHistory();
+      lgDraw(getLGResult(LG.round), null, null, true);
+      if (LG.confirmed) {
+        ['lgBtnLeft','lgBtnRight','lgBtn3','lgBtn4','lgBtnHol','lgBtnJjak'].forEach(id => {
+          const e = document.getElementById(id); if (e) e.disabled = true;
+        });
+        const inp = document.getElementById('betInput'); if (inp) inp.disabled = true;
+        ['qbtn5000','qbtn10000','qbtn30000','qbtn50000','qbtn100000','qbtnMax'].forEach(id => { const e=document.getElementById(id); if(e) e.disabled=true; });
+        const btn = document.getElementById('btnBetConfirm');
+        if (btn) { btn.disabled = true; btn.textContent = '배팅 완료'; }
+        const s = document.getElementById('lgBetStatus');
+        if (s) { s.textContent = '✅ 배팅 완료! 추첨을 기다리세요.'; s.style.color = '#4ade80'; }
+      }
+      updateMobBetBar();
+      LG.timer = setInterval(() => {
+        const newRound = getLGRound();
+        const secs = 60 - new Date().getSeconds();
+        const dtEl = document.getElementById('lgDatetime');
+        if (dtEl) dtEl.textContent = lgNow();
+        const cdEl = document.getElementById('lgCountdown');
+        if (cdEl) {
+          const mm = String(Math.floor((secs-1)/60)).padStart(2,'0');
+          const ss = String((secs-1)%60).padStart(2,'0');
+          cdEl.textContent = `${mm}:${ss} 후 ${newRound}회차 추첨 시작`;
+        }
+        lgSetBetLock(secs <= 8);
+        if (newRound !== LG.round && !LG.isAnimating) {
+          const prev = LG.round;
+          LG.round = newRound;
+          lgAnimate(prev, async () => {
+            const d = getLGResult(prev);
+            if (LG.confirmed && LG.confirmedBetOptions) {
+              const bet = LG.confirmedAmount;
+              const opts = LG.confirmedBetOptions;
+              const numSel = [opts.side, opts.line, opts.hj].filter(Boolean).length;
+              const allCorrect =
+                (!opts.side || opts.side === d.side) &&
+                (!opts.line || opts.line === d.line) &&
+                (!opts.hj   || opts.hj   === d.result);
+              const multiplier = Math.pow(1.95, numSel);
+              const totalPayout = allCorrect ? Math.floor(bet * multiplier) : 0;
+              const netChange = totalPayout - bet;
+              points += totalPayout;
+              const resultLabel = d.result;
+              const resultCls = d.result === '홀' ? 'odd' : 'even';
+              const pendingIdx = gameHistory.findIndex(h => h.gameType==='ladder' && h.round===prev && h.status==='pending');
+              if (pendingIdx !== -1) {
+                const rec = gameHistory[pendingIdx];
+                rec.number = resultLabel; rec.cls = resultCls; rec.payout = totalPayout; rec.netChange = netChange; rec.isWin = allCorrect; rec.status = 'settled';
+                if (rec._docId) updateBetRecord(rec._docId, { number:resultLabel, cls:resultCls, payout:totalPayout, netChange, isWin:allCorrect, status:'settled' });
+              }
+              updatePointsDisplay(); savePoints(); renderHistory();
+            }
+            LG.bet = { side: null, line: null, hj: null };
+            LG.confirmed = false; LG.confirmedAmount = 0; LG.confirmedBetOptions = null;
+            ['lgBtnLeft','lgBtnRight','lgBtn3','lgBtn4','lgBtnHol','lgBtnJjak'].forEach(id => {
+              const e = document.getElementById(id);
+              if (e) { e.classList.remove('selected'); e.disabled = false; }
+            });
+            const betInp = document.getElementById('betInput');
+            if (betInp) betInp.disabled = false;
+            ['qbtn5000','qbtn10000','qbtn30000','qbtn50000','qbtn100000','qbtnMax'].forEach(id => {
+              const e = document.getElementById(id); if (e) e.disabled = false;
+            });
+            const confirmBtn = document.getElementById('btnBetConfirm');
+            if (confirmBtn) { confirmBtn.disabled = false; confirmBtn.textContent = '배팅하기'; }
+            resetBet(); renderLGCart();
+            const s = document.getElementById('lgBetStatus');
+            if (s) { s.textContent = '배팅 항목을 선택하세요'; s.style.color = '#555'; }
+            setTimeout(() => {
+              lgDraw(getLGResult(LG.round), null, null, true);
+              renderLGResultList(); renderLGHistory();
+            }, 1800);
+          });
+        }
+      }, 1000);
+    }
+
+    window.selectLGBet = function(category, value) {
+      if (LG.confirmed || document.getElementById('lgBtnHol')?.disabled) return;
+      LG.bet[category] = LG.bet[category] === value ? null : value;
+      if (LG.bet[category]) {
+        if (category === 'hj') {
+          LG.bet.side = null; LG.bet.line = null;
+          ['lgBtnLeft','lgBtnRight','lgBtn3','lgBtn4'].forEach(id => document.getElementById(id)?.classList.remove('selected'));
+        } else {
+          LG.bet.hj = null;
+          ['lgBtnHol','lgBtnJjak'].forEach(id => document.getElementById(id)?.classList.remove('selected'));
+        }
+      }
+      const map = {
+        side: { '좌': 'lgBtnLeft', '우': 'lgBtnRight' },
+        line: { '3줄': 'lgBtn3', '4줄': 'lgBtn4' },
+        hj:   { '홀': 'lgBtnHol', '짝': 'lgBtnJjak' }
+      };
+      const pairs = { side: ['lgBtnLeft','lgBtnRight'], line: ['lgBtn3','lgBtn4'], hj: ['lgBtnHol','lgBtnJjak'] };
+      pairs[category].forEach(id => document.getElementById(id)?.classList.remove('selected'));
+      if (LG.bet[category]) {
+        const selId = map[category][value];
+        if (selId) document.getElementById(selId)?.classList.add('selected');
+      }
+      renderLGCart(); updateSummary(); lgSetBetLock(false);
+    };
+
+    let lgHistoryTab = 'side';
+
+    function getHistoryCell(d) {
+      if (lgHistoryTab === 'side')   return { cls: d.startLeft ? 'h-left' : 'h-right' };
+      if (lgHistoryTab === 'line')   return { cls: d.numBars === 3 ? 'h-three' : 'h-four' };
+      if (lgHistoryTab === 'result') return { cls: d.result === '홀' ? 'h-hol' : 'h-jjak' };
+      const key = (d.startLeft ? 'l' : 'r') + d.numBars;
+      return { cls: { l3:'h-l3', l4:'h-l4', r3:'h-r3', r4:'h-r4' }[key] };
+    }
+
+    function renderLGHistory() {
+      const grid = document.getElementById('lgHistoryGrid');
+      if (!grid) return;
+      const cur = getLGRound();
+      if (cur <= 1) { grid.innerHTML = '<div class="lg-history-empty">아직 게임 기록이 없습니다</div>'; return; }
+      const columns = [];
+      for (let r = 1; r < cur; r++) {
+        const d = getLGResult(r);
+        const { cls } = getHistoryCell(d);
+        const last = columns[columns.length - 1];
+        if (!last || last.cls !== cls) { columns.push({ cls, items: [r] }); }
+        else { last.items.push(r); }
+      }
+      grid.innerHTML = columns.map(col =>
+        `<div class="lg-hcol">${col.items.map(r =>
+          `<div class="lg-hcell ${col.cls}">${r}</div>`
+        ).join('')}</div>`
+      ).join('');
+      requestAnimationFrame(() => { grid.scrollLeft = grid.scrollWidth; });
+    }
+
+    window.setHistoryTab = function(tab) {
+      lgHistoryTab = tab;
+      document.querySelectorAll('.lg-history-tab').forEach(el =>
+        el.classList.toggle('active', el.dataset.tab === tab)
+      );
+      renderLGHistory();
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,1640 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KINGS - 블랙잭</title>
+  <link rel="stylesheet" href="common.css">
+  <style>
+    /* ── 인슈어런스 UI ── */
+    .bjt-ins-overlay {
+      position: absolute;
+      top: 52%; left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 30;
+      width: 72%; max-width: 480px;
+    }
+    .bjt-ins-box {
+      background: linear-gradient(135deg, rgba(13,26,58,.96), rgba(26,42,90,.96));
+      border: 1px solid rgba(200,169,81,.5);
+      border-radius: 10px; padding: 14px 16px;
+      box-shadow: 0 8px 30px rgba(0,0,0,.5);
+    }
+    .bjt-ins-title { font-size: 0.92rem; font-weight: 900; color: #c8a951; margin-bottom: 4px; }
+    .bjt-ins-desc  { font-size: 0.72rem; color: #8899bb; margin-bottom: 10px; line-height: 1.5; }
+    .bjt-ins-desc strong { color: #c8a951; }
+    .bjt-ins-amount-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+    .bjt-ins-label { font-size: 0.72rem; color: #888; }
+    .bjt-ins-val   { font-size: 1.1rem; font-weight: 900; color: #4ade80; }
+    .bjt-ins-btns  { display: flex; gap: 8px; }
+    .bjt-ins-btn {
+      flex: 1; padding: 10px; border-radius: 6px; font-size: 0.88rem;
+      font-weight: bold; cursor: pointer; font-family: inherit; border: 2px solid;
+      transition: all .15s;
+    }
+    .bjt-ins-yes { background: rgba(74,222,128,.12); border-color: #22c55e; color: #4ade80; }
+    .bjt-ins-yes:hover { background: rgba(74,222,128,.25); }
+    .bjt-ins-no  { background: rgba(224,85,85,.1); border-color: #b91c1c; color: #f87171; }
+    .bjt-ins-no:hover  { background: rgba(224,85,85,.22); }
+    .bjt-ins-btn:disabled { opacity: .45; cursor: not-allowed; }
+    .bjt-ins-status { font-size: 0.75rem; color: #c8a951; margin-top: 6px; min-height: 18px; text-align: center; }
+    .bjt-ins-timer  { font-size: 0.75rem; color: #888; text-align: center; margin-top: 4px; }
+    @media (max-width: 480px) {
+      .bjt-ins-overlay { width: 90%; }
+      .bjt-ins-box { padding: 10px 12px; }
+      .bjt-ins-title { font-size: 0.8rem; }
+      .bjt-ins-desc  { font-size: 0.62rem; margin-bottom: 7px; }
+      .bjt-ins-btn   { padding: 8px; font-size: 0.8rem; }
+      /* 슈 표기 / 배너 / 베팅 서클 모바일 */
+      .bjt-shoe-info { top: 40px; right: 6px; padding: 3px 6px; gap: 4px; }
+      .bjt-shoe-bar-track { width: 48px; }
+      .bjt-shoe-text { font-size: 0.5rem; }
+      .bjtable-seat-circle { width: 46px; height: 46px; border-width: 1.5px; box-shadow: 0 0 8px rgba(200,169,81,0.18); }
+      .bjtable-seat.empty .bjtable-seat-num { display: none; }
+      .bjtable-seat-empty-label { font-size: 0.4rem; }
+      .bjtable-seat-name { font-size: 0.46rem; max-width: 42px; }
+      .bjtable-seat-bet  { font-size: 0.44rem; }
+    }
+
+    @keyframes bjtDealerCardIn {
+      0%   { transform: rotateY(-90deg); opacity: 0.4; }
+      100% { transform: rotateY(0deg);   opacity: 1; }
+    }
+    .bjt-header-points {
+      font-size: 0.78rem; color: #aaa; white-space: nowrap;
+      background: rgba(0,0,0,.35); border: 1px solid rgba(200,169,81,.25);
+      border-radius: 12px; padding: 3px 10px;
+    }
+    @media (max-width: 480px) {
+      .bjt-header-points { font-size: 0.62rem; padding: 2px 7px; }
+    }
+    /* ── 방 선택 ── */
+    .bjt-room-select { padding: 40px 16px; min-height: 60vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; }
+    .bjt-room-title { font-size: 1.4rem; font-weight: 900; color: #c8a951; letter-spacing: 2px; }
+    .bjt-room-sub   { font-size: 0.85rem; color: #777; margin-bottom: 22px; }
+    .bjt-room-grid  { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; width: 100%; max-width: 860px; }
+    .bjt-room-card {
+      aspect-ratio: 1 / 1;
+      background: linear-gradient(160deg, #14302010, #0d3d1c40), #13192e;
+      border: 1.5px solid #2a3a4a; border-radius: 12px;
+      padding: 16px; text-align: center; cursor: pointer;
+      transition: all .18s; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+    }
+    .bjt-room-card:hover { border-color: #c8a951; transform: translateY(-3px); box-shadow: 0 8px 26px rgba(200,169,81,.22); background: linear-gradient(160deg, #1a4a2e, #0d3d1c), #1a2240; }
+    .bjt-room-icon { font-size: 2.4rem; color: #c8a951; }
+    .bjt-room-name { font-size: 1.05rem; font-weight: 900; color: #e0c87a; }
+    .bjt-room-meta { font-size: 0.78rem; color: #8aa; min-height: 18px; }
+    .bjt-room-enter {
+      margin-top: 6px; font-size: 0.8rem; font-weight: bold; color: #0d0d1a;
+      background: linear-gradient(135deg,#7d6608,#c8a951); border-radius: 6px; padding: 7px 18px;
+    }
+    @media (max-width: 480px) {
+      .bjt-room-select { padding: 24px 12px; }
+      .bjt-room-title { font-size: 1.1rem; }
+      .bjt-room-grid { grid-template-columns: 1fr 1fr; gap: 10px; max-width: 340px; }
+      .bjt-room-card { padding: 12px; gap: 5px; }
+      .bjt-room-icon { font-size: 1.8rem; }
+      .bjt-room-name { font-size: 0.9rem; }
+      .bjt-room-meta { font-size: 0.68rem; min-height: 14px; }
+      .bjt-room-enter { margin-top: 3px; font-size: 0.72rem; padding: 5px 12px; }
+    }
+    /* ── 카지노 곡선 배너 + 엠블럼 ── */
+    .bjtable-banner {
+      position: absolute; top: 240px; left: 50%;
+      transform: translateX(-50%);
+      width: 70%; max-width: 760px; height: auto;
+      pointer-events: none; z-index: 0; opacity: 0.9;
+    }
+    .bj-mono {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 92px; font-style: italic; font-weight: 700;
+      fill: rgba(200,169,81,0.12);
+      letter-spacing: 2px;
+    }
+    .bj-banner-1 {
+      font-family: Georgia, serif; font-size: 27px; font-weight: 700;
+      letter-spacing: 2px; fill: rgba(200,169,81,0.4);
+    }
+    .bj-banner-2 {
+      font-family: Georgia, serif; font-size: 20px; font-weight: 700;
+      letter-spacing: 2px; fill: rgba(200,169,81,0.32);
+    }
+    /* 모바일 배너 위치 (기본 규칙 뒤에 와야 적용됨) */
+    @media (max-width: 480px) {
+      .bjtable-banner { top: 165px; width: 86%; }
+    }
+    /* ── 슈 진행률 (오른쪽 위) ── */
+    .bjt-shoe-info {
+      position: absolute; top: 46px; right: 12px; z-index: 3;
+      display: flex; align-items: center; gap: 6px;
+      padding: 4px 9px; border-radius: 14px;
+      background: rgba(0,0,0,.4); border: 1px solid rgba(200,169,81,.25);
+    }
+    .bjt-shoe-bar-track {
+      width: 70px; height: 5px; border-radius: 3px;
+      background: rgba(0,0,0,.5); border: 1px solid rgba(200,169,81,.25);
+      overflow: hidden;
+    }
+    .bjt-shoe-bar-fill {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, #4ade80, #c8a951);
+      transition: width 0.4s ease, background 0.4s;
+    }
+    .bjt-shoe-bar-fill.warn { background: linear-gradient(90deg, #c8a951, #e05555); }
+    .bjt-shoe-text {
+      font-size: 0.6rem; color: rgba(200,169,81,.7);
+      letter-spacing: 0.5px; white-space: nowrap;
+    }
+    /* ── 라운드 결과 오버레이 ── */
+    .bjt-result-overlay {
+      position: absolute; inset: 0; z-index: 40;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: inherit;
+      pointer-events: none;
+    }
+    .bjt-result-content {
+      position: relative; z-index: 2;
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      animation: bjtResAppear 0.45s cubic-bezier(.2,.8,.3,1.25) both;
+    }
+    @keyframes bjtResAppear {
+      0%   { transform: scale(0.3) translateY(16px); opacity: 0; }
+      70%  { transform: scale(1.08); opacity: 1; }
+      100% { transform: scale(1) translateY(0); opacity: 1; }
+    }
+    .bjt-result-icon  { font-size: 2.8rem; filter: drop-shadow(0 0 12px currentColor); }
+    .bjt-result-label {
+      font-size: 2.2rem; font-weight: 900; letter-spacing: 4px;
+      text-shadow: 0 2px 8px rgba(0,0,0,.6);
+    }
+    .bjt-result-amount {
+      font-size: 1.3rem; font-weight: 900; letter-spacing: 1px;
+      text-shadow: 0 2px 6px rgba(0,0,0,.7);
+    }
+    /* 결과 타입별 색상 + 글로우 */
+    .bjt-res-win  .bjt-result-label { color: #4ade80; animation: bjtGlowGreen 0.7s ease-in-out infinite alternate; }
+    .bjt-res-win  .bjt-result-amount { color: #4ade80; }
+    .bjt-res-bj   .bjt-result-label { color: #ffd700; animation: bjtGlowGold 0.55s ease-in-out infinite alternate; }
+    .bjt-res-bj   .bjt-result-amount { color: #ffd700; }
+    .bjt-res-lose .bjt-result-label { color: #f87171; animation: bjtShakeLose 0.5s ease-in-out 0.2s both; }
+    .bjt-res-lose .bjt-result-amount { color: #f87171; }
+    .bjt-res-push .bjt-result-label { color: #c8a951; }
+    .bjt-res-push .bjt-result-amount { color: #c8a951; }
+
+    @keyframes bjtGlowGreen {
+      from { text-shadow: 0 0 14px rgba(74,222,128,.7), 0 0 28px rgba(74,222,128,.35); }
+      to   { text-shadow: 0 0 24px rgba(74,222,128,1),  0 0 50px rgba(74,222,128,.6), 0 0 80px rgba(74,222,128,.25); }
+    }
+    @keyframes bjtGlowGold {
+      from { text-shadow: 0 0 14px rgba(255,215,0,.7),  0 0 28px rgba(255,215,0,.35); }
+      to   { text-shadow: 0 0 24px rgba(255,215,0,1),   0 0 50px rgba(255,215,0,.6),  0 0 80px rgba(255,215,0,.25);
+             transform: scale(1.06); }
+    }
+    @keyframes bjtShakeLose {
+      0%,100%  { transform: translateX(0); }
+      20%  { transform: translateX(-10px); }
+      40%  { transform: translateX(10px); }
+      60%  { transform: translateX(-7px); }
+      80%  { transform: translateX(7px); }
+    }
+    /* 파티클 */
+    .bjt-particles-wrap {
+      position: absolute; inset: 0; pointer-events: none; overflow: hidden;
+      border-radius: inherit;
+    }
+    .bjt-particle {
+      position: absolute; border-radius: 50%;
+      animation: bjtParticleFloat linear both;
+    }
+    @keyframes bjtParticleFloat {
+      0%   { transform: translateY(0) scale(1); opacity: 1; }
+      100% { transform: translateY(-220px) scale(0.3); opacity: 0; }
+    }
+    /* 배경 어두운 오버레이 */
+    .bjt-res-win::before, .bjt-res-bj::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 60% 50% at 50% 55%, rgba(74,222,128,.12) 0%, rgba(0,0,0,.52) 100%);
+      border-radius: inherit;
+    }
+    .bjt-res-lose::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 60% 50% at 50% 55%, rgba(248,113,113,.1) 0%, rgba(0,0,0,.52) 100%);
+      border-radius: inherit;
+    }
+    .bjt-res-bj::before {
+      background: radial-gradient(ellipse 60% 50% at 50% 55%, rgba(255,215,0,.14) 0%, rgba(0,0,0,.52) 100%);
+    }
+    .bjt-res-push::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,.48);
+      border-radius: inherit;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="loadingScreen">
+    <div class="loading-logo">♠ KINGS</div>
+    <div class="loading-spinner"></div>
+  </div>
+
+  <div id="loginScreen" style="display:none">
+    <div class="login-wrap">
+      <div class="login-logo-area"><h1>♠ KINGS</h1><p>로그인하고 시작하세요</p></div>
+      <div class="login-card">
+        <div class="tab-row">
+          <button class="tab-btn active" id="tabLogin" onclick="switchTab('login')">로그인</button>
+          <button class="tab-btn" id="tabRegister" onclick="switchTab('register')">회원가입</button>
+        </div>
+        <div class="field"><label>아이디</label><input type="text" id="usernameInput" placeholder="아이디 입력" maxlength="16" autocomplete="username"></div>
+        <div class="field"><label>비밀번호</label><input type="password" id="passwordInput" placeholder="6자 이상" onkeydown="handleEnter(event)" autocomplete="current-password"></div>
+        <div id="registerFields" style="display:none">
+          <div class="field"><label>비밀번호 확인</label><input type="password" id="passwordConfirmInput" placeholder="비밀번호를 다시 입력"></div>
+          <div class="field"><label>닉네임</label><input type="text" id="nicknameInput" placeholder="게임에서 표시될 이름" maxlength="12"></div>
+          <div class="field"><label>휴대폰 번호</label><input type="tel" id="phoneInput" placeholder="010-0000-0000" maxlength="13" oninput="formatPhone(this)"></div>
+          <div class="field"><label>추천인 코드</label><input type="text" id="referralInput" placeholder="추천인 코드 입력 (필수)" maxlength="16"></div>
+        </div>
+        <p class="error-msg" id="authError"></p>
+        <button class="btn-login-submit" id="submitBtn" onclick="handleSubmit()">로그인</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="gameScreen">
+    <header class="header">
+      <a class="header-logo" href="index.html" style="text-decoration:none;color:inherit">♠ KINGS</a>
+      <div class="header-user">
+        <div class="user-point-box" id="headerPoints">0 P</div>
+        <div class="myinfo-nickname" id="userNickname">—</div>
+        <button class="btn-myinfo" onclick="location.href='myinfo.html'">👤 내정보</button>
+        <button class="btn-myinfo" id="btnAdmin" style="display:none;border-color:#e05555;color:#e05555;background:#1a0d0d" onclick="location.href='admin.html'">⚙ 관리자</button>
+        <button class="btn-logout-top" onclick="handleLogout()">로그아웃</button>
+      </div>
+      <button class="btn-hamburger" id="btnHamburger" onclick="toggleMobileMenu()">☰</button>
+    </header>
+
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay" onclick="closeMobileMenu()">
+      <div class="mobile-menu-drawer" onclick="event.stopPropagation()">
+        <div class="mob-user-row">
+          <div><div class="mob-user-sub">환영합니다</div><div class="mob-user-name" id="mobNickname">—</div></div>
+          <div class="user-point-box" id="mobPoints" style="font-size:0.8rem">0 P</div>
+        </div>
+        <div class="mob-section-title">GAME</div>
+        <a class="mob-item" href="ladder.html">사다리 <span class="sidebar-badge">LIVE</span></a>
+        <div class="mob-section-title">CASINO</div>
+        <a class="mob-item" href="dragon.html">드래곤타이거 <span class="sidebar-badge">LIVE</span></a>
+        <a class="mob-item" href="pdragon.html">파워 드래곤타이거 <span class="sidebar-badge">LIVE</span></a>
+        <a class="mob-item" href="baccarat.html">바카라 <span class="sidebar-badge">LIVE</span></a>
+        <a class="mob-item active" href="blackjack.html">블랙잭 <span class="sidebar-badge">LIVE</span></a>
+        <div class="mob-section-title">MENU</div>
+        <a class="mob-item" href="bethistory.html">배팅내역</a>
+        <div class="mob-actions">
+          <button class="btn-myinfo" id="mobBtnAdmin" style="display:none;border-color:#e05555;color:#e05555;background:#1a0d0d" onclick="location.href='admin.html'">⚙ 관리자</button>
+          <button class="btn-myinfo" onclick="location.href='myinfo.html'">👤 내정보</button>
+          <button class="btn-logout-top" style="flex:1;text-align:center" onclick="handleLogout()">로그아웃</button>
+        </div>
+      </div>
+    </div>
+
+    <nav class="subnav">
+      <div class="subnav-category" id="catGame">
+        <button class="subnav-cat-btn" onclick="toggleSubnav('game')">게임 <span class="subnav-arrow">▼</span></button>
+        <div class="subnav-dropdown"><a class="subnav-drop-item" href="ladder.html">사다리 <span class="sidebar-badge">LIVE</span></a></div>
+      </div>
+      <div class="subnav-category" id="catCasino">
+        <button class="subnav-cat-btn active" onclick="toggleSubnav('casino')">카지노 <span class="subnav-arrow">▼</span></button>
+        <div class="subnav-dropdown">
+          <a class="subnav-drop-item" href="dragon.html">드래곤타이거 <span class="sidebar-badge">LIVE</span></a>
+          <a class="subnav-drop-item" href="pdragon.html">파워 드래곤타이거 <span class="sidebar-badge">LIVE</span></a>
+          <a class="subnav-drop-item" href="baccarat.html">바카라 <span class="sidebar-badge">LIVE</span></a>
+          <a class="subnav-drop-item active" href="blackjack.html">블랙잭 <span class="sidebar-badge">LIVE</span></a>
+        </div>
+      </div>
+      <div class="subnav-category" id="catMenu">
+        <button class="subnav-cat-btn" onclick="toggleSubnav('menu')">메뉴 <span class="subnav-arrow">▼</span></button>
+        <div class="subnav-dropdown"><a class="subnav-drop-item" href="bethistory.html">배팅내역</a></div>
+      </div>
+    </nav>
+
+    <div class="main-layout">
+      <aside class="sidebar-left">
+        <div class="sidebar-section-title">GAME</div>
+        <a class="sidebar-menu-item" href="ladder.html">사다리 <span class="sidebar-badge">LIVE</span></a>
+        <div class="sidebar-section-title" style="margin-top:10px">CASINO</div>
+        <a class="sidebar-menu-item" href="dragon.html">드래곤타이거 <span class="sidebar-badge">LIVE</span></a>
+        <a class="sidebar-menu-item" href="pdragon.html">파워 드래곤타이거 <span class="sidebar-badge">LIVE</span></a>
+        <a class="sidebar-menu-item" href="baccarat.html">바카라 <span class="sidebar-badge">LIVE</span></a>
+        <a class="sidebar-menu-item active" href="blackjack.html">블랙잭 <span class="sidebar-badge">LIVE</span></a>
+      </aside>
+
+      <main class="main-content" style="padding:0">
+        <!-- 방 선택 화면 -->
+        <div id="bjtRoomSelect" class="bjt-room-select">
+          <div class="bjt-room-title">🃏 블랙잭 테이블 선택</div>
+          <div class="bjt-room-sub">원하는 테이블에 입장하세요</div>
+          <div class="bjt-room-grid">
+            <div class="bjt-room-card" onclick="bjtEnterRoom('bjtable1')">
+              <div class="bjt-room-icon">♠</div>
+              <div class="bjt-room-name">테이블 1</div>
+              <div class="bjt-room-meta" id="bjtRoomInfo1">· · ·</div>
+              <div class="bjt-room-enter">입장하기</div>
+            </div>
+            <div class="bjt-room-card" onclick="bjtEnterRoom('bjtable2')">
+              <div class="bjt-room-icon">♥</div>
+              <div class="bjt-room-name">테이블 2</div>
+              <div class="bjt-room-meta" id="bjtRoomInfo2">· · ·</div>
+              <div class="bjt-room-enter">입장하기</div>
+            </div>
+            <div class="bjt-room-card" onclick="bjtEnterRoom('bjtable3')">
+              <div class="bjt-room-icon">♣</div>
+              <div class="bjt-room-name">테이블 3</div>
+              <div class="bjt-room-meta" id="bjtRoomInfo3">· · ·</div>
+              <div class="bjt-room-enter">입장하기</div>
+            </div>
+            <div class="bjt-room-card" onclick="bjtEnterRoom('bjtable4')">
+              <div class="bjt-room-icon">♦</div>
+              <div class="bjt-room-name">테이블 4</div>
+              <div class="bjt-room-meta" id="bjtRoomInfo4">· · ·</div>
+              <div class="bjt-room-enter">입장하기</div>
+            </div>
+          </div>
+        </div>
+
+        <div id="panelBJTable" style="display:none">
+
+          <!-- 카지노 펠트 테이블 (D자형) -->
+          <div class="bjtable-felt">
+            <div class="bjtable-header">
+              <button class="bjtable-leave-btn" id="bjtRoomBackBtn" onclick="bjtBackToRooms()" style="border-color:rgba(200,169,81,.4);color:#c8a951">◀ 방 목록</button>
+              <div class="dt-game-title" id="bjtRoomTitle" style="flex:1">🃏 블랙잭</div>
+              <div class="bjt-header-points">💰 <span id="bjtPointsDisplay" style="color:#c8a951;font-weight:bold">0 P</span></div>
+              <div id="bjtPhase" class="dt-round-badge">대기 중</div>
+              <div id="bjtTimer" class="dt-timer-box" style="display:none">30</div>
+              <button class="bjtable-leave-btn" id="bjtLeaveBtn" onclick="bjtLeaveSeat()" style="display:none">나가기</button>
+            </div>
+            <div class="bjtable-dealer-zone">
+              <div class="bjtable-zone-label">DEALER</div>
+              <div id="bjtDealerCards" class="bjtable-dealer-cards"></div>
+              <div class="bjtable-score-wrap">
+                <div class="bj-score" id="bjtDealerScore">-</div>
+                <div class="bj-hand-status" id="bjtDealerStatus"></div>
+              </div>
+            </div>
+            <!-- 카지노 곡선 배너 + BJ 엠블럼 -->
+            <svg class="bjtable-banner" viewBox="0 0 800 230" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+              <defs>
+                <path id="bjArcTop" d="M 40,55 Q 400,165 760,55" fill="none"/>
+                <path id="bjArcBot" d="M 95,92 Q 400,202 705,92" fill="none"/>
+              </defs>
+              <text class="bj-mono" x="400" y="62" text-anchor="middle">BJ</text>
+              <text class="bj-banner-1"><textPath href="#bjArcTop" startOffset="50%" text-anchor="middle">DEALER MUST STAND ON ALL 17</textPath></text>
+              <text class="bj-banner-2"><textPath href="#bjArcBot" startOffset="50%" text-anchor="middle">INSURANCE · PAYS · 2 TO 1</textPath></text>
+            </svg>
+            <div class="bjt-shoe-info" id="bjtShoeInfo">
+              <div class="bjt-shoe-bar-track"><div class="bjt-shoe-bar-fill" id="bjtShoeBarFill"></div></div>
+              <span class="bjt-shoe-text" id="bjtShoeText">슈 0%</span>
+            </div>
+            <div class="bjtable-arc-zone" id="bjtSeatsRow"></div>
+            <!-- 라운드 결과 오버레이 -->
+            <div id="bjtResultOverlay" class="bjt-result-overlay" style="display:none">
+              <div class="bjt-result-content">
+                <div class="bjt-result-icon" id="bjtResIcon"></div>
+                <div class="bjt-result-label" id="bjtResLabel"></div>
+                <div class="bjt-result-amount" id="bjtResAmount"></div>
+              </div>
+              <div class="bjt-particles-wrap" id="bjtResParticles"></div>
+            </div>
+            <div id="bjtPlayActions" class="bjtable-play-overlay" style="display:none">
+              <button class="bjt-act-btn bjt-btn-hit"    onclick="bjtHit()">히트</button>
+              <button class="bjt-act-btn bjt-btn-stand"  onclick="bjtStand()">스탠드</button>
+              <button class="bjt-act-btn bjt-btn-double" id="bjtBtnDouble" onclick="bjtDouble()">더블다운</button>
+              <button class="bjt-act-btn bjt-btn-split"  id="bjtBtnSplit"  onclick="bjtSplit()" disabled style="opacity:.4">스플릿</button>
+            </div>
+            <!-- 인슈어런스 오버레이 (테이블 중앙) -->
+            <div id="bjtInsuranceArea" class="bjt-ins-overlay" style="display:none">
+              <div class="bjt-ins-box">
+                <div class="bjt-ins-title">🛡 딜러 에이스 — 인슈어런스</div>
+                <div class="bjt-ins-desc">딜러 블랙잭 시 <strong>2:1</strong> 지급 | 최대 베팅의 <strong>50%</strong></div>
+                <div class="bjt-ins-amount-row">
+                  <span class="bjt-ins-label">보험금</span>
+                  <span class="bjt-ins-val" id="bjtInsAmount">0 P</span>
+                </div>
+                <div class="bjt-ins-btns">
+                  <button class="bjt-ins-btn bjt-ins-yes"  onclick="bjtPlaceInsurance()">보험 걸기</button>
+                  <button class="bjt-ins-btn bjt-ins-no"   onclick="bjtDeclineInsurance()">거부</button>
+                </div>
+                <div class="bjt-ins-status" id="bjtInsStatus"></div>
+                <div id="bjtInsTimer" class="bjt-ins-timer" style="display:none">⏱ <span id="bjtInsTimerVal">10</span>초</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 액션 패널 (펠트 아래) -->
+          <div class="bjtable-action-panel">
+            <div class="bjt-my-hand-wrap">
+              <div id="bjtMyPlayArea" style="display:none">
+                <div class="bj-player-area bjt-my-hand-inner">
+                  <div class="bj-area-label">나의 패</div>
+                  <div class="bj-cards" id="bjtMyCards"></div>
+                  <div class="bj-score-row">
+                    <div class="bj-score" id="bjtMyScore">-</div>
+                    <div class="bj-hand-status" id="bjtMyPlayStatus"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div id="bjtBettingArea" style="display:none">
+              <div class="bj-area-label" style="margin-bottom:8px">배팅 금액 선택</div>
+              <div class="bet-quick-btns" style="margin-bottom:8px">
+                <button class="bet-quick-btn" onclick="bjtSetBet(5000)">+5,000</button>
+                <button class="bet-quick-btn" onclick="bjtSetBet(10000)">+10,000</button>
+                <button class="bet-quick-btn" onclick="bjtSetBet(30000)">+30,000</button>
+                <button class="bet-quick-btn" onclick="bjtSetBet(50000)">+50,000</button>
+                <button class="bet-quick-btn" onclick="bjtSetBet(100000)">+100,000</button>
+                <button class="bet-quick-btn" id="bjtMaxBtn" onclick="bjtSetMaxBet()">MAX</button>
+              </div>
+              <div class="bjtbet-confirm-row" style="display:flex;gap:8px">
+                <input type="number" id="bjtBetInput" class="bet-input" placeholder="배팅 금액" style="flex:1">
+                <button class="dt-confirm-btn" onclick="bjtPlaceBet()">배팅 확정</button>
+              </div>
+              <div class="bjtable-bet-confirmed" id="bjtBetConfirmedMsg" style="display:none">✓ 배팅 완료! 다른 플레이어를 기다리는 중...</div>
+            </div>
+            <div id="bjtStartArea" style="display:none;text-align:center">
+              <button class="bj-new-game-btn" onclick="bjtStartGame()">게임 시작</button>
+              <div style="font-size:0.72rem;color:#555;margin-top:5px">테이블에 앉은 모든 플레이어와 함께 게임을 시작합니다</div>
+            </div>
+          </div>
+
+        </div>
+      </main>
+
+      <!-- 블랙잭은 우측 슬립 불필요 - 최소화 -->
+      <aside class="sidebar-right" style="min-width:0;max-width:0;overflow:hidden;border:none"></aside>
+    </div>
+  </div>
+
+  <script type="module">
+    import { auth, db, onAuthStateChanged, doc, getDoc, setDoc, updateDoc,
+             collection, getDocs, addDoc, query, orderBy, serverTimestamp, signOut }
+      from './common.js';
+    import { onSnapshot, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    let points = 0;
+    let gameHistory = [];
+    let currentUid = null;
+    let currentUserData = {};
+
+    onAuthStateChanged(auth, async (user) => {
+      document.getElementById('loadingScreen').style.display = 'none';
+      if (user) {
+        currentUid = user.uid;
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('gameScreen').style.display = 'flex';
+        document.getElementById('gameScreen').style.flexDirection = 'column';
+        await loadUserData(user.uid);
+        await loadBetHistory();
+        localStorage.setItem('lastGame', 'bjtable');
+        // 새로고침 시 마지막 입장 테이블 복원
+        const savedRoom = localStorage.getItem('bjtRoom');
+        if (savedRoom && BJT_ROOMS.includes(savedRoom)) bjtEnterRoom(savedRoom);
+        else bjtShowRoomSelect();
+      } else {
+        currentUid = null;
+        document.getElementById('loginScreen').style.display = 'flex';
+        document.getElementById('gameScreen').style.display = 'none';
+      }
+    });
+
+    async function loadUserData(uid) {
+      try {
+        const snap = await getDoc(doc(db, 'users', uid));
+        if (snap.exists()) {
+          const data = snap.data(); currentUserData = data; points = data.points ?? 10000;
+          const nick = data.nickname || data.username || '유저';
+          document.getElementById('userNickname').textContent = nick;
+          document.getElementById('mobNickname').textContent  = nick;
+          if (data.isAdmin) document.getElementById('btnAdmin').style.display = 'flex'; { const m=document.getElementById('mobBtnAdmin'); if(m) m.style.display='flex'; }
+        } else {
+          const uname = auth.currentUser?.email?.split('@')[0] || '유저';
+          currentUserData = { username: uname, nickname: uname, points: 10000 }; points = 10000;
+          document.getElementById('userNickname').textContent = uname;
+          document.getElementById('mobNickname').textContent  = uname;
+          await setDoc(doc(db, 'users', uid), currentUserData);
+        }
+        sessionStorage.setItem('userData', JSON.stringify({ ...currentUserData, points }));
+        updatePointsDisplay();
+      } catch(e) { points = 10000; updatePointsDisplay(); }
+    }
+
+    async function savePoints() {
+      if (!currentUid) return;
+      try { await updateDoc(doc(db, 'users', currentUid), { points }); } catch(e) {}
+    }
+
+    async function saveBet(betData) {
+      if (!currentUid) return null;
+      try { const ref = await addDoc(collection(db, 'users', currentUid, 'bets'), { ...betData, timestamp: serverTimestamp() }); return ref.id; }
+      catch(e) { return null; }
+    }
+
+    async function loadBetHistory() {
+      if (!currentUid) return;
+      try {
+        const q = query(collection(db, 'users', currentUid, 'bets'), orderBy('timestamp', 'desc'));
+        const snap = await getDocs(q);
+        gameHistory = snap.docs.map(d => ({ _docId: d.id, ...d.data() }));
+      } catch(e) {}
+    }
+
+    function updatePointsDisplay() {
+      const txt = points.toLocaleString() + ' P';
+      document.getElementById('headerPoints').textContent = txt;
+      const bjtPts = document.getElementById('bjtPointsDisplay');
+      if (bjtPts) bjtPts.textContent = txt;
+      const mob = document.getElementById('mobPoints'); if (mob) mob.textContent = txt;
+    }
+
+    window.handleLogout = async function() {
+      bjtCleanup();
+      await signOut(auth);
+    };
+    window.recharge = async function() { points += 10000; updatePointsDisplay(); await savePoints(); };
+
+    // ═══════════════════════════════════════
+    // 블랙잭 라이브 테이블
+    // ═══════════════════════════════════════
+    function lgHash(n) {
+      let h = (n ^ 0xdeadbeef) >>> 0;
+      h = Math.imul(h ^ (h >>> 16), 0x45d9f3b) >>> 0;
+      h = Math.imul(h ^ (h >>> 15), 0xc2b2ae35) >>> 0;
+      return ((h ^ (h >>> 16)) >>> 0) / 0xffffffff;
+    }
+
+    const BJT_SPLIT_PLAYED = new Set();
+    // 스플릿 단계별 연출: 갈라짐 → 손1 추가카드 → 손2 추가카드
+    const BJT_SPLIT_ANIM = {}; // key -> { mainCount, splitCount, active, justDealt }
+    function bjtStartSplitAnim(key) {
+      BJT_SPLIT_ANIM[key] = { mainCount: 1, splitCount: 1, active: true, justDealt: null };
+      // 1단계: 갈라짐 모션 후 손1에 추가 카드
+      setTimeout(() => {
+        if (!BJT_SPLIT_ANIM[key]) return;
+        BJT_SPLIT_ANIM[key].mainCount = 2; BJT_SPLIT_ANIM[key].justDealt = 'main';
+        if (BJT.data) bjtRender(BJT.data);
+      }, 520);
+      // 2단계: 손2에 추가 카드
+      setTimeout(() => {
+        if (!BJT_SPLIT_ANIM[key]) return;
+        BJT_SPLIT_ANIM[key].splitCount = 2; BJT_SPLIT_ANIM[key].justDealt = 'split';
+        if (BJT.data) bjtRender(BJT.data);
+      }, 1000);
+      // 완료
+      setTimeout(() => {
+        if (!BJT_SPLIT_ANIM[key]) return;
+        BJT_SPLIT_ANIM[key].active = false; BJT_SPLIT_ANIM[key].justDealt = null;
+        if (BJT.data) bjtRender(BJT.data);
+      }, 1450);
+    }
+    const BJT_DEAL_ANIM = { roundId: -1, seatCards: {}, dealerCards: 0, done: true };
+    const BJT_DEALER_SEQ = { roundId: -1, staged: 0, total: 0 };
+
+    function bjtStartDealAnim(d) {
+      const active = d.seats.map((s,i) => (s?.bet > 0) ? i : -1).filter(i => i >= 0).reverse();
+      BJT_DEAL_ANIM.roundId   = d.roundId;
+      BJT_DEAL_ANIM.seatCards = {};
+      active.forEach(i => { BJT_DEAL_ANIM.seatCards[i] = 0; });
+      BJT_DEAL_ANIM.dealerCards = 0;
+      BJT_DEAL_ANIM.done = false;
+      const order = [];
+      for (const i of active) order.push({type:'seat', idx:i});
+      order.push({type:'dealer'});
+      for (const i of active) order.push({type:'seat', idx:i});
+      order.push({type:'dealer'});
+      let step = 0;
+      function next() {
+        if (step >= order.length) { BJT_DEAL_ANIM.done = true; if (BJT.data) bjtRender(BJT.data); return; }
+        const item = order[step++];
+        if (item.type === 'seat') BJT_DEAL_ANIM.seatCards[item.idx] = (BJT_DEAL_ANIM.seatCards[item.idx]||0) + 1;
+        else BJT_DEAL_ANIM.dealerCards++;
+        if (BJT.data) bjtRender(BJT.data);
+        setTimeout(next, 650);
+      }
+      next();
+    }
+
+    const BJT = { unsub: null, timerIv: null, data: null, advancing: false, roomId: null };
+    const BJT_SEATS = 7;
+    const BJT_BET_SEC = 15;
+    const BJT_ACT_SEC = 30;
+    const BJT_DONE_SEC = 4;
+    const BJT_INS_SEC  = 10;
+    const BJT_ROOMS = ['bjtable1', 'bjtable2', 'bjtable3', 'bjtable4'];
+    let BJT_ROOM_UNSUBS = [];
+
+    function bjtRef() { return doc(db, 'tables', BJT.roomId || 'bjtable1'); }
+
+    function bjtBuildDeck(seed) {
+      const SUITS = ['♠','♥','♦','♣'];
+      const RANKS = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+      const raw = [];
+      for (let d = 0; d < 6; d++) for (let i = 0; i < 52; i++) raw.push(i);
+      for (let i = raw.length - 1; i > 0; i--) {
+        const j = Math.min(Math.floor(lgHash(seed * 9001 + i * 17 + 31) * (i + 1)), i);
+        [raw[i], raw[j]] = [raw[j], raw[i]];
+      }
+      return raw.map(idx => {
+        const val = (idx % 13) + 1; const suit = Math.floor(idx / 13);
+        return { val, suit, rank: RANKS[val-1], suitStr: SUITS[suit], isRed: suit===1||suit===2 };
+      });
+    }
+
+    function initBJTable() {
+      bjtCleanup();
+      const ref = bjtRef();
+      getDoc(ref).then(snap => { if (!snap.exists()) setDoc(ref, bjtDefault()); });
+      BJT.unsub = onSnapshot(ref, snap => {
+        BJT.data = snap.exists() ? snap.data() : null;
+        if (!BJT.data) { setDoc(ref, bjtDefault()); return; }
+        bjtRender(BJT.data);
+      });
+      BJT.timerIv = setInterval(() => {
+        if (!BJT.data) return;
+        bjtTickTimer(BJT.data);
+      }, 1000);
+    }
+
+    function bjtCleanup() {
+      if (BJT.unsub) { BJT.unsub(); BJT.unsub = null; }
+      if (BJT.timerIv) { clearInterval(BJT.timerIv); BJT.timerIv = null; }
+      BJT.data = null; BJT.advancing = false;
+    }
+
+    // ── 방 선택 ──────────────────────────────────────
+    function bjtShowRoomSelect() {
+      bjtCleanup();
+      BJT.roomId = null;
+      localStorage.removeItem('bjtRoom'); // 방 목록으로 돌아오면 기억 해제
+      document.getElementById('bjtRoomSelect').style.display = '';
+      document.getElementById('panelBJTable').style.display = 'none';
+      // 각 방의 실시간 인원/상태 구독
+      bjtRoomUnsubAll();
+      const phaseTxt = { waiting:'대기 중', betting:'배팅 중', insurance:'진행 중', playing:'게임 중', dealer:'게임 중', settling:'정산 중', done:'정산 중' };
+      BJT_ROOMS.forEach((rid, i) => {
+        const ref = doc(db, 'tables', rid);
+        const unsub = onSnapshot(ref, snap => {
+          const el = document.getElementById(`bjtRoomInfo${i+1}`);
+          if (!el) return;
+          if (!snap.exists()) { el.textContent = '빈 테이블 · 0/7명'; return; }
+          const d = snap.data();
+          const count = (d.seats || []).filter(s => s && !s.kicked).length;
+          const ph = phaseTxt[d.phase] || '대기 중';
+          el.textContent = `${ph} · ${count}/7명`;
+        });
+        BJT_ROOM_UNSUBS.push(unsub);
+      });
+    }
+
+    function bjtRoomUnsubAll() {
+      BJT_ROOM_UNSUBS.forEach(u => { try { u(); } catch(e){} });
+      BJT_ROOM_UNSUBS = [];
+    }
+
+    window.bjtEnterRoom = function(roomId) {
+      bjtRoomUnsubAll();
+      BJT.roomId = roomId;
+      localStorage.setItem('bjtRoom', roomId); // 새로고침 시 유지
+      const num = roomId.replace('bjtable', '');
+      const t = document.getElementById('bjtRoomTitle'); if (t) t.textContent = `테이블 ${num}`;
+      document.getElementById('bjtRoomSelect').style.display = 'none';
+      document.getElementById('panelBJTable').style.display = '';
+      initBJTable();
+    };
+
+    window.bjtBackToRooms = async function() {
+      // 앉아있으면 먼저 자리에서 나가기
+      try {
+        const myIdx = bjtMyIdx();
+        if (myIdx >= 0 && BJT.data && (BJT.data.phase === 'waiting' || BJT.data.phase === 'betting')) {
+          await bjtLeaveSeat();
+        }
+      } catch(e) {}
+      bjtShowRoomSelect();
+    };
+
+    function bjtDefault() {
+      return { phase: 'waiting', roundId: 0, roundSeed: 0, nextCardIdx: 0, cutCard: 0, shoeNum: 0, currentSeat: -1, betDeadline: 0, actionDeadline: 0, dealerCards: [], seats: Array(BJT_SEATS).fill(null) };
+    }
+
+    // 새 슈 생성: 시드 + 컷 카드 위치(50~70% 침투, 156~218장)
+    function bjtNewShoe() {
+      return {
+        roundSeed: Math.floor(Math.random() * 99999999),
+        nextCardIdx: 0,
+        cutCard: Math.floor(156 + Math.random() * 62) // 50%~70% of 312
+      };
+    }
+
+    window.bjtJoinSeat = async function(idx) {
+      if (!currentUid) return;
+      try {
+        await runTransaction(db, async tx => {
+          const snap = await tx.get(bjtRef()); const d = snap.data();
+          if (!d || (d.phase !== 'waiting' && d.phase !== 'betting')) throw Object.assign(new Error(), {code:'busy'});
+          if (d.seats[idx]) throw Object.assign(new Error(), {code:'taken'});
+          const myNick = document.getElementById('userNickname')?.textContent?.trim() || currentUid.slice(0,6);
+          const seats = [...d.seats];
+          const oldIdx = seats.findIndex(s => s?.uid === currentUid);
+          if (oldIdx >= 0) {
+            if (seats[oldIdx].betConfirmed) throw Object.assign(new Error(), {code:'confirmed'});
+            seats[oldIdx] = null;
+          }
+          seats[idx] = { uid:currentUid, nickname:myNick, bet:0, betConfirmed:false, cards:[], doubled:false, done:false, result:null, payout:0, splitCards:[], splitDone:false, splitDoubled:false, splitResult:null, splitPayout:0, playingSplit:false };
+          tx.update(bjtRef(), { seats });
+        });
+      } catch(e) {
+        if (e.code === 'taken') alert('이미 다른 사람이 앉아있습니다.');
+        else if (e.code === 'confirmed') alert('배팅을 확정한 후에는 자리를 이동할 수 없습니다.');
+        else if (e.code === 'busy') alert('게임 진행 중에는 자리에 앉을 수 없습니다.');
+      }
+    };
+
+    window.bjtLeaveSeat = async function() {
+      if (!currentUid || !BJT.data) return;
+      const myIdx = BJT.data.seats.findIndex(s => s?.uid === currentUid);
+      if (myIdx < 0) return;
+      if (BJT.data.phase !== 'waiting') { alert('게임 진행 중에는 자리를 떠날 수 없습니다.'); return; }
+      try {
+        await runTransaction(db, async tx => {
+          const snap = await tx.get(bjtRef()); const d = snap.data();
+          if (!d || d.seats[myIdx]?.uid !== currentUid) return;
+          const seats = [...d.seats]; seats[myIdx] = null;
+          tx.update(bjtRef(), { seats });
+        });
+      } catch(e) {}
+    };
+
+    window.bjtStartGame = async function() {
+      if (!currentUid || !BJT.data) return;
+      const myIdx = BJT.data.seats.findIndex(s => s?.uid === currentUid);
+      if (myIdx < 0) { alert('자리에 먼저 앉아주세요.'); return; }
+      try {
+        await runTransaction(db, async tx => {
+          const snap = await tx.get(bjtRef()); const d = snap.data();
+          if (!d || d.phase !== 'waiting') return;
+          if (!d.seats.some(s => s !== null)) return;
+          // 슈가 없거나 컷 카드 통과 시 새 슈, 아니면 기존 슈 이어쓰기
+          const needNew = !d.roundSeed || !d.cutCard || d.nextCardIdx >= d.cutCard;
+          const shoe = needNew ? bjtNewShoe() : { roundSeed:d.roundSeed, nextCardIdx:d.nextCardIdx, cutCard:d.cutCard };
+          const seats = d.seats.map(s => s ? { ...s, bet:0, betConfirmed:false, cards:[], doubled:false, done:false, result:null, payout:0 } : null);
+          tx.update(bjtRef(), { phase:'betting', roundId:d.roundId+1, roundSeed:shoe.roundSeed, nextCardIdx:shoe.nextCardIdx, cutCard:shoe.cutCard, shoeNum:(d.shoeNum||0)+(needNew?1:0), currentSeat:-1, betDeadline:Date.now()+BJT_BET_SEC*1000, actionDeadline:0, dealerCards:[], seats });
+        });
+      } catch(e) {}
+    };
+
+    window.bjtSetBet = function(amount) {
+      const inp = document.getElementById('bjtBetInput');
+      if (inp) inp.value = Math.min(amount, points);
+    };
+
+    window.bjtSetMaxBet = function() {
+      const inp = document.getElementById('bjtBetInput');
+      if (inp) inp.value = Math.max(0, Math.floor(points));
+    };
+
+    window.bjtPlaceBet = async function() {
+      if (!currentUid || !BJT.data) return;
+      const myIdx = BJT.data.seats.findIndex(s => s?.uid === currentUid);
+      if (myIdx < 0 || BJT.data.phase !== 'betting') return;
+      if (BJT.data.seats[myIdx]?.betConfirmed) return;
+      const bet = parseInt(document.getElementById('bjtBetInput')?.value || '0', 10);
+      if (!bet || bet < 1000) { alert('최소 배팅은 1,000P입니다.'); return; }
+      if (bet > points) { alert('포인트가 부족합니다.'); return; }
+      points -= bet; updatePointsDisplay(); savePoints();
+      try {
+        let shouldDeal = false;
+        await runTransaction(db, async tx => {
+          const snap = await tx.get(bjtRef()); const d = snap.data();
+          if (!d || d.phase !== 'betting') throw new Error('배팅 시간 아님');
+          if (d.seats[myIdx]?.uid !== currentUid) throw new Error('자리 오류');
+          const seats = [...d.seats];
+          seats[myIdx] = { ...seats[myIdx], bet, betConfirmed:true };
+          const allConfirmed = seats.every(s => !s || s.betConfirmed);
+          if (allConfirmed) {
+            const dealt = bjtDeal(d.roundSeed, seats, d.nextCardIdx || 0);
+            let nextPhase, updates;
+            if (dealt.dealerAce && !dealt.allBJ) {
+              // 딜러 에이스 → 인슈어런스 단계
+              nextPhase = 'insurance';
+              updates = { seats:dealt.seats, phase:'insurance', nextCardIdx:dealt.nextIdx,
+                currentSeat:-1, dealerCards:dealt.dealerCards,
+                insuranceDeadline: Date.now() + BJT_INS_SEC*1000 };
+            } else if (dealt.allBJ) {
+              nextPhase = 'dealer';
+              updates = { seats:dealt.seats, phase:'dealer', nextCardIdx:dealt.nextIdx,
+                currentSeat:-1, actionDeadline:Date.now()+BJT_ACT_SEC*1000, dealerCards:dealt.dealerCards };
+              shouldDeal = true;
+            } else {
+              nextPhase = 'playing';
+              updates = { seats:dealt.seats, phase:'playing', nextCardIdx:dealt.nextIdx,
+                currentSeat:dealt.firstActive, actionDeadline:Date.now()+BJT_ACT_SEC*1000, dealerCards:dealt.dealerCards };
+            }
+            tx.update(bjtRef(), updates);
+          } else { tx.update(bjtRef(), { seats }); }
+        });
+        if (shouldDeal) setTimeout(bjtRunDealer, 1200);
+      } catch(e) {
+        points += bet; updatePointsDisplay(); savePoints();
+      }
+    };
+
+    function bjtDeal(seed, seats, startIdx = 0) {
+      const deck = bjtBuildDeck(seed);
+      // 자리1(높은 인덱스)부터 자리7 순으로 딜
+      const idxs = seats.map((s,i) => (s && s.bet > 0) ? i : -1).filter(i => i >= 0).reverse();
+      let c = startIdx;
+      const dcard = () => deck[c++ % deck.length];
+      const newSeats = seats.map(s => s ? {...s} : null);
+      for (const i of idxs) newSeats[i].cards = [dcard()];
+      const dc1 = dcard();
+      for (const i of idxs) newSeats[i].cards = [...newSeats[i].cards, dcard()];
+      const dc2 = dcard();
+      // 딜러 오픈카드가 A 또는 10값이면 딜러 블랙잭 가능 → 즉시 승리 보류(정산 시 푸시 확인)
+      const dealerMightBJ = dc1.val === 1 || dc1.val >= 10;
+      for (const i of idxs) {
+        if (bjIsBlackjack(newSeats[i].cards)) {
+          newSeats[i].done = true;
+          if (!dealerMightBJ) {
+            // 딜러가 블랙잭일 수 없으므로 즉시 승리 확정
+            newSeats[i].result = 'bj';
+            newSeats[i].payout = Math.floor(newSeats[i].bet * 2.5);
+          }
+        }
+      }
+      const nonBJ = idxs.filter(i => !bjIsBlackjack(newSeats[i].cards));
+      // 딜러 오픈 카드가 Ace이면 인슈어런스 단계
+      const dealerAce = dc1.val === 1;
+      return {
+        seats: newSeats,
+        dealerCards: [dc1, {...dc2, hidden:true}],
+        nextIdx: c,
+        firstActive: nonBJ.length ? nonBJ[0] : -1,
+        allBJ: nonBJ.length === 0,
+        dealerAce
+      };
+    }
+
+    function bjtMyIdx() { return BJT.data?.seats.findIndex(s => s?.uid === currentUid) ?? -1; }
+
+    // ── 인슈어런스 ──────────────────────────────────
+    window.bjtPlaceInsurance = async function() {
+      const myIdx = bjtMyIdx();
+      if (myIdx < 0 || BJT.data?.phase !== 'insurance') return;
+      const mySeat = BJT.data.seats[myIdx];
+      if (!mySeat || mySeat.insuranceDecided) return;
+      const maxIns = Math.floor(mySeat.bet / 2);
+      if (maxIns < 100) { alert('보험금이 너무 적습니다.'); return; }
+      if (points < maxIns) { alert('포인트가 부족합니다.'); return; }
+      points -= maxIns; updatePointsDisplay(); savePoints();
+      try {
+        await runTransaction(db, async tx => {
+          const snap = await tx.get(bjtRef()); const d = snap.data();
+          if (!d || d.phase !== 'insurance') throw new Error('인슈어런스 단계 아님');
+          const seats = [...d.seats];
+          if (seats[myIdx]?.insuranceDecided) throw new Error('이미 결정됨');
+          seats[myIdx] = { ...seats[myIdx], insuranceBet: maxIns, insuranceDecided: true };
+          const allDecided = seats.every(s => !s || s.insuranceDecided);
+          const updates = { seats };
+          if (allDecided) Object.assign(updates, bjtInsuranceToPlay(d, seats));
+          tx.update(bjtRef(), updates);
+        });
+      } catch(e) {
+        points += maxIns; updatePointsDisplay(); savePoints();
+        if (e.message !== '인슈어런스 단계 아님' && e.message !== '이미 결정됨') console.error(e);
+      }
+    };
+
+    window.bjtDeclineInsurance = async function() {
+      const myIdx = bjtMyIdx();
+      if (myIdx < 0 || BJT.data?.phase !== 'insurance') return;
+      const mySeat = BJT.data.seats[myIdx];
+      if (!mySeat || mySeat.insuranceDecided) return;
+      try {
+        await runTransaction(db, async tx => {
+          const snap = await tx.get(bjtRef()); const d = snap.data();
+          if (!d || d.phase !== 'insurance') return;
+          const seats = [...d.seats];
+          if (seats[myIdx]?.insuranceDecided) return;
+          seats[myIdx] = { ...seats[myIdx], insuranceBet: 0, insuranceDecided: true };
+          const allDecided = seats.every(s => !s || s.insuranceDecided);
+          const updates = { seats };
+          if (allDecided) Object.assign(updates, bjtInsuranceToPlay(d, seats));
+          tx.update(bjtRef(), updates);
+        });
+      } catch(e) { console.error(e); }
+    };
+
+    // 인슈어런스 후 → 플레이/딜러 단계 전환 계산
+    function bjtInsuranceToPlay(d, seats) {
+      // 자리1(높은 인덱스)부터 → 내림차순
+      const nonBJ = seats.map((s,i)=>i).filter(i => seats[i] && !bjIsBlackjack(seats[i].cards)).reverse();
+      if (nonBJ.length === 0) {
+        return { phase:'dealer', currentSeat:-1, actionDeadline: Date.now()+BJT_ACT_SEC*1000 };
+      }
+      return { phase:'playing', currentSeat: nonBJ[0], actionDeadline: Date.now()+BJT_ACT_SEC*1000 };
+    }
+
+    // 인슈어런스 타임아웃 강제 처리
+    async function bjtForceInsuranceEnd() {
+      if (BJT.advancing) return;
+      BJT.advancing = true;
+      try {
+        await runTransaction(db, async tx => {
+          const snap = await tx.get(bjtRef()); const d = snap.data();
+          if (!d || d.phase !== 'insurance') return;
+          // 미결정 플레이어는 모두 거부 처리
+          const seats = d.seats.map(s => s ? { ...s, insuranceDecided: true, insuranceBet: s.insuranceDecided ? s.insuranceBet : 0 } : null);
+          tx.update(bjtRef(), { seats, ...bjtInsuranceToPlay(d, seats) });
+        });
+      } catch(e) { console.error(e); }
+      BJT.advancing = false;
+    }
+
+    window.bjtHit = async function() {
+      const myIdx = bjtMyIdx();
+      if (myIdx < 0 || BJT.data?.currentSeat !== myIdx || BJT.data?.phase !== 'playing') return;
+      try {
+        let goDealer = false;
+        await runTransaction(db, async tx => {
+          const snap = await tx.get(bjtRef()); const d = snap.data();
+          if (!d || d.currentSeat !== myIdx || d.phase !== 'playing') throw new Error('차례 아님');
+          const deck = bjtBuildDeck(d.roundSeed);
+          const card = deck[d.nextCardIdx % deck.length];
+          const seats = [...d.seats]; const seat = seats[myIdx];
+          const onSplit = seat.playingSplit;
+          if (onSplit) seats[myIdx] = { ...seat, splitCards:[...seat.splitCards, card] };
+          else seats[myIdx] = { ...seat, cards:[...seat.cards, card] };
+          const activeCards = onSplit ? seats[myIdx].splitCards : seats[myIdx].cards;
+          const busted = bjIsBust(activeCards); const is21 = bjHandValue(activeCards) === 21;
+          const updates = { nextCardIdx: d.nextCardIdx+1, seats, actionDeadline:Date.now()+BJT_ACT_SEC*1000 };
+          if (busted || is21) {
+            if (onSplit || !seats[myIdx].splitCards?.length) {
+              if (onSplit) seats[myIdx] = { ...seats[myIdx], splitDone:true };
+              seats[myIdx] = { ...seats[myIdx], done:true };
+              const next = bjtNextSeat(seats, myIdx); updates.currentSeat = next;
+              if (next === -1) { updates.phase = 'dealer'; goDealer = true; }
+            } else { seats[myIdx] = { ...seats[myIdx], playingSplit:true }; }
+          }
+          tx.update(bjtRef(), updates);
+        });
+        if (goDealer) setTimeout(bjtRunDealer, 800);
+      } catch(e) {}
+    };
+
+    window.bjtStand = async function(kicked = false) {
+      const myIdx = bjtMyIdx();
+      if (myIdx < 0 || BJT.data?.currentSeat !== myIdx || BJT.data?.phase !== 'playing') return;
+      try {
+        let goDealer = false;
+        await runTransaction(db, async tx => {
+          const snap = await tx.get(bjtRef()); const d = snap.data();
+          if (!d || d.currentSeat !== myIdx || d.phase !== 'playing') throw new Error('차례 아님');
+          const seats = [...d.seats]; const seat = seats[myIdx];
+          const onSplit = seat.playingSplit;
+          if (!onSplit && seat.splitCards?.length && !kicked) {
+            seats[myIdx] = { ...seat, playingSplit:true };
+            tx.update(bjtRef(), { seats, actionDeadline:Date.now()+BJT_ACT_SEC*1000 }); return;
+          }
+          if (onSplit) seats[myIdx] = { ...seat, splitDone:true };
+          seats[myIdx] = { ...seats[myIdx], done:true, ...(kicked ? {kicked:true} : {}) };
+          const next = bjtNextSeat(seats, myIdx);
+          const updates = { seats, currentSeat:next, actionDeadline:Date.now()+BJT_ACT_SEC*1000 };
+          if (next === -1) { updates.phase = 'dealer'; goDealer = true; }
+          tx.update(bjtRef(), updates);
+        });
+        if (goDealer) setTimeout(bjtRunDealer, 800);
+      } catch(e) {}
+    };
+
+    window.bjtDouble = async function() {
+      const myIdx = bjtMyIdx();
+      if (myIdx < 0 || BJT.data?.currentSeat !== myIdx || BJT.data?.phase !== 'playing') return;
+      const seat = BJT.data.seats[myIdx];
+      const onSplit = seat.playingSplit;
+      const activeCards = onSplit ? (seat.splitCards||[]) : seat.cards;
+      if (!seat || activeCards.length !== 2) return;
+      if (points < seat.bet) { alert('더블다운할 포인트가 부족합니다.'); return; }
+      points -= seat.bet; updatePointsDisplay(); savePoints();
+      try {
+        let goDealer = false;
+        await runTransaction(db, async tx => {
+          const snap = await tx.get(bjtRef()); const d = snap.data();
+          if (!d || d.currentSeat !== myIdx || d.phase !== 'playing') throw new Error('차례 아님');
+          // 더블다운은 처음 2장에서만 가능 (히트로 3장째 받으면 불가)
+          const dActive = onSplit ? (d.seats[myIdx].splitCards||[]) : d.seats[myIdx].cards;
+          if (dActive.length !== 2) throw new Error('더블다운 불가');
+          const deck = bjtBuildDeck(d.roundSeed);
+          const card = deck[d.nextCardIdx % deck.length];
+          const seats = [...d.seats];
+          if (onSplit) {
+            seats[myIdx] = { ...seats[myIdx], splitCards:[...seats[myIdx].splitCards, card], splitDoubled:true, splitDone:true, done:true };
+          } else {
+            const newBet = seats[myIdx].bet * 2;
+            seats[myIdx] = { ...seats[myIdx], bet:newBet, cards:[...seats[myIdx].cards, card], doubled:true };
+            if (seats[myIdx].splitCards?.length) { seats[myIdx].playingSplit = true; seats[myIdx].done = false; }
+            else { seats[myIdx].done = true; }
+          }
+          const allDone = onSplit || !seats[myIdx].splitCards?.length;
+          const next = allDone ? bjtNextSeat(seats, myIdx) : myIdx;
+          const updates = { nextCardIdx:d.nextCardIdx+1, seats, actionDeadline:Date.now()+BJT_ACT_SEC*1000 };
+          if (allDone) { updates.currentSeat = next; if (next === -1) { updates.phase = 'dealer'; goDealer = true; } }
+          tx.update(bjtRef(), updates);
+        });
+        if (goDealer) setTimeout(bjtRunDealer, 800);
+      } catch(e) { points += seat.bet; updatePointsDisplay(); savePoints(); }
+    };
+
+    window.bjtSplit = async function() {
+      const myIdx = bjtMyIdx();
+      if (myIdx < 0 || BJT.data?.currentSeat !== myIdx || BJT.data?.phase !== 'playing') return;
+      const seat = BJT.data.seats[myIdx];
+      if (!seat || seat.cards.length !== 2 || seat.cards[0].rank !== seat.cards[1].rank) return;
+      if (seat.splitCards?.length) return;
+      if (points < seat.bet) { alert('스플릿할 포인트가 부족합니다.'); return; }
+      points -= seat.bet; updatePointsDisplay(); savePoints();
+      try {
+        await runTransaction(db, async tx => {
+          const snap = await tx.get(bjtRef()); const d = snap.data();
+          if (!d || d.currentSeat !== myIdx || d.phase !== 'playing') throw new Error('차례 아님');
+          const s = d.seats[myIdx];
+          if (!s || s.cards.length !== 2 || s.cards[0].rank !== s.cards[1].rank || s.splitCards?.length) throw new Error('스플릿 불가');
+          const deck = bjtBuildDeck(d.roundSeed);
+          const c1 = deck[d.nextCardIdx % deck.length]; const c2 = deck[(d.nextCardIdx+1) % deck.length];
+          const seats = [...d.seats];
+          seats[myIdx] = { ...s, cards:[s.cards[0], c1], splitCards:[s.cards[1], c2], playingSplit:false, splitDone:false, splitDoubled:false, splitResult:null, splitPayout:0 };
+          tx.update(bjtRef(), { seats, nextCardIdx:d.nextCardIdx+2, actionDeadline:Date.now()+BJT_ACT_SEC*1000 });
+        });
+      } catch(e) { points += seat.bet; updatePointsDisplay(); savePoints(); }
+    };
+
+    function bjtNextSeat(seats, fromIdx) {
+      // 자리1(높은 인덱스)부터 자리7 순 → 인덱스 내림차순으로 진행
+      for (let i = fromIdx-1; i >= 0; i--) { if (seats[i] && !seats[i].done) return i; }
+      return -1;
+    }
+
+    async function bjtRunDealer() {
+      if (BJT.advancing) return;
+      BJT.advancing = true;
+      try {
+        let totalCards = 0;
+        await runTransaction(db, async tx => {
+          const snap = await tx.get(bjtRef()); const d = snap.data();
+          if (!d || d.phase !== 'dealer') return;
+          const deck = bjtBuildDeck(d.roundSeed);
+          const dealerCards = d.dealerCards.map(c => ({...c, hidden:false}));
+          let cIdx = d.nextCardIdx;
+          while (bjHandValue(dealerCards) < 17) dealerCards.push(deck[cIdx++ % deck.length]);
+          totalCards = dealerCards.length;
+          tx.update(bjtRef(), { dealerCards, nextCardIdx: cIdx });
+        });
+        if (totalCards > 0) {
+          const wait = Math.max(1, totalCards - 1) * 900 + 400;
+          await new Promise(r => setTimeout(r, wait));
+        }
+        await runTransaction(db, async tx => {
+          const snap = await tx.get(bjtRef()); const d = snap.data();
+          if (!d || d.phase !== 'dealer') return;
+          tx.update(bjtRef(), { phase: 'settling' });
+        });
+        await bjtSettle();
+      } catch(e) {}
+      BJT.advancing = false;
+    }
+
+    async function bjtSettle() {
+      let myResult = null;
+      try {
+        await runTransaction(db, async tx => {
+          const snap = await tx.get(bjtRef()); const d = snap.data();
+          if (!d || d.phase !== 'settling') return;
+          const dv = bjHandValue(d.dealerCards);
+          const dealerBJ = bjIsBlackjack(d.dealerCards);
+          const dealerBust = bjIsBust(d.dealerCards);
+          const evalHand = (cards, bet) => {
+            const pv = bjHandValue(cards); const pBJ = bjIsBlackjack(cards); const pBust = bjIsBust(cards);
+            let result, payout;
+            if (pBust) { result='lose'; payout=0; }
+            else if (pBJ && dealerBJ) { result='push'; payout=bet; }
+            else if (pBJ) { result='bj'; payout=Math.floor(bet*2.5); }
+            else if (dealerBJ) { result='lose'; payout=0; }
+            else if (dealerBust||pv>dv) { result='win'; payout=Math.floor(bet*2); }
+            else if (pv===dv) { result='push'; payout=bet; }
+            else { result='lose'; payout=0; }
+            return { result, payout };
+          };
+          // 인슈어런스 정산: 딜러 BJ면 2:1 지급, 아니면 몰수
+          const insuredPayout = (ins) => ins ? (dealerBJ ? ins * 3 : 0) : 0;
+          const seats = d.seats.map(s => {
+            if (!s || !s.bet) return s;
+            const main = evalHand(s.cards, s.bet);
+            const insPayout = insuredPayout(s.insuranceBet || 0);
+            if (!s.splitCards?.length) return {...s, result:main.result, payout:main.payout + insPayout, insurancePayout: insPayout};
+            const split = evalHand(s.splitCards, s.bet);
+            return {...s, result:main.result, payout:main.payout + insPayout, splitResult:split.result, splitPayout:split.payout, insurancePayout: insPayout};
+          });
+          tx.update(bjtRef(), { phase:'done', seats, actionDeadline: Date.now() + BJT_DONE_SEC*1000 });
+          myResult = seats.find(s => s?.uid === currentUid);
+        });
+        if (myResult) {
+          const totalPayout = (myResult.payout||0) + (myResult.splitPayout||0);
+          const totalBet = (myResult.splitCards?.length ? myResult.bet * 2 : myResult.bet) + (myResult.insuranceBet||0);
+          if (totalPayout > 0) { points += totalPayout; updatePointsDisplay(); savePoints(); }
+          if (myResult.bet > 0) {
+            const rl = {win:'승리',lose:'패배',push:'무승부',bj:'블랙잭!'};
+            const label = myResult.splitCards?.length
+              ? `${rl[myResult.result]||myResult.result} / ${rl[myResult.splitResult]||myResult.splitResult}`
+              : (rl[myResult.result]||myResult.result);
+            saveBet({ gameType:'blackjack_table', gameName:'블랙잭', choice:'블랙잭', bet:totalBet, number:label, payout:totalPayout, netChange:totalPayout-totalBet, isWin:myResult.result==='win'||myResult.result==='bj'||myResult.splitResult==='win'||myResult.splitResult==='bj', status:'settled', round:BJT.data?.roundId||0 });
+          }
+        }
+      } catch(e) {}
+    }
+
+    function bjtTickTimer(d) {
+      const now = Date.now();
+      const timerEl = document.getElementById('bjtTimer');
+      if (timerEl) {
+        const deadline = d.phase==='betting' ? d.betDeadline : d.phase==='playing' ? d.actionDeadline : 0;
+        if (!deadline) { timerEl.style.display='none'; }
+        else {
+          const sec = Math.max(0, Math.ceil((deadline - now)/1000));
+          timerEl.style.display=''; timerEl.textContent=sec;
+          timerEl.style.color = sec<=10 ? '#e05555' : '#c8a951';
+        }
+      }
+      if (BJT.advancing) return;
+      const myIdx = bjtMyIdx();
+      // 베팅 시간 초과: 아무 접속 클라이언트나 진행 (트랜잭션이 중복 방지)
+      if (d.phase==='betting' && d.betDeadline && now > d.betDeadline+2000) {
+        bjtForceStartDealing(d);
+      }
+      if (d.phase==='playing' && d.actionDeadline && now > d.actionDeadline+2000) {
+        if (d.currentSeat === myIdx) { bjtStand(true); }
+        else { bjtForceAdvanceTurn(); }
+      }
+      // 라운드 종료: 아무 클라이언트나 리셋
+      if (d.phase==='done' && d.actionDeadline && now > d.actionDeadline) {
+        bjtResetTable(d.roundId);
+      }
+      if (d.phase === 'dealer') {
+        if (!BJT._dealerStart) BJT._dealerStart = now;
+        if (now - BJT._dealerStart > 5000) { BJT._dealerStart = 0; bjtRunDealer(); }
+      } else { BJT._dealerStart = 0; }
+      if (d.phase === 'settling') bjtSettle();
+      // 인슈어런스 타임아웃
+      if (d.phase === 'insurance' && d.insuranceDeadline && now > d.insuranceDeadline + 1000 && !BJT.advancing) {
+        bjtForceInsuranceEnd();
+      }
+    }
+
+    async function bjtForceStartDealing(d) {
+      BJT.advancing = true;
+      try {
+        await runTransaction(db, async tx => {
+          const snap = await tx.get(bjtRef()); const data = snap.data();
+          if (!data || data.phase !== 'betting') return;
+          const seats = data.seats.map(s => { if (!s) return null; if (s.bet === 0) return null; return {...s, betConfirmed:true}; });
+          const bettors = seats.filter(s => s && s.bet > 0);
+          // 전원 베팅 안 함(잠수) → 베팅 안 한 좌석 비우고 대기로
+          if (!bettors.length) { tx.update(bjtRef(), { phase:'waiting', seats, currentSeat:-1, betDeadline:0, actionDeadline:0 }); return; }
+          const dealt = bjtDeal(data.roundSeed, seats, data.nextCardIdx || 0);
+          if (dealt.dealerAce && !dealt.allBJ) {
+            tx.update(bjtRef(), { seats:dealt.seats, phase:'insurance', nextCardIdx:dealt.nextIdx, currentSeat:-1, dealerCards:dealt.dealerCards, insuranceDeadline: Date.now() + BJT_INS_SEC*1000 });
+          } else {
+            tx.update(bjtRef(), { seats:dealt.seats, phase:dealt.allBJ?'dealer':'playing', nextCardIdx:dealt.nextIdx, currentSeat:dealt.allBJ?-1:dealt.firstActive, actionDeadline:Date.now()+BJT_ACT_SEC*1000, dealerCards:dealt.dealerCards });
+            if (dealt.allBJ) setTimeout(bjtRunDealer, 1200);
+          }
+        });
+      } catch(e) {}
+      BJT.advancing = false;
+    }
+
+    async function bjtForceAdvanceTurn() {
+      BJT.advancing = true;
+      try {
+        let goDealer = false;
+        await runTransaction(db, async tx => {
+          const snap = await tx.get(bjtRef()); const data = snap.data();
+          if (!data || data.phase !== 'playing') return;
+          if (!data.actionDeadline || Date.now() <= data.actionDeadline) return;
+          const cur = data.currentSeat;
+          if (cur < 0 || !data.seats[cur]) return;
+          const curSeat = data.seats[cur];
+          const seats = data.seats.map((s, i) => {
+            if (i !== cur) return s;
+            if (!s.playingSplit && s.splitCards?.length) return {...s, playingSplit:true};
+            return {...s, done:true, kicked:true, ...(s.playingSplit ? {splitDone:true} : {})};
+          });
+          if (!curSeat.playingSplit && curSeat.splitCards?.length) {
+            tx.update(bjtRef(), { seats, actionDeadline:Date.now()+BJT_ACT_SEC*1000 }); return;
+          }
+          const next = bjtNextSeat(seats, cur);
+          const updates = { seats, currentSeat:next, actionDeadline:Date.now()+BJT_ACT_SEC*1000 };
+          if (next === -1) { updates.phase = 'dealer'; goDealer = true; }
+          tx.update(bjtRef(), updates);
+        });
+        if (goDealer) setTimeout(bjtRunDealer, 800);
+      } catch(e) {}
+      BJT.advancing = false;
+    }
+
+    async function bjtResetTable(roundId) {
+      BJT.advancing = true;
+      try {
+        await runTransaction(db, async tx => {
+          const snap = await tx.get(bjtRef()); const d = snap.data();
+          if (!d || d.phase !== 'done' || d.roundId !== roundId) return;
+          const seats = d.seats.map(s => {
+            if (!s || s.kicked) return null;
+            return { uid:s.uid, nickname:s.nickname, bet:0, betConfirmed:false, cards:[], doubled:false, done:false, result:null, payout:0, splitCards:[], splitDone:false, splitDoubled:false, splitResult:null, splitPayout:0, playingSplit:false, insuranceBet:0, insuranceDecided:false, insurancePayout:0 };
+          });
+          const players = seats.filter(s => s !== null);
+          if (players.length === 0) {
+            tx.update(bjtRef(), { phase:'waiting', dealerCards:[], seats, currentSeat:-1, betDeadline:0, actionDeadline:0 });
+          } else {
+            // 슈가 없거나 컷 카드 통과 시 새 슈, 아니면 기존 슈 이어쓰기
+            const needNew = !d.roundSeed || !d.cutCard || d.nextCardIdx >= d.cutCard;
+            const shoe = needNew ? bjtNewShoe() : { roundSeed:d.roundSeed, nextCardIdx:d.nextCardIdx, cutCard:d.cutCard };
+            tx.update(bjtRef(), { phase:'betting', roundId:d.roundId+1, roundSeed:shoe.roundSeed, nextCardIdx:shoe.nextCardIdx, cutCard:shoe.cutCard, shoeNum:(d.shoeNum||0)+(needNew?1:0), currentSeat:-1, dealerCards:[], seats, betDeadline:Date.now()+BJT_BET_SEC*1000, actionDeadline:0 });
+          }
+        });
+      } catch(e) {}
+      BJT.advancing = false;
+    }
+
+    function bjtSmartUpdateCards(elId, cards, forceHidden) {
+      const el = document.getElementById(elId); if (!el) return;
+      const cardKey = c => `${c.rank||''}${c.suit||''}${c.hidden?'H':'V'}`;
+      while (el.children.length > cards.length) el.removeChild(el.lastChild);
+      cards.forEach((c, idx) => {
+        const hidden = forceHidden !== undefined ? forceHidden : !!c.hidden;
+        const key = cardKey(c) + (hidden ? 'fH' : '');
+        if (idx < el.children.length) {
+          const existing = el.children[idx];
+          if (existing.dataset.bjKey !== key) {
+            const wasHidden = (existing.dataset.bjKey || '').includes('H');
+            if (wasHidden && !hidden) {
+              existing.dataset.bjKey = key;
+              existing.style.transition = 'transform 0.2s ease-in';
+              existing.style.transform  = 'rotateY(90deg)';
+              const ref = existing;
+              setTimeout(() => {
+                if (!ref.parentNode) return;
+                const tmp = document.createElement('div');
+                tmp.innerHTML = bjCardHtml(c, false);
+                const node = tmp.firstElementChild;
+                node.dataset.bjKey = key;
+                node.style.transform  = 'rotateY(-90deg)';
+                node.style.transition = 'transform 0.2s ease-out';
+                ref.parentNode.replaceChild(node, ref);
+                node.offsetHeight;
+                node.style.transform = 'rotateY(0deg)';
+              }, 205);
+            } else {
+              const tmp = document.createElement('div');
+              tmp.innerHTML = bjCardHtml(c, hidden);
+              const node = tmp.firstElementChild; node.dataset.bjKey = key;
+              el.replaceChild(node, existing);
+            }
+          }
+        } else {
+          const tmp = document.createElement('div');
+          tmp.innerHTML = bjCardHtml(c, hidden);
+          const node = tmp.firstElementChild; node.dataset.bjKey = key;
+          // 딜러 카드 신규 추가 시 rotateY 애니메이션 적용 (dtFlip 대신)
+          if (elId === 'bjtDealerCards') {
+            node.style.animation = 'none';
+            node.style.animation = 'bjtDealerCardIn 0.38s ease-out both';
+          }
+          el.appendChild(node);
+        }
+      });
+    }
+
+    function bjtRender(d) {
+      const myIdx = bjtMyIdx();
+      const isSitting = myIdx >= 0;
+      const isMyTurn  = isSitting && d.currentSeat === myIdx && d.phase === 'playing';
+      const mySeat    = isSitting ? d.seats[myIdx] : null;
+      const phaseTxt = {waiting:'대기 중', betting:'배팅 시간', insurance:'인슈어런스', playing:'게임 진행 중', dealer:'딜러 차례', settling:'정산 중', done:'라운드 종료'};
+      const phaseEl = document.getElementById('bjtPhase');
+      if (phaseEl) phaseEl.textContent = phaseTxt[d.phase] || d.phase;
+      // 슈 진행률
+      const shoeFill = document.getElementById('bjtShoeBarFill');
+      const shoeText = document.getElementById('bjtShoeText');
+      if (shoeFill && shoeText) {
+        const TOTAL = 312; // 6덱
+        const used = Math.min(d.nextCardIdx || 0, TOTAL);
+        const pct = Math.round((used / TOTAL) * 100);          // 실제 덱 소진율
+        const cut = d.cutCard || 0;
+        shoeFill.style.width = pct + '%';
+        shoeFill.classList.toggle('warn', cut && used >= cut); // 컷 지점은 표기 안 함
+        shoeText.textContent = `슈 ${pct}%`;
+      }
+      if ((d.phase === 'playing' || d.phase === 'dealer') && d.roundId !== BJT_DEAL_ANIM.roundId && d.seats.some(s => s?.cards?.length > 0)) {
+        bjtStartDealAnim(d);
+      }
+      const dealAnimActive = !BJT_DEAL_ANIM.done && BJT_DEAL_ANIM.roundId === d.roundId;
+      const rawDealerCards = d.dealerCards || [];
+      if (d.phase === 'dealer' && rawDealerCards.length > 0) {
+        const total = rawDealerCards.length;
+        if (BJT_DEALER_SEQ.roundId !== d.roundId) { BJT_DEALER_SEQ.roundId = d.roundId; BJT_DEALER_SEQ.staged = 2; BJT_DEALER_SEQ.total = total; }
+        if (total > BJT_DEALER_SEQ.total) {
+          const prevTotal = BJT_DEALER_SEQ.total; BJT_DEALER_SEQ.total = total;
+          for (let i = prevTotal; i < total; i++) {
+            const cnt = i + 1;
+            setTimeout(() => {
+              if (!BJT.data || BJT_DEALER_SEQ.roundId !== d.roundId) return;
+              BJT_DEALER_SEQ.staged = cnt; bjtRender(BJT.data);
+            }, (i - prevTotal + 1) * 900);
+          }
+        }
+      }
+      const visibleDealerCards = dealAnimActive
+        ? rawDealerCards.slice(0, BJT_DEAL_ANIM.dealerCards)
+        : (d.phase === 'dealer' && BJT_DEALER_SEQ.roundId === d.roundId)
+          ? rawDealerCards.slice(0, BJT_DEALER_SEQ.staged)
+          : rawDealerCards;
+      bjtSmartUpdateCards('bjtDealerCards', visibleDealerCards);
+      const dScoreEl = document.getElementById('bjtDealerScore');
+      if (dScoreEl) { const vis = visibleDealerCards.filter(c => !c.hidden); dScoreEl.textContent = vis.length ? bjHandValue(vis) : '-'; }
+      const dStatusEl = document.getElementById('bjtDealerStatus');
+      if (dStatusEl) {
+        const allVis = (d.dealerCards||[]).map(c => ({...c, hidden:false}));
+        dStatusEl.textContent = allVis.length && (d.phase==='done'||d.phase==='settling') ? (bjIsBust(allVis)?'버스트!':bjIsBlackjack(allVis)?'블랙잭!':'') : '';
+      }
+      bjtRenderSeats(d, myIdx, dealAnimActive);
+      const myPlayEl = document.getElementById('bjtMyPlayArea');
+      const showHand = isSitting && ['playing','dealer','settling','done'].includes(d.phase) && mySeat?.cards?.length > 0;
+      if (myPlayEl) myPlayEl.style.display = showHand ? '' : 'none';
+      if (showHand) {
+        const rawActiveCards = mySeat.playingSplit ? (mySeat.splitCards || []) : mySeat.cards;
+        const myAnimLimit = (dealAnimActive && !mySeat.playingSplit && myIdx >= 0) ? (BJT_DEAL_ANIM.seatCards[myIdx] || 0) : rawActiveCards.length;
+        const activeCards = rawActiveCards.slice(0, myAnimLimit);
+        bjtSmartUpdateCards('bjtMyCards', activeCards, false);
+        const mySc = document.getElementById('bjtMyScore'); if (mySc) mySc.textContent = activeCards.length ? bjHandValue(activeCards) : '-';
+        const myStEl = document.getElementById('bjtMyPlayStatus'); if (myStEl) myStEl.textContent = bjIsBust(activeCards)?'버스트!':bjIsBlackjack(activeCards)?'블랙잭!': mySeat.playingSplit ? '손 2' : '';
+      }
+      const actEl = document.getElementById('bjtPlayActions'); if (actEl) actEl.style.display = isMyTurn ? '' : 'none';
+      if (isMyTurn) {
+        const activeCards = mySeat.playingSplit ? (mySeat.splitCards||[]) : mySeat.cards;
+        const dblBtn = document.getElementById('bjtBtnDouble'); if (dblBtn) dblBtn.disabled = activeCards.length !== 2 || points < mySeat.bet;
+        const splitBtn = document.getElementById('bjtBtnSplit');
+        if (splitBtn) {
+          const canSplit = !mySeat.playingSplit && !mySeat.splitCards?.length && mySeat.cards.length === 2 && mySeat.cards[0].rank === mySeat.cards[1].rank && points >= mySeat.bet;
+          splitBtn.disabled = !canSplit; splitBtn.style.opacity = canSplit ? '1' : '.3';
+        }
+      }
+      const betEl = document.getElementById('bjtBettingArea'); const betConfEl = document.getElementById('bjtBetConfirmedMsg');
+      if (betEl) betEl.style.display = (d.phase==='betting' && isSitting) ? '' : 'none';
+      if (betConfEl) betConfEl.style.display = (d.phase==='betting' && mySeat?.betConfirmed) ? '' : 'none';
+      if (d.phase==='betting' && isSitting && mySeat?.betConfirmed) { const inp = document.getElementById('bjtBetInput'); if (inp) inp.disabled = true; }
+      const startEl = document.getElementById('bjtStartArea'); if (startEl) startEl.style.display = (d.phase==='waiting' && isSitting) ? '' : 'none';
+
+      // 인슈어런스 UI
+      const insEl = document.getElementById('bjtInsuranceArea');
+      if (insEl) {
+        const showIns = d.phase === 'insurance' && isSitting && mySeat && !mySeat.insuranceDecided;
+        insEl.style.display = showIns ? '' : 'none';
+        if (showIns) {
+          const maxIns = Math.floor(mySeat.bet / 2);
+          const amtEl = document.getElementById('bjtInsAmount'); if (amtEl) amtEl.textContent = maxIns.toLocaleString() + ' P';
+          const sEl = document.getElementById('bjtInsStatus'); if (sEl) sEl.textContent = '';
+          // 타이머
+          const timerWrap = document.getElementById('bjtInsTimer');
+          const timerVal  = document.getElementById('bjtInsTimerVal');
+          if (timerWrap && d.insuranceDeadline) {
+            const sec = Math.max(0, Math.ceil((d.insuranceDeadline - Date.now()) / 1000));
+            timerWrap.style.display = ''; if (timerVal) timerVal.textContent = sec;
+          }
+          // 포인트 부족하면 버튼 비활성화
+          const yesBtn = insEl.querySelector('.bjt-ins-yes');
+          if (yesBtn) yesBtn.disabled = points < maxIns;
+        } else if (d.phase === 'insurance' && isSitting && mySeat?.insuranceDecided) {
+          insEl.style.display = '';
+          const sEl = document.getElementById('bjtInsStatus');
+          if (sEl) sEl.textContent = mySeat.insuranceBet > 0 ? `✓ 보험 ${mySeat.insuranceBet.toLocaleString()}P 걸림 — 결과 대기 중...` : '보험 거부 — 결과 대기 중...';
+          insEl.querySelector('.bjt-ins-btns').style.display = 'none';
+        }
+      }
+      const leaveBtn = document.getElementById('bjtLeaveBtn'); if (leaveBtn) leaveBtn.style.display = (isSitting && d.phase==='waiting') ? '' : 'none';
+      // 결과 오버레이
+      if (d.phase === 'done' && mySeat?.result && _bjtOverlayRoundId !== d.roundId) {
+        _bjtOverlayRoundId = d.roundId;
+        const r = mySeat.result;
+        const totalPayout = (mySeat.payout||0) + (mySeat.splitPayout||0);
+        const totalBet    = mySeat.splitCards?.length ? mySeat.bet * 2 : mySeat.bet;
+        const net = totalPayout - totalBet;
+        const dispResult  = r === 'bj' ? 'bj' : net > 0 ? 'win' : net === 0 ? 'push' : 'lose';
+        bjtShowResultOverlay(dispResult, net);
+      } else if (d.phase !== 'done') {
+        _bjtOverlayRoundId = -1;
+        bjtHideResultOverlay();
+      }
+      bjtUpdateStatus(d, myIdx, mySeat);
+    }
+
+    function bjtRenderSeats(d, myIdx, dealAnimActive) {
+      const el = document.getElementById('bjtSeatsRow'); if (!el) return;
+      const rlColor = r => r==='win'||r==='bj' ? '#4ade80' : r==='push' ? '#c8a951' : '#e05555';
+      const rlLabel = {win:'WIN', lose:'LOSE', push:'PUSH', bj:'BJ!'};
+      const showScore = d.phase!=='waiting' && d.phase!=='betting';
+      el.innerHTML = d.seats.map((s, i) => {
+        const isMe = i === myIdx; const isTurn = i === d.currentSeat && d.phase === 'playing';
+        const isEmpty = !s;
+        const canSit = isEmpty && ((d.phase === 'waiting') || (d.phase === 'betting' && (myIdx < 0 || !d.seats[myIdx]?.betConfirmed)));
+        const hasSplit = s?.splitCards?.length > 0;
+        const mainActive = isTurn && !s?.playingSplit; const splitActive = isTurn && s?.playingSplit;
+        const rawCards = s?.cards || [];
+        const animLimit = dealAnimActive ? (BJT_DEAL_ANIM.seatCards[i] || 0) : rawCards.length;
+        const visCards = rawCards.slice(0, animLimit);
+        const mainCards = visCards.map(c => bjtMiniCard(c)).join('');
+        const mainScore = visCards.length && showScore ? bjHandValue(visCards) : 0;
+        const isBust = visCards.length && bjIsBust(visCards);
+        let cardsHtml;
+        if (hasSplit) {
+          // 스플릿 단계별 연출 시작 감지
+          const skey = `${d.roundId}-${i}`;
+          if (!BJT_SPLIT_PLAYED.has(skey)) { BJT_SPLIT_PLAYED.add(skey); bjtStartSplitAnim(skey); }
+          const sa = BJT_SPLIT_ANIM[skey];
+          const saActive = sa && sa.active;
+          const mLimit = saActive ? sa.mainCount  : (s.cards?.length || 0);
+          const spLimit = saActive ? sa.splitCount : (s.splitCards?.length || 0);
+          const mCards = (s.cards || []).slice(0, mLimit);
+          const spCards = (s.splitCards || []).slice(0, spLimit);
+          const dealMainIdx  = (sa && sa.justDealt === 'main')  ? mCards.length - 1  : -1;
+          const dealSplitIdx = (sa && sa.justDealt === 'split') ? spCards.length - 1 : -1;
+          const mainCardsH  = mCards.map((c, ci)  => bjtMiniCard(c, ci === dealMainIdx)).join('');
+          const splitCardsH = spCards.map((c, ci) => bjtMiniCard(c, ci === dealSplitIdx)).join('');
+          const mScore  = mCards.length  && showScore ? bjHandValue(mCards)  : 0;
+          const mBust   = mCards.length  && bjIsBust(mCards);
+          const splitScore = spCards.length && showScore ? bjHandValue(spCards) : 0;
+          const splitBust  = spCards.length && bjIsBust(spCards);
+          // 갈라짐 모션: 1단계(둘 다 1장)일 때만 적용
+          const sepCls = (saActive && sa.mainCount === 1 && sa.splitCount === 1) ? ' split-anim' : '';
+          cardsHtml = `<div class="bjtable-seat-split-wrap${sepCls}">
+            <div class="bjtable-seat-hand${mainActive?' active-hand':''}">
+              <div class="bjtable-split-label${mainActive?' active-hand':''}">손 1</div>
+              <div class="bjtable-seat-cards">${mainCardsH}</div>
+              ${mScore ? `<div class="bjtable-seat-score">${mScore}${mBust?' 💥':''}</div>` : ''}
+              ${s.result ? `<div class="bjtable-seat-result" style="color:${rlColor(s.result)}">${rlLabel[s.result]||''}</div>` : ''}
+            </div>
+            <div class="bjtable-seat-hand${splitActive?' active-hand':''}">
+              <div class="bjtable-split-label${splitActive?' active-hand':''}">손 2</div>
+              <div class="bjtable-seat-cards">${splitCardsH}</div>
+              ${splitScore ? `<div class="bjtable-seat-score">${splitScore}${splitBust?' 💥':''}</div>` : ''}
+              ${s.splitResult ? `<div class="bjtable-seat-result" style="color:${rlColor(s.splitResult)}">${rlLabel[s.splitResult]||''}</div>` : ''}
+            </div>
+          </div>`;
+        } else {
+          cardsHtml = `<div class="bjtable-seat-cards">${mainCards}</div>
+          ${mainScore ? `<div class="bjtable-seat-score">${mainScore}</div>` : ''}
+          ${s?.result ? `<div class="bjtable-seat-result" style="color:${rlColor(s.result)}">${rlLabel[s.result]||''}</div>` : ''}`;
+        }
+        const showBet = s?.bet && (d.phase==='betting'||d.phase==='playing'||d.phase==='dealer'||d.phase==='settling'||d.phase==='done');
+        const totalBet = hasSplit ? s.bet * 2 : s?.bet;
+        return `<div class="bjtable-seat s-${i}${isEmpty?' empty':''}${!isEmpty&&!isMe?' taken':''}${isMe?' mine':''}${isTurn?' active':''}${isBust&&!hasSplit?' bust':''}"
+          ${canSit ? `onclick="bjtJoinSeat(${i})"` : ''}>
+          <div class="bjtable-seat-above">${!isEmpty ? cardsHtml : ''}</div>
+          <div class="bjtable-seat-circle">
+            ${isEmpty
+              ? `<div class="bjtable-seat-empty-label">${canSit ? '+ 앉기' : '빈 자리'}</div>`
+              : `${showBet ? `<div class="bjtable-seat-bet">${totalBet?.toLocaleString()}P${s.betConfirmed&&d.phase==='betting'?' ✓':''}</div>` : ''}`}
+          </div>
+          <div class="bjtable-seat-below">
+            ${isEmpty
+              ? `<div class="bjtable-seat-num">자리 ${7-i}</div>`
+              : `<div class="bjtable-seat-name">${s.nickname}${isMe?' 👤':''}</div>`}
+            ${s?.done && !s?.result && d.phase==='playing' ? '<div class="bjtable-seat-done" style="color:#555">✓</div>' : ''}
+            ${isTurn ? `<div class="bjtable-seat-turn">▶ ${s?.playingSplit?'손 2':'차례'}</div>` : ''}
+          </div>
+        </div>`;
+      }).join('');
+      // 스플릿 시 슬라이드 애니메이션 없이 즉시 손1/손2 레이아웃으로 표시
+    }
+
+    function bjtMiniCard(c, dealAnim) {
+      const da = dealAnim ? ' bjtmc-deal' : '';
+      if (!c || c.hidden) return `<div class="bjtmc-back${da}"><div class="bjtmc-back-inner">♦</div></div>`;
+      const cls = c.isRed ? 'red' : 'black';
+      return `<div class="bjtmc-card ${cls}${da}">
+        <div class="bjtmc-corner">${c.rank}<span>${c.suitStr}</span></div>
+        <div class="bjtmc-suit-mid">${c.suitStr}</div>
+        <div class="bjtmc-corner bjtmc-corner-br">${c.rank}<span>${c.suitStr}</span></div>
+      </div>`;
+    }
+
+    function bjtUpdateStatus(d, myIdx, mySeat) {
+      const el = document.getElementById('bjtStatusMsg'); if (!el) return;
+      const isSitting = myIdx >= 0;
+      if (d.phase==='waiting') { el.textContent = isSitting ? '게임 시작 버튼을 눌러 라운드를 시작하세요' : '빈 자리를 클릭해서 테이블에 앉으세요'; }
+      else if (d.phase==='betting') { el.textContent = mySeat?.betConfirmed ? '배팅 완료! 다른 플레이어를 기다리는 중...' : isSitting ? '배팅 금액을 입력하고 배팅 확정을 누르세요' : '게임이 진행 중입니다'; }
+      else if (d.phase==='playing') {
+        if (d.currentSeat === myIdx) el.textContent = '내 차례입니다! Hit 또는 Stand를 선택하세요';
+        else { const cur = d.seats[d.currentSeat]; el.textContent = cur ? `${cur.nickname}의 차례입니다 (${BJT_ACT_SEC}초)` : ''; }
+      } else if (d.phase==='insurance') { el.textContent = '🛡 딜러 에이스 — 인슈어런스 여부를 선택하세요'; }
+      else if (d.phase==='dealer') { el.textContent = '딜러가 카드를 뽑는 중...'; }
+      else if (d.phase==='done') { el.textContent = `라운드 종료! ${BJT_DONE_SEC}초 후 다음 라운드 베팅이 시작됩니다`; }
+      else { el.textContent = ''; }
+    }
+
+    // ── 결과 오버레이 ──────────────────────────────
+    let _bjtOverlayRoundId = -1;
+    function bjtShowResultOverlay(result, net) {
+      const overlay = document.getElementById('bjtResultOverlay');
+      const labelEl = document.getElementById('bjtResLabel');
+      const amountEl = document.getElementById('bjtResAmount');
+      const iconEl   = document.getElementById('bjtResIcon');
+      if (!overlay) return;
+
+      const cfgs = {
+        bj:   { icon:'🃏', label:'블랙잭!', cls:'bjt-res-bj'   },
+        win:  { icon:'🏆', label:'승  리!', cls:'bjt-res-win'  },
+        push: { icon:'🤝', label:'무승부',  cls:'bjt-res-push' },
+        lose: { icon:'💸', label:'패  배',  cls:'bjt-res-lose' },
+      };
+      const cfg = cfgs[result] || cfgs.lose;
+
+      iconEl.textContent   = cfg.icon;
+      labelEl.textContent  = cfg.label;
+      amountEl.textContent = net > 0 ? `+${net.toLocaleString()} P` : net < 0 ? `${net.toLocaleString()} P` : '반환';
+
+      // 클래스 초기화 후 적용
+      overlay.className = `bjt-result-overlay ${cfg.cls}`;
+      overlay.style.display = 'flex';
+
+      // 카드 재생성으로 애니 재시작
+      const content = overlay.querySelector('.bjt-result-content');
+      if (content) { content.style.animation = 'none'; content.offsetHeight; content.style.animation = ''; }
+
+      if (result === 'win' || result === 'bj') bjtSpawnParticles(result);
+    }
+
+    function bjtHideResultOverlay() {
+      const overlay = document.getElementById('bjtResultOverlay');
+      if (overlay) overlay.style.display = 'none';
+    }
+
+    function bjtSpawnParticles(result) {
+      const wrap = document.getElementById('bjtResParticles');
+      if (!wrap) return;
+      wrap.innerHTML = '';
+      const palettes = {
+        bj:  ['#ffd700','#ffed4a','#fff8b0','#fff','#ffe680'],
+        win: ['#4ade80','#22c55e','#86efac','#ffd700','#fff'],
+      };
+      const colors = palettes[result] || palettes.win;
+      for (let i = 0; i < 28; i++) {
+        const p = document.createElement('div');
+        p.className = 'bjt-particle';
+        const size = 4 + Math.random() * 7;
+        p.style.cssText = [
+          `left:${10+Math.random()*80}%`,
+          `top:${30+Math.random()*60}%`,
+          `width:${size}px`, `height:${size}px`,
+          `background:${colors[Math.floor(Math.random()*colors.length)]}`,
+          `animation-delay:${(Math.random()*0.6).toFixed(2)}s`,
+          `animation-duration:${(0.9+Math.random()*0.8).toFixed(2)}s`,
+        ].join(';');
+        wrap.appendChild(p);
+      }
+    }
+
+    // 블랙잭 헬퍼 함수
+    function bjHandValue(cards) {
+      let sum = 0, aces = 0;
+      for (const c of cards) {
+        if (c.val === 1) { aces++; sum += 11; }
+        else if (c.val >= 10) sum += 10;
+        else sum += c.val;
+      }
+      while (sum > 21 && aces > 0) { sum -= 10; aces--; }
+      return sum;
+    }
+    function bjIsBlackjack(cards) { return cards.length === 2 && bjHandValue(cards) === 21; }
+    function bjIsBust(cards) { return bjHandValue(cards) > 21; }
+
+    function bjCardHtml(card, hidden) {
+      if (hidden) return `<div class="bjc-back"><div class="bjc-back-inner">♦</div></div>`;
+      const colorCls = card.isRed ? 'red' : 'black';
+      return `<div class="bjc-card ${colorCls}">
+        <div class="bjc-corner">${card.rank}<span>${card.suitStr}</span></div>
+        <div class="bjc-center">${card.suitStr}</div>
+        <div class="bjc-corner bjc-corner-br">${card.rank}<span>${card.suitStr}</span></div>
+      </div>`;
+    }
+  </script>
+</body>
+</html>

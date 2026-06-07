@@ -1,0 +1,1849 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #1a1a2e;
+  font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+  color: #ccc;
+  min-height: 100vh;
+}
+
+/* 초기 로딩 화면 */
+#loadingScreen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: #0d0d1a;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.loading-logo {
+  font-size: 2rem;
+  font-weight: 900;
+  color: #c8a951;
+  letter-spacing: 6px;
+}
+
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #2a2a4a;
+  border-top-color: #c8a951;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ══════════════════════════════
+   로그인 화면
+══════════════════════════════ */
+#loginScreen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0d0d1a, #1a1a2e);
+  padding: 20px;
+}
+
+.login-wrap { width: 100%; max-width: 420px; }
+
+.login-logo-area {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.login-logo-area h1 {
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: #c8a951;
+  letter-spacing: 6px;
+  text-shadow: 0 0 20px rgba(200,169,81,0.5);
+}
+
+.login-logo-area p {
+  color: #888;
+  font-size: 0.85rem;
+  margin-top: 6px;
+}
+
+.login-card {
+  background: #16213e;
+  border: 1px solid #2a2a4a;
+  border-radius: 8px;
+  padding: 28px 24px;
+}
+
+.tab-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  margin-bottom: 24px;
+  border: 1px solid #2a2a4a;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.tab-btn {
+  padding: 10px;
+  border: none;
+  background: #0d0d1a;
+  color: #666;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab-btn.active {
+  background: #c8a951;
+  color: #000;
+  font-weight: bold;
+}
+
+.field { margin-bottom: 12px; }
+
+.field label {
+  display: block;
+  font-size: 0.78rem;
+  color: #c8a951;
+  margin-bottom: 5px;
+}
+
+.field input {
+  width: 100%;
+  background: #0d0d1a;
+  border: 1px solid #2a2a4a;
+  border-radius: 4px;
+  padding: 10px 12px;
+  color: #fff;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.field input:focus { border-color: #c8a951; }
+.field input::placeholder { color: #444; }
+
+.error-msg {
+  font-size: 0.8rem;
+  color: #e05555;
+  min-height: 18px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.btn-login-submit {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(90deg, #b8941f, #c8a951, #b8941f);
+  border: none;
+  border-radius: 4px;
+  color: #000;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  letter-spacing: 2px;
+  transition: opacity 0.2s;
+}
+
+.btn-login-submit:hover { opacity: 0.88; }
+.btn-login-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ══════════════════════════════
+   게임 화면 전체 레이아웃
+══════════════════════════════ */
+#gameScreen { display: none; flex-direction: column; min-height: 100vh; }
+
+/* ─── 상단 헤더 ─── */
+.header {
+  background: linear-gradient(90deg, #0d0d1a, #16213e, #0d0d1a);
+  border-bottom: 2px solid #c8a951;
+  padding: 0 16px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-logo {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: #c8a951;
+  letter-spacing: 4px;
+  text-shadow: 0 0 10px rgba(200,169,81,0.4);
+}
+
+.header-user {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 0.85rem;
+}
+
+.user-point-box {
+  background: #0d0d1a;
+  border: 1px solid #c8a951;
+  border-radius: 4px;
+  padding: 5px 14px;
+  color: #c8a951;
+  font-weight: bold;
+}
+
+.user-name-box { color: #ccc; }
+.user-name-box span { color: #fff; font-weight: bold; }
+
+.btn-logout-top {
+  background: transparent;
+  border: 1px solid #444;
+  color: #888;
+  padding: 5px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.2s;
+}
+
+.btn-logout-top:hover { border-color: #e05555; color: #e05555; }
+
+.btn-myinfo {
+  background: #1a2240;
+  border: 1px solid #c8a951;
+  color: #c8a951;
+  padding: 5px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: bold;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-myinfo:hover { background: rgba(200,169,81,0.15); }
+
+.myinfo-nickname {
+  color: #fff;
+  font-weight: bold;
+  font-size: 0.88rem;
+  background: #0d0d1a;
+  border: 1px solid #2a2a4a;
+  border-radius: 4px;
+  padding: 4px 12px;
+}
+
+/* ─── 햄버거 버튼 ─── */
+.btn-hamburger {
+  display: none;
+  background: transparent;
+  border: 1px solid #2a2a4a;
+  color: #ccc;
+  padding: 7px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+  transition: all 0.15s;
+}
+.btn-hamburger:hover { border-color: #c8a951; color: #c8a951; }
+
+/* ─── 모바일 드로어 메뉴 ─── */
+.mobile-menu-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 300;
+}
+.mobile-menu-overlay.open { display: block; }
+
+.mobile-menu-drawer {
+  position: absolute;
+  top: 56px;
+  left: 0; right: 0;
+  background: #16213e;
+  border-bottom: 2px solid #c8a951;
+  padding: 14px 16px 18px;
+  max-height: calc(100vh - 56px);
+  overflow-y: auto;
+}
+
+.mob-user-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid #2a2a4a;
+}
+.mob-user-name { color: #fff; font-weight: bold; font-size: 0.95rem; }
+.mob-user-sub  { color: #888; font-size: 0.72rem; margin-bottom: 2px; }
+
+.mob-section-title {
+  font-size: 0.68rem;
+  color: #c8a951;
+  font-weight: bold;
+  letter-spacing: 2px;
+  padding: 10px 4px 4px;
+}
+
+.mob-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 11px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 5px;
+  color: #aaa;
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: background 0.15s;
+  text-decoration: none;
+}
+.mob-item:hover  { background: #1e2a4a; color: #eee; }
+.mob-item.active { background: #1a2240; color: #c8a951; font-weight: bold; }
+
+.mob-actions {
+  display: flex;
+  gap: 8px;
+  padding-top: 14px;
+  margin-top: 6px;
+  border-top: 1px solid #2a2a4a;
+}
+
+@media (max-width: 640px) {
+  .header-user   { display: none; }
+  .btn-hamburger { display: block; }
+  .subnav        { display: none; }
+}
+
+/* 내정보 모달 */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 999;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-overlay.open { display: flex; }
+
+.modal-box {
+  background: #16213e;
+  border: 1px solid #c8a951;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 360px;
+  overflow: hidden;
+}
+
+.modal-header {
+  background: linear-gradient(90deg, #b8941f, #c8a951);
+  padding: 12px 18px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #000;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: #000;
+  font-size: 1.1rem;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.modal-body { padding: 20px; }
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #1e2a3a;
+  font-size: 0.85rem;
+}
+
+.info-row:last-child { border-bottom: none; }
+.info-label { color: #888; }
+.info-value { color: #fff; font-weight: bold; }
+
+/* ─── 서브 네비 ─── */
+.subnav {
+  background: #16213e;
+  border-bottom: 1px solid #2a2a4a;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  height: 38px;
+  gap: 4px;
+  position: relative;
+  z-index: 100;
+}
+
+.subnav-category { position: relative; }
+
+.subnav-cat-btn {
+  padding: 6px 14px;
+  background: transparent;
+  border: 1px solid #2a2a4a;
+  border-radius: 3px;
+  color: #888;
+  font-size: 0.82rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.subnav-cat-btn:hover { background: #1e2a4a; color: #ccc; }
+
+.subnav-cat-btn.active {
+  background: #c8a951;
+  border-color: #c8a951;
+  color: #000;
+  font-weight: bold;
+}
+
+.subnav-arrow {
+  font-size: 0.55rem;
+  transition: transform 0.15s;
+  display: inline-block;
+}
+
+.subnav-category.open .subnav-arrow { transform: rotate(180deg); }
+
+.subnav-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 0;
+  background: #16213e;
+  border: 1px solid #2a2a4a;
+  border-radius: 6px;
+  min-width: 150px;
+  z-index: 200;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.7);
+  overflow: hidden;
+}
+
+.subnav-category.open .subnav-dropdown { display: block; }
+
+.subnav-drop-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 16px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #1a2240;
+  color: #aaa;
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+  font-family: inherit;
+  text-decoration: none;
+}
+
+.subnav-drop-item:last-child { border-bottom: none; }
+.subnav-drop-item:hover { background: #1e2a4a; color: #eee; }
+.subnav-drop-item.active { color: #c8a951; background: #1a2240; font-weight: bold; }
+
+/* ─── 3단 레이아웃 ─── */
+.main-layout {
+  display: grid;
+  grid-template-columns: 180px 1fr 280px;
+  flex: 1;
+  min-height: 0;
+}
+
+/* ─── 좌측 사이드바 ─── */
+.sidebar-left {
+  background: #13192e;
+  border-right: 1px solid #2a2a4a;
+  padding: 12px 0;
+}
+
+.sidebar-section-title {
+  font-size: 0.7rem;
+  color: #c8a951;
+  letter-spacing: 1px;
+  padding: 8px 14px 4px;
+  border-bottom: 1px solid #1e2440;
+}
+
+.sidebar-menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 14px;
+  font-size: 0.83rem;
+  color: #888;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: all 0.15s;
+  text-decoration: none;
+}
+
+.sidebar-menu-item:hover { background: #1a2240; color: #ccc; }
+
+.sidebar-menu-item.active {
+  background: #1a2240;
+  color: #c8a951;
+  border-left-color: #c8a951;
+  font-weight: bold;
+}
+
+.sidebar-badge {
+  background: #c8a951;
+  color: #000;
+  font-size: 0.65rem;
+  padding: 1px 6px;
+  border-radius: 10px;
+  font-weight: bold;
+}
+
+/* ─── 메인 콘텐츠 ─── */
+.main-content {
+  padding: 16px;
+  overflow-y: auto;
+}
+
+.content-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.content-title {
+  font-size: 1rem;
+  color: #c8a951;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.content-title::before {
+  content: '';
+  display: inline-block;
+  width: 4px;
+  height: 16px;
+  background: #c8a951;
+  border-radius: 2px;
+}
+
+/* ─── 게임 패널 ─── */
+.game-panel {
+  background: #13192e;
+  border: 1px solid #2a2a4a;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.game-panel-header {
+  background: linear-gradient(90deg, #1a2240, #16213e);
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #2a2a4a;
+}
+
+.game-panel-title {
+  font-size: 0.88rem;
+  font-weight: bold;
+  color: #e0c87a;
+}
+
+.game-panel-body { padding: 20px; }
+
+/* 숫자 결과창 */
+.result-display {
+  background: #0d0d1a;
+  border: 1px solid #2a2a4a;
+  border-radius: 6px;
+  padding: 24px;
+  text-align: center;
+  margin-bottom: 20px;
+  min-height: 130px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.result-number {
+  font-size: 5rem;
+  font-weight: 900;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.result-number.odd { color: #e05555; text-shadow: 0 0 20px rgba(224,85,85,0.5); }
+.result-number.even { color: #4a9eff; text-shadow: 0 0 20px rgba(74,158,255,0.5); }
+.result-number.rolling { animation: roll 0.08s infinite alternate; }
+
+@keyframes roll { from { transform: scale(1); } to { transform: scale(1.08); } }
+
+.result-tag { font-size: 1.1rem; font-weight: bold; letter-spacing: 2px; }
+.result-tag.odd { color: #e05555; }
+.result-tag.even { color: #4a9eff; }
+
+.result-outcome {
+  font-size: 1.4rem;
+  font-weight: bold;
+  margin-top: 6px;
+}
+
+.result-outcome.win { color: #4ade80; animation: pop 0.3s ease-out; }
+.result-outcome.lose { color: #e05555; }
+
+@keyframes pop { 0% { transform: scale(0.7); } 60% { transform: scale(1.15); } 100% { transform: scale(1); } }
+
+.result-change { font-size: 0.9rem; color: #888; margin-top: 4px; }
+.idle-text { color: #444; font-size: 0.9rem; }
+
+/* 홀짝 선택 버튼 */
+.choice-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.btn-odd, .btn-even {
+  padding: 18px;
+  border-radius: 5px;
+  border: 1px solid;
+  cursor: pointer;
+  font-size: 1.2rem;
+  font-weight: bold;
+  letter-spacing: 2px;
+  transition: all 0.15s;
+}
+
+.btn-odd {
+  background: rgba(224,85,85,0.12);
+  border-color: #e05555;
+  color: #e05555;
+}
+
+.btn-odd:not(:disabled):hover {
+  background: rgba(224,85,85,0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(224,85,85,0.3);
+}
+
+.btn-even {
+  background: rgba(74,158,255,0.12);
+  border-color: #4a9eff;
+  color: #4a9eff;
+}
+
+.btn-even:not(:disabled):hover {
+  background: rgba(74,158,255,0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(74,158,255,0.3);
+}
+
+.btn-odd:disabled, .btn-even:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.odds-label {
+  text-align: center;
+  font-size: 0.75rem;
+  color: #555;
+  margin-top: 10px;
+}
+
+/* ─── 우측 배팅 슬립 ─── */
+.sidebar-right {
+  background: #13192e;
+  border-left: 1px solid #2a2a4a;
+  display: flex;
+  flex-direction: column;
+}
+
+.slip-header {
+  background: linear-gradient(90deg, #b8941f, #c8a951);
+  padding: 10px 16px;
+  font-size: 0.88rem;
+  font-weight: bold;
+  color: #000;
+  letter-spacing: 1px;
+}
+
+.slip-body { padding: 16px; flex: 1; }
+
+.slip-point-row {
+  background: #0d0d1a;
+  border: 1px solid #2a2a4a;
+  border-radius: 4px;
+  padding: 10px 12px;
+  margin-bottom: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.slip-point-label { font-size: 0.78rem; color: #888; }
+.slip-point-value { font-size: 1.1rem; color: #c8a951; font-weight: bold; }
+
+.slip-section-label {
+  font-size: 0.75rem;
+  color: #c8a951;
+  margin-bottom: 8px;
+}
+
+.bet-quick-btns {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.bet-quick-btn {
+  background: #1a2240;
+  border: 1px solid #2a2a4a;
+  border-radius: 4px;
+  color: #ccc;
+  padding: 7px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s;
+}
+
+.bet-quick-btn:hover { background: #243060; border-color: #c8a951; color: #c8a951; }
+
+.bet-input-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.bet-input {
+  flex: 1;
+  background: #0d0d1a;
+  border: 1px solid #2a2a4a;
+  border-radius: 4px;
+  padding: 9px 12px;
+  color: #fff;
+  font-size: 0.95rem;
+  text-align: right;
+  outline: none;
+}
+
+.bet-input:focus { border-color: #c8a951; }
+
+.bet-reset-btn {
+  background: #1a2240;
+  border: 1px solid #e05555;
+  color: #e05555;
+  padding: 9px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.15s;
+}
+
+.bet-reset-btn:hover { background: rgba(224,85,85,0.15); }
+
+.slip-divider {
+  border: none;
+  border-top: 1px solid #2a2a4a;
+  margin: 14px 0;
+}
+
+.slip-summary {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  margin-bottom: 8px;
+}
+
+.slip-summary .label { color: #888; }
+.slip-summary .value { color: #fff; font-weight: bold; }
+.slip-summary .value.gold { color: #c8a951; }
+
+.btn-bet-now {
+  width: 100%;
+  padding: 13px;
+  background: linear-gradient(90deg, #b8941f, #c8a951, #b8941f);
+  border: none;
+  border-radius: 4px;
+  color: #000;
+  font-size: 1rem;
+  font-weight: 900;
+  letter-spacing: 3px;
+  cursor: pointer;
+  margin-bottom: 10px;
+  transition: opacity 0.2s;
+}
+
+.btn-bet-now:hover { opacity: 0.88; }
+.btn-bet-now:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btn-recharge-slip {
+  width: 100%;
+  padding: 9px;
+  background: transparent;
+  border: 1px solid #c8a951;
+  color: #c8a951;
+  border-radius: 4px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-recharge-slip:hover { background: rgba(200,169,81,0.1); }
+
+/* 최근 기록 */
+.history-panel {
+  padding: 12px 16px;
+  border-top: 1px solid #2a2a4a;
+}
+
+.history-panel-title {
+  font-size: 0.75rem;
+  color: #c8a951;
+  margin-bottom: 8px;
+}
+
+.history-rows { display: flex; flex-direction: column; gap: 4px; max-height: 200px; overflow-y: auto; }
+.history-rows::-webkit-scrollbar { width: 3px; }
+.history-rows::-webkit-scrollbar-thumb { background: #c8a951; }
+
+.h-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 8px;
+  background: #0d0d1a;
+  border-radius: 3px;
+  font-size: 0.78rem;
+  border-left: 2px solid transparent;
+}
+
+.h-row.win { border-left-color: #4ade80; }
+.h-row.lose { border-left-color: #e05555; }
+
+.h-num { font-weight: bold; width: 28px; }
+.h-num.odd { color: #e05555; }
+.h-num.even { color: #4a9eff; }
+.h-info { flex: 1; padding: 0 6px; color: #666; }
+.h-result { font-weight: bold; }
+.h-result.win { color: #4ade80; }
+.h-result.lose { color: #e05555; }
+
+.history-empty { color: #444; font-size: 0.78rem; text-align: center; padding: 10px 0; }
+
+/* ══ 배팅 내역 패널 ══ */
+.betlist-header {
+  background: #0d0d1a; padding: 13px 18px 11px;
+  border-bottom: 2px solid #2a2a4a;
+  display: flex; align-items: center; gap: 8px;
+}
+.betlist-del-btn {
+  margin-left: auto; padding: 4px 12px; font-size: 0.75rem; font-weight: 700;
+  background: transparent; border: 1px solid #6b2a2a; border-radius: 4px;
+  color: #c05555; cursor: pointer; letter-spacing: 0.5px; transition: all 0.15s;
+}
+.betlist-del-btn:hover { background: #6b2a2a; color: #fff; }
+.betlist-title { font-size: 1.05rem; font-weight: 900; color: #e0c87a; letter-spacing: 1px; }
+.betlist-sub   { font-size: 0.72rem; color: #444; letter-spacing: 2px; }
+
+.bh-card { border-bottom: 2px solid #0d1020; }
+.bh-card:last-child { border-bottom: none; }
+
+.bh-card-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 11px 14px 6px;
+}
+.bh-meta { display: flex; flex-direction: column; gap: 3px; }
+.bh-meta-top { display: flex; align-items: center; gap: 7px; }
+.bh-game-badge {
+  background: #1a2240; border: 1px solid #2a3a6a;
+  border-radius: 3px; padding: 2px 8px;
+  font-size: 0.68rem; color: #7aaad8; font-weight: bold;
+}
+.bh-round-num { font-size: 0.82rem; font-weight: bold; color: #ccc; }
+.bh-date-str  { font-size: 0.69rem; color: #555; }
+.bh-win-badge {
+  padding: 5px 18px; border-radius: 3px;
+  font-size: 0.82rem; font-weight: 900; white-space: nowrap;
+}
+.bh-win-badge.win  { background: rgba(74,222,128,0.14); border: 1px solid rgba(74,222,128,0.45); color: #4ade80; }
+.bh-win-badge.lose { background: rgba(224,85,85,0.14);  border: 1px solid rgba(224,85,85,0.45);  color: #e05555; }
+.bh-win-badge.pending { background: rgba(200,169,81,0.14); border: 1px solid rgba(200,169,81,0.45); color: #c8a951; }
+
+/* 선택/결과 2-박스 쌍 */
+.bh-sect-label { font-size: 0.64rem; color: #555; padding: 6px 14px 3px; }
+.bh-pairs      { display: flex; flex-direction: column; gap: 5px; padding: 0 14px 10px; }
+.bh-pair       { display: flex; gap: 5px; }
+.bh-opt {
+  flex: 1; height: 40px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 5px;
+  font-size: 0.92rem; font-weight: 900; letter-spacing: 0.3px;
+}
+.bh-opt.empty { border: 1.5px solid #222236; color: #363650; background: transparent; }
+.bh-opt.f-left  { background: linear-gradient(135deg,#922b21,#c0392b); color:#fff; box-shadow:0 2px 8px rgba(192,57,43,.35); }
+.bh-opt.f-right { background: linear-gradient(135deg,#154360,#1f618d); color:#fff; box-shadow:0 2px 8px rgba(31,97,141,.35); }
+.bh-opt.f-three { background: linear-gradient(135deg,#6e4c1e,#c8a951); color:#fff; box-shadow:0 2px 8px rgba(200,169,81,.3); }
+.bh-opt.f-four  { background: linear-gradient(135deg,#4a235a,#7d3c98); color:#fff; box-shadow:0 2px 8px rgba(125,60,152,.35); }
+.bh-opt.f-hol   { background: linear-gradient(135deg,#922b21,#c0392b); color:#fff; box-shadow:0 2px 8px rgba(192,57,43,.35); }
+.bh-opt.f-jjak  { background: linear-gradient(135deg,#154360,#1f618d); color:#fff; box-shadow:0 2px 8px rgba(31,97,141,.35); }
+
+/* 하단 통계 */
+.bh-card-bottom {
+  background: #0a0e1a; border-top: 1px solid #131826;
+  padding: 8px 14px 10px;
+  display: grid; grid-template-columns: repeat(4,1fr);
+}
+.bh-stat { display: flex; flex-direction: column; gap: 3px; }
+.bh-stat + .bh-stat { border-left: 1px solid #161c2e; padding-left: 10px; }
+.bh-stat-label { font-size: 0.64rem; color: #444; }
+.bh-stat-value { font-size: 0.8rem; font-weight: bold; color: #777; }
+.bh-stat-value.win-val  { color: #4ade80; }
+.bh-stat-value.zero-val { color: #444; }
+
+/* 배팅 히스토리 드래곤타이거 색상 */
+.bh-opt.f-dragon { background: linear-gradient(135deg,#922b21,#c0392b); color:#fff; box-shadow:0 2px 8px rgba(192,57,43,.35); }
+.bh-opt.f-tiger  { background: linear-gradient(135deg,#154360,#1f618d); color:#fff; box-shadow:0 2px 8px rgba(31,97,141,.35); }
+.bh-opt.f-tie    { background: linear-gradient(135deg,#7d6608,#f39c12); color:#fff; box-shadow:0 2px 8px rgba(243,156,18,.3); }
+
+/* ══ 드래곤타이거 게임 ══ */
+.dt-wrap { padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+.dt-top-bar {
+  display: flex; align-items: center; gap: 10px;
+  padding-bottom: 10px; border-bottom: 1px solid #1e2a40;
+}
+.dt-game-title { font-size: 1rem; font-weight: 900; color: #e0c87a; letter-spacing: 1px; flex: 1; }
+.dt-round-badge {
+  background: #1a2240; border: 1px solid #2a3a6a;
+  border-radius: 3px; padding: 2px 8px; font-size: 0.72rem; color: #7aaad8;
+}
+.dt-timer-box {
+  background: #0d0d1a; border: 1px solid #2a2a4a;
+  border-radius: 3px; padding: 3px 10px;
+  font-size: 0.88rem; font-weight: 900; color: #c8a951; font-variant-numeric: tabular-nums;
+}
+.dt-arena {
+  display: flex; align-items: center; justify-content: center; gap: 24px;
+  background: linear-gradient(180deg,#0d1220,#12182e);
+  border: 1px solid #1e2a40; border-radius: 8px; padding: 20px 16px;
+}
+.dt-side { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.dt-side-name {
+  font-size: 0.78rem; font-weight: 900; letter-spacing: 2px;
+  padding: 3px 12px; border-radius: 3px;
+}
+.dt-side-name.dragon { background: rgba(192,57,43,0.2); border: 1px solid rgba(192,57,43,0.4); color: #e07070; }
+.dt-side-name.tiger  { background: rgba(31,97,141,0.2); border: 1px solid rgba(31,97,141,0.4); color: #70b0e0; }
+.dt-arena-vs { text-align: center; font-size: 0.8rem; font-weight: 900; color: #3a3a5a; }
+/* 카드 */
+.dt-card-back {
+  width: 120px; height: 168px; border-radius: 10px;
+  background: repeating-linear-gradient(45deg,#0d1a3a 0,#0d1a3a 5px,#1a2a5a 5px,#1a2a5a 10px);
+  border: 2px solid #2a3a6a; box-shadow: 0 6px 24px rgba(0,0,0,.7);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 3.2rem;
+}
+.pdt-suit-card {
+  width: 120px; height: 168px; border-radius: 10px;
+  background: #fff;
+  border: 2px solid #2a3a6a; box-shadow: 0 6px 24px rgba(0,0,0,.7);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 4rem; font-weight: 900;
+  animation: dtFlip 0.35s ease;
+}
+.pdt-suit-card.suit-red { color: #e03333; }
+.pdt-suit-card.suit-black { color: #111; }
+@keyframes cardFoldOut { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+.dt-card-face {
+  width: 120px; height: 168px; border-radius: 10px;
+  background: #f0f0f0; border: 1px solid #bbb;
+  box-shadow: 0 6px 24px rgba(0,0,0,.7);
+  display: flex; flex-direction: column;
+  justify-content: space-between; padding: 9px;
+  position: relative; animation: dtFlip .35s ease;
+}
+@keyframes dtFlip { from { transform: scaleX(0); opacity:0; } to { transform: scaleX(1); opacity:1; } }
+.dt-card-face.red   { color: #c0392b; }
+.dt-card-face.black { color: #1a1a2e; }
+.dt-rank-tl { font-size: 1.5rem; font-weight: 900; line-height: 1.1; }
+.dt-suit-mid {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+  font-size: 3.4rem; opacity: 0.18;
+}
+.dt-rank-br { font-size: 1.5rem; font-weight: 900; line-height: 1.1; transform: rotate(180deg); align-self: flex-end; }
+/* 결과 표시 */
+.dt-result-area {
+  text-align: center; min-height: 36px;
+  display: flex; align-items: center; justify-content: center;
+}
+.dt-res-dragon,.dt-res-tiger,.dt-res-tie {
+  font-size: 1.1rem; font-weight: 900; padding: 6px 24px; border-radius: 5px;
+  animation: dtFlip .4s ease;
+}
+.dt-res-dragon { background: rgba(192,57,43,.15); border: 1px solid rgba(192,57,43,.5); color: #e07070; }
+.dt-res-tiger  { background: rgba(31,97,141,.15);  border: 1px solid rgba(31,97,141,.5);  color: #70b0e0; }
+.dt-res-tie    { background: rgba(243,156,18,.15); border: 1px solid rgba(243,156,18,.5); color: #f0c040; }
+/* 배팅 버튼 3종 */
+.dt-bet-btns { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 7px; }
+.dt-btn {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 4px; padding: 12px 6px; border-radius: 6px; border: 2px solid transparent;
+  cursor: pointer; transition: all .15s;
+}
+.dt-btn:disabled { opacity: .45; cursor: not-allowed; }
+.dt-btn-label { font-size: 0.88rem; font-weight: 900; }
+.dt-btn-odds  { font-size: 0.72rem; }
+.dt-dragon-btn { background: #1a0a0a; border-color: #5a2020; color: #e07070; }
+.dt-dragon-btn:hover:not(:disabled) { background: #2a1010; border-color: #c0392b; }
+.dt-dragon-btn.selected { background: linear-gradient(135deg,#922b21,#c0392b); border-color: #e74c3c; color: #fff; }
+.dt-tie-btn    { background: #1a1605; border-color: #5a4a10; color: #d4a040; }
+.dt-tie-btn:hover:not(:disabled) { background: #2a2008; border-color: #c8a951; }
+.dt-tie-btn.selected { background: linear-gradient(135deg,#7d6608,#f39c12); border-color: #f5b041; color: #fff; }
+.dt-tiger-btn  { background: #0a0f1a; border-color: #1a2a5a; color: #70b0e0; }
+.dt-tiger-btn:hover:not(:disabled) { background: #101828; border-color: #2471a3; }
+.dt-tiger-btn.selected { background: linear-gradient(135deg,#154360,#1f618d); border-color: #2e86c1; color: #fff; }
+.dt-specialtie-btn {
+  background: #1a1200; border-color: #5a3e00; color: #ffc940;
+}
+.dt-specialtie-btn:hover:not(:disabled) { background: #261a00; border-color: #ffd700; }
+.dt-specialtie-btn.selected { background: linear-gradient(135deg,#7a5000,#c8880a); border-color: #ffd700; color: #fff; }
+.dt-hcell.h-specialtie { background: linear-gradient(135deg,#c8880a,#ffd700); color: #000; font-size: 0.55rem; }
+
+/* ══ 바카라 ══ */
+.bac-arena {
+  display: flex; align-items: center; justify-content: center; gap: 20px;
+  background: linear-gradient(180deg,#0d1220,#12182e);
+  border: 1px solid #1e2a40; border-radius: 8px; padding: 16px 10px;
+}
+.bac-side { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.bac-cards { display: flex; gap: 5px; min-height: 92px; align-items: center; }
+.bac-score {
+  font-size: 1.3rem; font-weight: 900; min-width: 36px; text-align: center;
+  background: #0d0d1a; border: 1px solid #2a2a4a; border-radius: 4px; padding: 2px 10px;
+}
+.bac-score.player { color: #70b0e0; }
+.bac-score.banker { color: #e07070; }
+.bac-card-back {
+  width: 121px; height: 172px; border-radius: 12px;
+  background: repeating-linear-gradient(45deg,#0d1a3a 0,#0d1a3a 4px,#1a2a5a 4px,#1a2a5a 8px);
+  border: 2px solid #2a3a6a; box-shadow: 0 4px 14px rgba(0,0,0,.6);
+  display: flex; align-items: center; justify-content: center; font-size: 3.5rem;
+}
+.bac-card-face {
+  width: 121px; height: 172px; border-radius: 12px;
+  background: #f0f0f0; border: 1px solid #bbb;
+  box-shadow: 0 4px 14px rgba(0,0,0,.6);
+  display: flex; flex-direction: column; justify-content: space-between; padding: 10px;
+  position: relative; animation: dtFlip .35s ease;
+}
+.bac-card-face.red   { color: #c0392b; }
+.bac-card-face.black { color: #1a1a2e; }
+.bac-rank-tl { font-size: 1.8rem; font-weight: 900; line-height: 1.1; }
+.bac-suit-mid {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+  font-size: 3.9rem; opacity: 0.16;
+}
+.bac-rank-br { font-size: 0.92rem; font-weight: 900; line-height: 1.1; transform: rotate(180deg); align-self: flex-end; }
+
+/* ── 블랙잭 카드 (실제 카드 모양) ── */
+.bjc-card {
+  width: 74px; height: 106px; border-radius: 8px;
+  background: #fff; border: 1px solid #c8c8c8;
+  box-shadow: 0 4px 14px rgba(0,0,0,.45);
+  display: flex; flex-direction: column; justify-content: space-between;
+  padding: 5px 6px; position: relative; flex-shrink: 0;
+  animation: dtFlip .3s ease;
+}
+.bjc-card.red   { color: #c62828; }
+.bjc-card.black { color: #1a1a2e; }
+.bjc-corner { font-size: 1.05rem; font-weight: 900; line-height: 1.15; align-self: flex-start; text-align: left; }
+.bjc-corner span { display: block; font-size: 0.82rem; line-height: 1; }
+.bjc-corner-br { transform: rotate(180deg); align-self: flex-end; text-align: left; }
+.bjc-center {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.6rem; line-height: 1; opacity: 0.18; pointer-events: none; user-select: none;
+}
+.bjc-back {
+  width: 74px; height: 106px; border-radius: 8px;
+  background: #0e1e4a;
+  border: 2px solid #c8a951;
+  box-shadow: 0 4px 14px rgba(0,0,0,.5);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; overflow: hidden; position: relative;
+}
+.bjc-back::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(135deg,#0e1e4a 0,#0e1e4a 5px,#162458 5px,#162458 10px);
+}
+.bjc-back-inner {
+  position: relative; z-index: 1;
+  width: 56px; height: 82px; border-radius: 5px;
+  border: 1.5px solid rgba(200,169,81,.55);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem; color: rgba(200,169,81,.6);
+  background: repeating-linear-gradient(135deg,#0a1638 0,#0a1638 5px,#132050 5px,#132050 10px);
+}
+.bac-third-wrap {
+  width: 172px; height: 121px;
+  position: relative; flex-shrink: 0;
+}
+.bac-third-wrap > * {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%) rotate(90deg) !important;
+  animation: dtFlip .35s ease;
+}
+.bac-player-btn { background: #0a0f1a; border-color: #1a2a5a; color: #70b0e0; }
+.bac-player-btn:hover:not(:disabled) { background: #101828; border-color: #2471a3; }
+.bac-player-btn.selected { background: linear-gradient(135deg,#154360,#1f618d); border-color: #2e86c1; color: #fff; }
+.bac-banker-btn { background: #1a0a0a; border-color: #5a2020; color: #e07070; }
+.bac-banker-btn:hover:not(:disabled) { background: #2a1010; border-color: #c0392b; }
+.bac-banker-btn.selected { background: linear-gradient(135deg,#922b21,#c0392b); border-color: #e74c3c; color: #fff; }
+.bac-pair-btn { background: #120d1a; border-color: #3a2060; color: #b090e0; }
+.bac-pair-btn:hover:not(:disabled) { background: #1e1430; border-color: #7d3c98; }
+.bac-pair-btn.selected { background: linear-gradient(135deg,#4a235a,#7d3c98); border-color: #9b59b6; color: #fff; }
+.bac-pair-label { font-size: 0.72rem; font-weight: 900; }
+.dt-hcell.h-player { background: #2471a3; }
+.dt-hcell.h-banker { background: #c0392b; }
+/* 배팅 입력 영역 */
+.dt-input-area { display: flex; flex-direction: column; gap: 7px; }
+.dt-quick-btns { display: grid; grid-template-columns: repeat(4,1fr); gap: 5px; }
+.dt-quick-btn {
+  background: #13192e; border: 1px solid #2a2a4a; border-radius: 4px;
+  color: #aaa; font-size: 0.75rem; padding: 6px 2px; cursor: pointer;
+}
+.dt-quick-btn:hover:not(:disabled) { border-color: #c8a951; color: #c8a951; }
+.dt-amount-row { display: flex; gap: 7px; }
+.dt-amount-row input {
+  flex: 1; background: #0d0d1a; border: 1px solid #2a2a4a;
+  border-radius: 4px; color: #ddd; padding: 8px 10px; font-size: 0.85rem;
+}
+.dt-confirm-btn {
+  padding: 8px 18px; border-radius: 4px; font-size: 0.85rem; font-weight: 900;
+  background: linear-gradient(135deg,#7d6608,#c8a951); border: none;
+  color: #0d0d1a; cursor: pointer; white-space: nowrap;
+}
+.dt-confirm-btn:disabled { opacity: .5; cursor: not-allowed; }
+.dt-bet-status { font-size: 0.78rem; min-height: 18px; color: #555; }
+
+/* DT 결과 히스토리 */
+.dt-history-section { background: #13192e; border: 1px solid #2a2a4a; border-radius: 6px; overflow: hidden; }
+.dt-history-title {
+  padding: 8px 12px; font-size: 0.78rem; font-weight: bold;
+  color: #888; border-bottom: 1px solid #2a2a4a;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.dt-history-legend { display: flex; gap: 10px; }
+.dt-legend-item { display: flex; align-items: center; gap: 4px; font-size: 0.68rem; color: #666; }
+.dt-legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+.dt-history-grid {
+  display: flex; gap: 3px; padding: 10px;
+  overflow-x: auto; min-height: 52px; align-items: flex-start;
+}
+.dt-history-grid::-webkit-scrollbar { height: 4px; }
+.dt-history-grid::-webkit-scrollbar-thumb { background: #c8a951; border-radius: 2px; }
+.dt-hcol { display: flex; flex-direction: column; gap: 3px; flex-shrink: 0; }
+.dt-hcell {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.6rem; font-weight: bold; color: #fff; flex-shrink: 0;
+}
+.dt-hcell.h-dragon { background: #c0392b; }
+.dt-hcell.h-tiger  { background: #2471a3; }
+.dt-hcell.h-tie    { background: #d4ac0d; }
+.dt-history-empty  { color: #444; font-size: 0.8rem; text-align: center; padding: 14px; width: 100%; }
+
+.saving-indicator { font-size: 0.72rem; color: #c8a951; text-align: center; height: 16px; }
+
+/* 반응형 */
+@media (max-width: 900px) {
+  .main-layout { grid-template-columns: 1fr; }
+  .sidebar-left { display: none; }
+  .sidebar-right { border-left: none; border-top: 1px solid #2a2a4a; }
+}
+
+/* ─── 모바일 하단 고정 배팅 바 (사다리) ─── */
+.lg-mobile-betbar { display: none; }
+@media (max-width: 900px) {
+  .lg-mobile-betbar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 300;
+    background: #0f1428; border-top: 1px solid #c8a951;
+    box-shadow: 0 -6px 22px rgba(0,0,0,0.55);
+    padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+    flex-direction: column; gap: 6px;
+  }
+  .lg-mobile-betbar.show { display: flex; }
+  .lg-mbb-quick { display: flex; gap: 5px; }
+  .lg-mbb-quick button {
+    flex: 1; background: #1a2240; border: 1px solid #2a3660; color: #c8d0e8;
+    border-radius: 5px; padding: 7px 0; font-size: 0.72rem; font-family: inherit;
+    cursor: pointer;
+  }
+  .lg-mbb-quick button:active { background: #243060; }
+  .lg-mbb-row { display: flex; gap: 6px; align-items: stretch; }
+  .lg-mbb-row input {
+    flex: 1; min-width: 0; background: #0a0e1c; border: 1px solid #2a3660;
+    color: #fff; border-radius: 5px; padding: 0 12px; font-size: 0.95rem;
+    font-family: inherit; text-align: right;
+  }
+  .lg-mbb-confirm {
+    flex-shrink: 0; min-width: 120px;
+    background: linear-gradient(135deg, #d4af37, #c8a951); color: #1a1a1a;
+    border: none; border-radius: 5px; font-weight: bold; font-size: 0.9rem;
+    padding: 12px 14px; font-family: inherit; cursor: pointer;
+  }
+  .lg-mbb-confirm:disabled { opacity: 0.4; cursor: not-allowed; }
+}
+
+/* ─── 사다리 게임 ─── */
+.lg-layout { display: grid; grid-template-columns: 1fr 175px; gap: 10px; }
+.lg-panel { background: #13192e; border: 1px solid #2a2a4a; border-radius: 6px; overflow: hidden; }
+.lg-panel-title {
+  background: linear-gradient(90deg, #1a2240, #16213e);
+  padding: 9px 14px; font-size: 0.85rem; font-weight: bold;
+  color: #e0c87a; border-bottom: 1px solid #2a2a4a; text-align: center;
+}
+.lg-sub-title { font-size: 0.72rem; color: #888; text-align: center; padding: 5px 8px; border-bottom: 1px solid #1a2030; }
+
+/* 픽모음 */
+.lg-pick-item { display: flex; align-items: center; gap: 6px; padding: 7px 10px; border-bottom: 1px solid #1a2030; }
+.lg-pick-num {
+  background: #c0392b; color: #fff; font-size: 0.68rem; font-weight: bold;
+  width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center;
+  justify-content: center; flex-shrink: 0;
+}
+.lg-pick-info { flex: 1; color: #777; font-size: 0.7rem; line-height: 1.5; }
+.lg-pick-badges { display: flex; flex-direction: column; gap: 3px; align-items: flex-end; }
+.lg-pick-badge { font-size: 0.68rem; font-weight: bold; padding: 2px 6px; border-radius: 8px; white-space: nowrap; }
+.lg-pick-badge.hol  { background: rgba(224,85,85,0.2);  color: #e05555; border: 1px solid rgba(224,85,85,0.35); }
+.lg-pick-badge.jjak { background: rgba(74,158,255,0.18); color: #4a9eff; border: 1px solid rgba(74,158,255,0.35); }
+.lg-pick-badge.left { background: rgba(200,169,81,0.15); color: #c8a951; border: 1px solid rgba(200,169,81,0.3); }
+.lg-pick-badge.three { background: rgba(74,222,128,0.15); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
+
+/* 게임 중앙 */
+.lg-game-title { text-align: center; font-size: 0.88rem; color: #c8a951; font-weight: bold; padding: 9px; border-bottom: 1px solid #1a2030; }
+.lg-datetime { text-align: center; font-size: 0.72rem; color: #555; padding: 3px; }
+.lg-canvas-wrap { display: flex; justify-content: center; padding: 4px 0; background: #0d0d1a; }
+/* 모바일: 사다리 위 / 회차별 결과 아래로 세로 스택 */
+@media (max-width: 700px) {
+  .lg-layout { grid-template-columns: 1fr; }
+}
+
+/* 확률 바 */
+.lg-stats { padding: 7px 12px; border-top: 1px solid #1a2030; }
+.lg-stat-row { display: flex; align-items: center; gap: 5px; margin-bottom: 4px; font-size: 0.7rem; }
+.lg-stat-lbl { color: #888; width: 28px; text-align: center; flex-shrink: 0; font-size: 0.65rem; }
+.lg-bar-track { flex: 1; height: 12px; background: #0d0d1a; border-radius: 2px; overflow: hidden; display: flex; }
+.lg-bar-a { height: 100%; transition: width 0.6s; }
+.lg-bar-b { height: 100%; flex: 1; }
+.lg-pct-a { font-size: 0.68rem; width: 36px; text-align: right; flex-shrink: 0; }
+.lg-pct-b { font-size: 0.68rem; width: 36px; flex-shrink: 0; }
+
+/* 배팅 버튼 */
+.lg-bet-section { padding: 8px 12px 4px; border-top: 1px solid #2a2a4a; }
+.lg-bet-label { font-size: 0.65rem; color: #666; margin-bottom: 5px; letter-spacing: 1px; }
+.lg-bet-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px; }
+.lg-bet-btn {
+  padding: 8px 4px; border: 2px solid transparent; border-radius: 4px;
+  font-size: 0.85rem; font-weight: bold; cursor: pointer; transition: all 0.18s; letter-spacing: 1px; background: transparent;
+}
+.lg-bet-btn.type-left  { border-color: #c8a951; color: #c8a951; }
+.lg-bet-btn.type-right { border-color: #a0a0a0; color: #a0a0a0; }
+.lg-bet-btn.type-three { border-color: #4ade80; color: #4ade80; }
+.lg-bet-btn.type-four  { border-color: #f59e0b; color: #f59e0b; }
+.lg-bet-btn.type-hol   { border-color: #e05555; color: #e05555; }
+.lg-bet-btn.type-jjak  { border-color: #4a9eff; color: #4a9eff; }
+.lg-bet-btn:hover { filter: brightness(1.25); }
+.lg-bet-btn.selected { filter: brightness(1.3); }
+.lg-bet-btn.selected.type-left  { background: rgba(200,169,81,0.25); }
+.lg-bet-btn.selected.type-right { background: rgba(160,160,160,0.2); }
+.lg-bet-btn.selected.type-three { background: rgba(74,222,128,0.2); }
+.lg-bet-btn.selected.type-four  { background: rgba(245,158,11,0.2); }
+.lg-bet-btn.selected.type-hol   { background: rgba(224,85,85,0.25); }
+.lg-bet-btn.selected.type-jjak  { background: rgba(74,158,255,0.22); }
+.lg-bet-btn:disabled { opacity: 0.28; cursor: not-allowed; filter: none; }
+.lg-bet-status { text-align: center; padding: 3px; font-size: 0.7rem; color: #555; }
+
+.lg-countdown {
+  text-align: center; background: linear-gradient(90deg, #0d0d1a, #13192e, #0d0d1a);
+  padding: 7px; font-size: 0.82rem; color: #c8a951; font-weight: bold;
+  letter-spacing: 1px; border-top: 1px solid #2a2a4a;
+}
+
+/* 결과 목록 */
+.lg-result-header {
+  display: grid; grid-template-columns: 1fr 58px;
+  padding: 5px 12px; font-size: 0.65rem; color: #888;
+  border-bottom: 1px solid #2a2a4a; background: #0d0d1a;
+}
+.lg-result-item {
+  display: grid; grid-template-columns: 1fr 58px;
+  padding: 6px 12px; border-bottom: 1px solid #1a2030; align-items: center;
+}
+.lg-result-item:last-child { border-bottom: none; }
+.lg-result-round { color: #666; font-size: 0.68rem; }
+
+/* 결과 배지: 큰 원(홀/짝) + 작은 검정 원(줄수, 좌/우 위치) */
+.lg-res-wrap {
+  position: relative;
+  width: 44px; height: 44px;
+  display: inline-block; flex-shrink: 0;
+}
+.lg-res-big {
+  width: 44px; height: 44px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.9rem; font-weight: bold; color: #fff;
+}
+.lg-res-big.hol  { background: #e05555; }
+.lg-res-big.jjak { background: #4a9eff; }
+.lg-res-big.wait { background: #2a2a4a; font-size: 0.6rem; color: #555; }
+.lg-res-small {
+  position: absolute; top: -4px;
+  width: 19px; height: 19px; border-radius: 50%;
+  background: #111; border: 1.5px solid #333;
+  color: #fff; font-size: 0.65rem; font-weight: bold;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1;
+}
+.lg-res-small.left  { left: -4px; }
+.lg-res-small.right { right: -4px; }
+
+.lg-result-list { max-height: 430px; overflow-y: auto; }
+.lg-result-list::-webkit-scrollbar { width: 3px; }
+.lg-result-list::-webkit-scrollbar-thumb { background: #c8a951; }
+
+/* 오늘의 게임 히스토리 */
+.lg-history-section { margin-top: 10px; background: #13192e; border: 1px solid #2a2a4a; border-radius: 6px; overflow: hidden; }
+.lg-history-tabs { display: flex; border-bottom: 1px solid #2a2a4a; }
+.lg-history-tab {
+  flex: 1; text-align: center; padding: 10px 4px;
+  font-size: 0.82rem; color: #777; cursor: pointer;
+  border-right: 1px solid #2a2a4a; transition: all 0.15s;
+}
+.lg-history-tab:last-child { border-right: none; }
+.lg-history-tab.active { background: #1a2240; color: #c8a951; font-weight: bold; }
+.lg-history-tab:hover:not(.active) { background: #161e30; color: #bbb; }
+.lg-history-grid {
+  display: flex; gap: 3px; padding: 10px 10px 6px;
+  overflow-x: auto; min-height: 60px; align-items: flex-start;
+}
+.lg-history-grid::-webkit-scrollbar { height: 4px; }
+.lg-history-grid::-webkit-scrollbar-thumb { background: #c8a951; border-radius: 2px; }
+.lg-hcol { display: flex; flex-direction: column; gap: 3px; flex-shrink: 0; }
+.lg-hcell {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.5rem; font-weight: bold; color: #fff; flex-shrink: 0;
+  letter-spacing: -0.5px;
+}
+.lg-hcell.h-left  { background: #2980b9; }
+.lg-hcell.h-right { background: #c0392b; }
+.lg-hcell.h-three { background: #27ae60; }
+.lg-hcell.h-four  { background: #d35400; }
+.lg-hcell.h-hol   { background: #c0392b; }
+.lg-hcell.h-jjak  { background: #2980b9; }
+.lg-hcell.h-l3    { background: #2471a3; }
+.lg-hcell.h-l4    { background: #7d3c98; }
+.lg-hcell.h-r3    { background: #d35400; }
+.lg-hcell.h-r4    { background: #c0392b; }
+.lg-history-empty { color: #444; font-size: 0.8rem; text-align: center; padding: 16px; width: 100%; }
+
+/* 배팅 버튼 배당 표시 */
+.lg-bet-odds { display: block; font-size: 0.6rem; font-weight: normal; opacity: 0.75; margin-top: 2px; letter-spacing: 0; }
+
+/* 배팅 카트 */
+.cart-items { display: flex; flex-direction: column; gap: 4px; min-height: 34px; margin-bottom: 8px; }
+.cart-item {
+  display: flex; justify-content: space-between; align-items: center;
+  background: #0d0d1a; border: 1px solid #2a2a4a;
+  border-radius: 3px; padding: 5px 10px;
+}
+.cart-item-left { display: flex; flex-direction: column; }
+.cart-item-name { color: #fff; font-weight: bold; font-size: 0.82rem; }
+.cart-item-odds { color: #c8a951; font-size: 0.7rem; }
+.cart-item-remove { background: none; border: none; color: #555; cursor: pointer; font-size: 0.85rem; padding: 0 2px; transition: color 0.15s; }
+.cart-item-remove:hover { color: #e05555; }
+.cart-empty { color: #444; font-size: 0.77rem; text-align: center; padding: 6px 0; border: 1px dashed #2a2a4a; border-radius: 3px; }
+.cart-confirmed { background: rgba(74,222,128,0.08); border: 1px solid rgba(74,222,128,0.3); border-radius: 4px; padding: 8px; font-size: 0.78rem; color: #4ade80; text-align: center; }
+
+/* ══ 모바일 카드 크기 ══ */
+@media (max-width: 640px) {
+  .dt-card-back { width: 68px !important; height: 96px !important; border-radius: 7px !important; font-size: 1.7rem !important; }
+  .dt-card-face { width: 68px !important; height: 96px !important; border-radius: 7px !important; padding: 5px !important; }
+  .dt-rank-tl   { font-size: 0.85rem !important; }
+  .dt-suit-mid  { font-size: 1.9rem !important; }
+  .dt-rank-br   { font-size: 0.5rem !important; }
+  .dt-arena     { gap: 16px !important; padding: 14px 10px !important; }
+
+  .bac-card-back  { width: 52px !important; height: 74px !important; border-radius: 6px !important; font-size: 1.4rem !important; }
+  .bac-card-face  { width: 52px !important; height: 74px !important; border-radius: 6px !important; padding: 4px !important; }
+  .bac-rank-tl    { font-size: 0.75rem !important; }
+  .bac-suit-mid   { font-size: 1.6rem !important; }
+  .bac-rank-br    { font-size: 0.45rem !important; }
+  .bac-third-wrap { width: 74px !important; height: 52px !important; }
+  .bac-arena      { gap: 10px !important; padding: 12px 8px !important; }
+  .bac-cards      { gap: 4px !important; min-height: 74px !important; flex-wrap: wrap !important; width: 108px !important; justify-content: center !important; }
+  .bac-score      { font-size: 1rem !important; padding: 2px 8px !important; min-width: 28px !important; }
+  .bac-third-wrap { order: 999 !important; margin-top: 2px !important; }
+}
+
+/* ══ 파워 드래곤타이거 – 가운데 파워카드 ══ */
+.pdt-center-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.pdt-center-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #c8a951;
+  letter-spacing: 1px;
+}
+.pdt-power-multi {
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: #ffd700;
+  text-shadow: 0 0 10px rgba(255,215,0,0.7);
+  min-height: 1.6rem;
+}
+.pdt-power-activated {
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #ffd700;
+  text-shadow: 0 0 10px rgba(255,215,0,0.8);
+  margin-top: 5px;
+  animation: dtFlip 0.35s ease;
+}
+.pdt-shoe-info {
+  text-align: center;
+  font-size: 0.68rem;
+  color: #666;
+  padding: 2px 0 6px;
+  letter-spacing: 0.3px;
+}
+.pdt-shoe-new { color: #c8a951; font-weight: 700; animation: dtFlip 0.4s ease; }
+
+/* ══ 블랙잭 ══ */
+.bj-player-area {
+  background: linear-gradient(180deg,#0d1220,#12182e);
+  border: 1px solid #1e2a40; border-radius: 8px; padding: 14px 16px;
+}
+.bj-area-label { font-size: 0.72rem; font-weight: 900; letter-spacing: 2px; color: #888; margin-bottom: 8px; }
+.bj-cards { display: flex; gap: 6px; min-height: 100px; align-items: center; flex-wrap: wrap; }
+.bj-score-row { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+.bj-score { font-size: 1.1rem; font-weight: 900; background: #0d0d1a; border: 1px solid #2a2a4a; border-radius: 4px; padding: 2px 12px; color: #ccc; }
+.bj-hand-status { font-size: 0.8rem; color: #888; }
+.bj-hand-status:empty { display: none; }
+.bj-new-game-btn {
+  width: 100%; padding: 12px; border-radius: 6px;
+  background: linear-gradient(90deg,#b8941f,#c8a951,#b8941f);
+  border: none; color: #000; font-size: 0.9rem; font-weight: 900;
+  cursor: pointer; letter-spacing: 2px; font-family: inherit;
+}
+.bj-new-game-btn:hover { opacity: .88; }
+
+/* ══ 블랙잭 테이블 카지노 배경 ══ */
+.bjtable-felt {
+  width: 100%; position: relative; height: 680px;
+  background:
+    radial-gradient(ellipse 110% 60% at 50% -5%, rgba(0,0,0,.65) 0%, transparent 55%),
+    radial-gradient(ellipse 90% 50% at 50% 108%, rgba(0,0,0,.55) 0%, transparent 50%),
+    radial-gradient(ellipse 130% 110% at 50% 50%, #237a3a 0%, #165628 35%, #0d3d1c 65%, #071b0d 100%);
+  border-radius: 0 0 50% 50% / 0 0 200px 200px;
+  border-bottom: 4px solid #c8a951;
+  border-left: 3px solid rgba(200,169,81,.45);
+  border-right: 3px solid rgba(200,169,81,.45);
+}
+.bjtable-felt::before {
+  content: '';
+  position: absolute; inset: 0; z-index: 0;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Ccircle cx='1' cy='1' r='.6' fill='rgba(255,255,255,.04)'/%3E%3Ccircle cx='3' cy='3' r='.6' fill='rgba(0,0,0,.06)'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+.bjtable-felt::after {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border: 2px solid rgba(200,169,81,.2);
+  border-radius: 0 0 50% 50% / 0 0 195px 195px;
+  pointer-events: none; z-index: 0;
+}
+.bjtable-felt > * { position: relative; z-index: 1; }
+.bjtable-header {
+  display: flex; align-items: center; gap: 8px;
+  height: 44px; padding: 0 12px; box-sizing: border-box;
+  background: rgba(0,0,0,.5);
+  border-bottom: 1px solid rgba(200,169,81,.2);
+}
+.bjtable-dealer-zone {
+  text-align: center; padding: 10px 14px;
+}
+.bjtable-zone-label {
+  color: #e0c87a; letter-spacing: 3px; font-size: 0.7rem; margin-bottom: 4px;
+}
+.bjtable-dealer-cards {
+  display: flex; justify-content: center; gap: 6px; height: 112px; align-items: center; flex-wrap: nowrap;
+  perspective: 600px;
+}
+.bjtable-score-wrap { margin-top: 4px; height: 30px; display: flex; gap: 8px; justify-content: center; align-items: center; }
+.bjtable-marking {
+  text-align: center; font-size: 0.68rem; letter-spacing: 2px;
+  color: rgba(200,169,81,.65); padding: 4px 0 2px; font-weight: bold;
+}
+.bjtable-insurance-text {
+  text-align: center; font-size: 0.6rem; color: rgba(200,169,81,.38); margin-bottom: 4px;
+}
+#panelBJTable .bjtable-status-bar,
+.bjtable-status-bar-inner {
+  background: rgba(0,0,0,.45);
+  border: 1px solid rgba(200,169,81,.2);
+  color: #bbb; margin: 4px 10px; border-radius: 5px;
+  padding: 0 12px; font-size: 0.8rem; text-align: center;
+  height: 34px; line-height: 34px;
+  overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+}
+.bjtable-status-bar {
+  background: #0d0d1a; border: 1px solid #1e2a40; border-radius: 5px;
+  padding: 7px 12px; font-size: 0.8rem; color: #888; text-align: center;
+}
+.bjtable-action-panel { padding: 10px 12px; }
+.bjtable-action-panel .bj-player-area {
+  background: rgba(0,0,0,.35);
+  border: 1px solid rgba(74,222,128,.3);
+  border-radius: 8px; padding: 10px;
+}
+#panelBJTable #bjtBettingArea,
+.bjtbet-area,
+#panelBJTable #bjtStartArea {
+  background: rgba(0,0,0,.45);
+  border: 1px solid rgba(200,169,81,.25);
+  border-radius: 8px;
+  padding: 12px;
+  max-width: 460px; margin-left: auto; margin-right: auto;
+}
+.bjtable-action-panel .bjt-my-hand-wrap { margin-bottom: 10px; }
+#panelBJTable .bet-input  { background: rgba(0,0,0,.5); border-color: rgba(200,169,81,.4); }
+#panelBJTable .bet-quick-btn { background: rgba(0,0,0,.4); border-color: rgba(200,169,81,.25); }
+#panelBJTable .bet-quick-btn:hover { background: rgba(200,169,81,.18); border-color: #c8a951; color: #c8a951; }
+#panelBJTable .bj-score { background: rgba(0,0,0,.5); border-color: rgba(200,169,81,.3); color: #e0c87a; }
+
+/* ══ 블랙잭 라이브 테이블 ══ */
+.bjtable-arc-zone { position: relative; height: 400px; margin: 0 4px; overflow: visible; }
+.bjtable-seat {
+  position: absolute; width: 84px; height: 84px;
+  transform: translate(-50%, -50%);
+  background: transparent; border: none; padding: 0; text-align: center;
+  cursor: default; transition: all .15s;
+}
+/* 타원 호 길이 균등 분할 — 자리 간 간격 균등 */
+.bjtable-seat.s-0 { left:  6%;   top: 37%; }
+.bjtable-seat.s-1 { left: 17.1%; top: 71.5%; }
+.bjtable-seat.s-2 { left: 33.2%; top: 85.1%; }
+.bjtable-seat.s-3 { left: 50%;   top: 89%; }
+.bjtable-seat.s-4 { left: 66.8%; top: 85.1%; }
+.bjtable-seat.s-5 { left: 82.9%; top: 71.5%; }
+.bjtable-seat.s-6 { left: 94%;   top: 37%; }
+.bjtable-seat.empty { cursor: pointer; }
+.bjtable-seat.bust  { opacity: .7; }
+.bjtable-seat-num   { font-size: 0.56rem; color: rgba(200,169,81,.7); letter-spacing: 1px; }
+.bjtable-seat-name  { font-size: 0.68rem; color: #fff; font-weight: bold; max-width: 76px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bjtable-seat-empty-label { font-size: 0.62rem; color: rgba(200,169,81,.7); font-weight: bold; }
+/* 베팅 서클 (원 안에 금액) — 자리의 고정 기준점 */
+.bjtable-seat-circle {
+  width: 84px; height: 84px; border-radius: 50%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  border: 2px solid rgba(200,169,81,0.45);
+  background: rgba(0,0,0,0.2);
+  box-shadow: 0 0 12px rgba(200,169,81,0.16), inset 0 0 18px rgba(0,0,0,0.32);
+  transition: all .15s;
+}
+/* 카드: 원 위쪽 (절대 배치, 첫 카드를 원 중앙에 고정) */
+.bjtable-seat-above {
+  position: absolute; bottom: calc(100% - 16px);
+  left: 50%; transform: translateX(-23px); /* 첫 카드(46px)의 절반만큼 → 첫 카드 중앙 정렬 */
+  z-index: 2;
+  display: flex; flex-direction: column; align-items: flex-start;
+  pointer-events: none;
+}
+/* 스플릿일 때는 손1/손2 전체를 원 중앙에 정렬 */
+.bjtable-seat-above:has(.bjtable-seat-split-wrap) {
+  transform: translateX(-50%);
+  align-items: center;
+}
+/* 닉네임·차례: 원 아래쪽 (절대 배치) */
+.bjtable-seat-below {
+  position: absolute; left: 50%; top: calc(100% + 3px);
+  transform: translateX(-50%); z-index: 1;
+  display: flex; flex-direction: column; align-items: center; gap: 1px;
+  white-space: nowrap;
+}
+.bjtable-seat.empty:hover .bjtable-seat-circle { border-color: #ffe680; box-shadow: 0 0 22px rgba(255,215,0,0.5), inset 0 0 18px rgba(0,0,0,0.25); }
+/* 다른 플레이어가 앉은 자리 */
+.bjtable-seat.taken  .bjtable-seat-circle { border-color: #4a9eff; box-shadow: 0 0 14px rgba(74,158,255,0.4), inset 0 0 18px rgba(0,0,0,0.3); background: rgba(20,40,80,0.35); }
+.bjtable-seat.mine   .bjtable-seat-circle { border-color: #4ade80; box-shadow: 0 0 16px rgba(74,222,128,0.45), inset 0 0 18px rgba(0,0,0,0.28); }
+.bjtable-seat.active .bjtable-seat-circle { border-color: #c8a951; box-shadow: 0 0 22px rgba(200,169,81,0.6), inset 0 0 18px rgba(0,0,0,0.25); }
+.bjtable-seat.bust   .bjtable-seat-circle { border-color: #e05555; }
+.bjtable-seat-cards {
+  display: flex; align-items: flex-end; justify-content: flex-start;
+  min-height: 60px;
+  overflow: visible; position: relative; z-index: 2;
+}
+.bjtable-seat-split-wrap { position: relative; z-index: 2; }
+.bjtable-seat-score, .bjtable-seat-result { position: relative; z-index: 2; }
+/* 카드 총합/결과: 첫 카드(원) 중앙에 정렬 (카드는 왼쪽 정렬이라 보정) */
+.bjtable-seat-above > .bjtable-seat-score,
+.bjtable-seat-above > .bjtable-seat-result {
+  align-self: flex-start; margin-left: 23px; transform: translateX(-50%);
+}
+.bjtmc-card {
+  width: 46px; height: 66px; border-radius: 6px;
+  background: #fff; border: 1px solid #ccc;
+  box-shadow: -2px 2px 5px rgba(0,0,0,.45);
+  display: flex; flex-direction: column; justify-content: space-between;
+  padding: 3px 4px; position: relative; flex-shrink: 0;
+  margin-left: -16px; transition: none;
+}
+.bjtmc-card:first-child { margin-left: 0; }
+.bjtmc-card.red   { color: #c62828; }
+.bjtmc-card.black { color: #1a1a2e; }
+.bjtmc-corner { font-size: 0.82rem; font-weight: 900; line-height: 1.1; align-self: flex-start; text-align: left; }
+.bjtmc-corner span { display: block; font-size: 0.7rem; line-height: 1; }
+.bjtmc-corner-br { transform: rotate(180deg); align-self: flex-end; text-align: left; }
+.bjtmc-suit-mid {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem; line-height: 1; opacity: 0.18; user-select: none; pointer-events: none;
+}
+.bjtmc-back {
+  width: 46px; height: 66px; border-radius: 6px;
+  background: #0e1e4a; border: 1.5px solid #c8a951;
+  box-shadow: -2px 2px 5px rgba(0,0,0,.45);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; overflow: hidden; position: relative;
+  margin-left: -16px;
+}
+.bjtmc-back:first-child { margin-left: 0; }
+.bjtmc-back::before {
+  content: ''; position: absolute; inset: 0;
+  background: repeating-linear-gradient(135deg,#0e1e4a 0,#0e1e4a 3px,#162458 3px,#162458 6px);
+}
+.bjtmc-back-inner {
+  position: relative; z-index: 1;
+  width: 34px; height: 50px; border-radius: 3px;
+  border: 1px solid rgba(200,169,81,.5);
+  background: repeating-linear-gradient(135deg,#0a1638 0,#0a1638 3px,#132050 3px,#132050 6px);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.9rem; color: rgba(200,169,81,.55);
+}
+.bjtable-seat-cards > *:nth-child(2) { transform: translateY(-30px); }
+.bjtable-seat-cards > *:nth-child(3) { transform: translateY(-60px); }
+.bjtable-seat-cards > *:nth-child(4) { transform: translateY(-90px); }
+.bjtable-seat-cards > *:nth-child(5) { transform: translateY(-118px); }
+.bjtable-seat-cards > *:nth-child(6) { transform: translateY(-144px); }
+.bjtable-seat-split-wrap { display: flex; gap: 5px; align-items: flex-end; justify-content: center; }
+.bjtable-seat-hand { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.bjtable-seat-hand.active-hand .bjtable-seat-cards { outline: 2px solid #c8a951; border-radius: 4px; }
+.bjtable-split-label { font-size: 0.55rem; color: #888; letter-spacing: 1px; }
+.bjtable-split-label.active-hand { color: #c8a951; }
+@keyframes bjtSplitLeft {
+  0%   { transform: translateX(22px) scale(0.92); opacity: 0.5; }
+  100% { transform: translateX(0)    scale(1);    opacity: 1; }
+}
+@keyframes bjtSplitRight {
+  0%   { transform: translateX(-22px) scale(0.92); opacity: 0.5; }
+  100% { transform: translateX(0)     scale(1);    opacity: 1; }
+}
+@keyframes bjtcDeal {
+  0%   { transform: translateY(-18px) rotate(-8deg) scale(0.8); opacity: 0; }
+  60%  { transform: translateY(3px)   rotate(2deg)  scale(1.05); opacity: 1; }
+  100% { transform: translateY(0)     rotate(0deg)  scale(1);    opacity: 1; }
+}
+.split-anim .bjtable-seat-hand:nth-child(1) { animation: bjtSplitLeft  0.45s cubic-bezier(.2,.8,.4,1) both; }
+.split-anim .bjtable-seat-hand:nth-child(2) { animation: bjtSplitRight 0.45s cubic-bezier(.2,.8,.4,1) both; }
+.bjtmc-deal { animation: bjtcDeal 0.32s ease-out both; }
+.bjtable-mini-card.red   { background: #f0f0f0; color: #c0392b; }
+.bjtable-mini-card.black { background: #f0f0f0; color: #1a1a2e; }
+.bjtable-mini-card.back  {
+  background: repeating-linear-gradient(45deg,#0d1a3a 0,#0d1a3a 3px,#1a2a5a 3px,#1a2a5a 6px);
+  border-color: #2a3a6a; font-size: 0.9rem; color: #5a7ac0;
+}
+.bjtable-seat-bet    { font-size: 0.72rem; color: #c8a951; font-weight: bold; margin-top: -1px; }
+.bjtable-seat-score  { font-size: 0.65rem; color: #aaa; background: rgba(0,0,0,.5); border: 1px solid #2a2a4a; border-radius: 3px; padding: 1px 4px; }
+.bjtable-seat-result { font-size: 0.64rem; font-weight: 900; letter-spacing: 0.5px; }
+.bjtable-seat-turn   { font-size: 0.68rem; color: #c8a951; animation: pulse 0.9s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1}50%{opacity:.3} }
+.bjtable-leave-btn {
+  background: transparent; border: 1px solid #5a2020; color: #c05555;
+  padding: 4px 10px; border-radius: 4px; font-size: 0.72rem;
+  cursor: pointer; font-family: inherit; transition: all .15s;
+  margin-left: auto;
+}
+.bjtable-leave-btn:hover { background: #5a2020; color: #fff; }
+.bjtable-bet-confirmed { font-size: 0.78rem; color: #4ade80; text-align: center; padding: 6px; }
+
+.bjt-my-hand-wrap { display: flex; justify-content: center; }
+.bjt-my-hand-inner { text-align: center; min-width: 420px; max-width: 600px; }
+.bjt-my-hand-inner .bj-cards { justify-content: center; gap: 8px; min-height: 132px; }
+.bjt-my-hand-inner .bj-score-row { justify-content: center; }
+.bjt-my-hand-inner .bj-area-label { font-size: 0.85rem; }
+.bjt-my-hand-inner .bj-score { font-size: 1.4rem; padding: 4px 16px; }
+/* 나의 패 카드 확대 */
+.bjt-my-hand-inner .bjc-card,
+.bjt-my-hand-inner .bjc-back { width: 94px; height: 134px; border-radius: 10px; }
+.bjt-my-hand-inner .bjc-corner { font-size: 1.3rem; }
+.bjt-my-hand-inner .bjc-corner span { font-size: 1rem; }
+.bjt-my-hand-inner .bjc-center { font-size: 3.3rem; }
+@media (max-width: 480px) {
+  .bjt-my-hand-inner { min-width: 240px; max-width: 320px; }
+  .bjt-my-hand-inner .bjc-card,
+  .bjt-my-hand-inner .bjc-back { width: 54px; height: 78px; border-radius: 6px; }
+  .bjt-my-hand-inner .bjc-corner { font-size: 0.78rem; }
+  .bjt-my-hand-inner .bjc-corner span { font-size: 0.62rem; }
+  .bjt-my-hand-inner .bjc-center { font-size: 1.9rem; }
+  .bjt-my-hand-inner .bj-cards { min-height: 82px; gap: 4px; }
+  .bjt-my-hand-inner .bj-player-area { padding: 6px 10px; }
+  .bjt-my-hand-inner .bj-area-label { font-size: 0.62rem; margin-bottom: 3px; }
+  .bjt-my-hand-inner .bj-score { font-size: 1rem; padding: 2px 10px; }
+  .bjtable-felt { height: 360px; border-radius: 0 0 50% 50% / 0 0 110px 110px; }
+  .bjtable-felt::after { border-radius: 0 0 50% 50% / 0 0 105px 105px; }
+  .bjtable-arc-zone { height: 180px; }
+
+  .bjtable-seat { width: 46px; height: 46px; padding: 0; }
+  .bjtable-seat-above { bottom: calc(100% - 8px); transform: translateX(-11px); }
+  .bjtable-seat-above > .bjtable-seat-score,
+  .bjtable-seat-above > .bjtable-seat-result { margin-left: 11px; }
+  /* 모바일: 호 길이 균등 분할 + 아래로 이동 */
+  .bjtable-seat.s-0 { left:  8%;   top: 32%; }
+  .bjtable-seat.s-1 { left: 16.1%; top: 59.1%; }
+  .bjtable-seat.s-2 { left: 32%;   top: 73.6%; }
+  .bjtable-seat.s-3 { left: 50%;   top: 78%; }
+  .bjtable-seat.s-4 { left: 67.9%; top: 73.6%; }
+  .bjtable-seat.s-5 { left: 83.9%; top: 59.1%; }
+  .bjtable-seat.s-6 { left: 92%;   top: 32%; }
+
+  .bjtable-seat-num         { font-size: 0.46rem; }
+  .bjtable-seat-name        { font-size: 0.56rem; max-width: 44px; }
+  .bjtable-seat-empty-label { font-size: 0.5rem; padding: 2px 0; }
+  .bjtable-seat-bet         { font-size: 0.48rem; }
+  .bjtable-seat-score       { font-size: 0.48rem; padding: 0 2px; }
+  .bjtable-seat-result      { font-size: 0.48rem; }
+  .bjtable-seat-turn        { font-size: 0.5rem; }
+
+  .bjtable-seat-cards { min-height: 34px; padding: 0; }
+  .bjtmc-card { width: 22px; height: 33px; border-radius: 3px; padding: 1px 2px; margin-left: -8px; }
+  .bjtmc-card:first-child { margin-left: 0; }
+  .bjtmc-corner      { font-size: 0.44rem; line-height: 1; }
+  .bjtmc-corner span { font-size: 0.38rem; }
+  .bjtmc-suit-mid    { font-size: 0.75rem; }
+  .bjtmc-back        { width: 22px; height: 33px; border-radius: 3px; }
+  .bjtmc-back-inner  { width: 16px; height: 24px; border-radius: 2px; font-size: 0.5rem; }
+
+  .bjtable-seat-cards > *:nth-child(2) { transform: translateY(-16px); }
+  .bjtable-seat-cards > *:nth-child(3) { transform: translateY(-32px); }
+  .bjtable-seat-cards > *:nth-child(4) { transform: translateY(-48px); }
+  .bjtable-seat-cards > *:nth-child(5) { transform: translateY(-64px); }
+  .bjtable-seat-cards > *:nth-child(6) { transform: translateY(-80px); }
+
+  .bjc-card   { width: 38px; height: 56px; border-radius: 5px; padding: 2px 3px; }
+  .bjc-corner { font-size: 0.6rem; }
+  .bjc-corner span { font-size: 0.48rem; }
+  .bjc-center { font-size: 1.35rem; }
+  .bjc-back   { width: 38px; height: 56px; border-radius: 5px; }
+  .bjc-back-inner { width: 28px; height: 42px; border-radius: 3px; }
+  .bjtable-dealer-cards { min-height: 56px; gap: 4px; }
+  .bjtable-dealer-zone  { padding: 5px 8px; }
+
+  .bjtable-header     { height: 36px; padding: 0 8px; gap: 4px; }
+  .dt-game-title      { font-size: 0.7rem; }
+  .bjtable-status-bar { font-size: 0.65rem; padding: 3px 8px; height: 28px !important; line-height: 28px !important; }
+  .bjtable-marking    { font-size: 0.52rem; padding: 1px 0 0; }
+  .bjtable-insurance-text { font-size: 0.5rem; padding: 1px 8px; }
+  .bjtable-dealer-zone { padding: 4px 8px; }
+  .bjtable-dealer-cards { height: 60px; gap: 3px; }
+  .bjtable-action-panel   { padding: 6px 10px; }
+  .bjt-my-hand-inner .bj-player-area { padding: 8px 12px; }
+  .bjt-my-hand-inner .bj-area-label  { margin-bottom: 5px; }
+  .bjt-my-hand-inner .bj-cards       { min-height: 60px; gap: 4px; }
+  .bjt-my-hand-inner .bj-score-row   { margin-top: 5px; }
+
+  .bjtable-play-overlay { width: 74%; gap: 5px; top: 44%; }
+  .bjt-act-btn { padding: 2px; font-size: 0.6rem; border-width: 1px; border-radius: 6px; }
+
+  .bjtbet-confirm-row { flex-direction: column !important; gap: 6px !important; }
+  .bjtbet-confirm-row .dt-confirm-btn { width: 100%; padding: 10px; }
+}
+
+/* ══ 액션 버튼 오버레이 (정사각형 가로 4개) ══ */
+.bjtable-play-overlay {
+  position: absolute;
+  top: 47%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 20;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  width: 58%;
+  max-width: 368px;
+}
+.bjt-act-btn {
+  aspect-ratio: 1 / 1;
+  display: flex; align-items: center; justify-content: center;
+  text-align: center;
+  padding: 4px;
+  border-radius: 8px;
+  font-size: 0.92rem;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: inherit;
+  border: 2px solid;
+  transition: filter .15s, transform .1s;
+  background: rgba(0,0,0,.72);
+  letter-spacing: 0.5px;
+}
+.bjt-act-btn:hover:not(:disabled) { filter: brightness(1.25); transform: translateY(-1px); }
+.bjt-act-btn:active:not(:disabled) { transform: translateY(0); }
+.bjt-act-btn:disabled { opacity: .3; cursor: not-allowed; filter: grayscale(.7); color: #888 !important; border-color: #444 !important; }
+.bjt-btn-hit    { border-color: #2e7d32; color: #4ade80; }
+.bjt-btn-stand  { border-color: #b71c1c; color: #f87171; }
+.bjt-btn-double { border-color: #b8860b; color: #c8a951; }
+.bjt-btn-split  { border-color: #1a3a6a; color: #70b0e0; }
+/* 모바일 오버레이 (기본 규칙 뒤에 와야 적용됨) */
+@media (max-width: 480px) {
+  .bjtable-play-overlay {
+    width: 62%; max-width: 260px; gap: 4px; top: 44%;
+    left: 50%; transform: translate(-50%, -50%);
+  }
+  .bjt-act-btn { padding: 2px; font-size: 0.55rem; border-width: 1px; border-radius: 5px; }
+}

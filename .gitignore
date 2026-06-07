@@ -1,0 +1,8 @@
+# Cloudflare / wrangler 빌드 캐시
+.wrangler/
+
+# 사용자 데이터 export (GitHub에 올리지 않음)
+users_export.json
+users_now.json
+check_users.json
+final_check.json
