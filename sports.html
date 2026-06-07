@@ -119,10 +119,6 @@
             <button class="sp-tab"        data-sport="basketball" onclick="switchSport('basketball')">🏀 농구</button>
             <button class="sp-tab"        data-sport="soccer"     onclick="switchSport('soccer')">⚽ 축구</button>
           </div>
-          <div class="sp-subbar">
-            <span id="spLeagueName">MLB</span>
-            <span class="sp-credits" id="spCredits"></span>
-          </div>
           <div class="sp-match-list" id="spMatchList">
             <div class="sp-loading">경기 불러오는 중...</div>
           </div>
@@ -197,10 +193,8 @@
     let currentUid = null;
     let currentUserData = {};
 
-    const LEAGUE_NAME = { baseball:'MLB', basketball:'NBA', soccer:'MLS' };
-    // cart: 조합(폴더) 배팅 선택 목록 — 여러 경기를 묶으면 배당이 곱해지고 전부 맞아야 당첨
+    // cart: 조합(폴더) 배팅 — 여러 경기를 묶으면 배당이 곱해지고 전부 맞아야 당첨
     const SP = { sport:'baseball', events:[], refreshTimer:null, settleTimer:null, cart:[] };
-
     function combinedOdds() { return SP.cart.reduce((p, s) => p * s.odds, 1); }
 
     document.getElementById('betInput').addEventListener('input', updateSummary);
@@ -337,48 +331,85 @@
       const d = new Date(iso), p = n => String(n).padStart(2,'0');
       return `${d.getMonth()+1}/${d.getDate()} ${p(d.getHours())}:${p(d.getMinutes())}`;
     }
-    function isSel(id, pick) { return SP.cart.some(s => s.eventId === id && s.pick === pick); }
+    function isSel(id, market, pick) { return SP.cart.some(s => s.eventId===id && s.market===market && s.pick===pick); }
     async function fetchJSON(url) { const r = await fetch(url); if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); }
+    function signPoint(p) { return (p > 0 ? '+' : '') + p; }
+
+    // 한 경기 박스(승무패/핸디캡/언오버 3마켓)
+    function matchHtml(ev) {
+      const started = new Date(ev.commence) <= new Date();
+      const o = ev.odds || {};
+      const cell = (market, pick, label, price, ptText) => {
+        if (price == null) return `<button class="sp-odds-btn" disabled><span class="sp-odds-team">${label}</span><span class="sp-odds-price">-</span></button>`;
+        const pt = ptText ? `<span class="sp-odds-pt">${ptText}</span>` : '';
+        return `<button class="sp-odds-btn ${isSel(ev.id,market,pick)?'selected':''}" ${started?'disabled':''} onclick="selectSpBet('${ev.id}','${market}','${pick}')">
+          <span class="sp-odds-team">${label}${pt}</span><span class="sp-odds-price">${price.toFixed(2)}</span></button>`;
+      };
+      const rows = [];
+      if (o.h2h) {
+        rows.push(`<div class="sp-market"><div class="sp-market-label">승무패</div>
+          <div class="sp-market-odds ${o.h2h.draw!=null?'three':'two'}">
+            ${cell('h2h','home', ev.home, o.h2h.home, '')}
+            ${o.h2h.draw!=null ? cell('h2h','draw','무승부', o.h2h.draw, '') : ''}
+            ${cell('h2h','away', ev.away, o.h2h.away, '')}
+          </div></div>`);
+      }
+      if (o.spreads) {
+        const s = o.spreads;
+        rows.push(`<div class="sp-market"><div class="sp-market-label">핸디캡</div>
+          <div class="sp-market-odds two">
+            ${cell('spreads','home', ev.home, s.home?.price, s.home?signPoint(s.home.point):'')}
+            ${cell('spreads','away', ev.away, s.away?.price, s.away?signPoint(s.away.point):'')}
+          </div></div>`);
+      }
+      if (o.totals) {
+        const t = o.totals;
+        rows.push(`<div class="sp-market"><div class="sp-market-label">언더/오버</div>
+          <div class="sp-market-odds two">
+            ${cell('totals','over', '오버', t.over?.price, t.over?String(t.over.point):'')}
+            ${cell('totals','under','언더', t.under?.price, t.under?String(t.under.point):'')}
+          </div></div>`);
+      }
+      return `<div class="sp-match ${started?'started':''}">
+        <div class="sp-match-head">
+          <span class="sp-match-teams">${ev.home} <span class="sp-vs">vs</span> ${ev.away}</span>
+          <span class="sp-match-time">🕒 ${fmtTime(ev.commence)}${started?' · 마감':''}</span>
+        </div>
+        ${rows.join('')}
+      </div>`;
+    }
 
     function renderMatches() {
       const list = document.getElementById('spMatchList');
       if (!SP.events.length) { list.innerHTML = '<div class="sp-empty">현재 진행 예정인 경기가 없습니다.<br>다른 종목 탭을 눌러보세요.</div>'; return; }
-      const now = new Date();
-      list.innerHTML = SP.events.map(ev => {
-        const started = new Date(ev.commence) <= now;
-        const o = ev.odds || {};
-        const cell = (pick, label, price) => {
-          if (price == null) return `<button class="sp-odds-btn" disabled><span class="sp-odds-team">${label}</span><span class="sp-odds-price">-</span></button>`;
-          return `<button class="sp-odds-btn ${isSel(ev.id,pick)?'selected':''}" ${started?'disabled':''} onclick="selectSpBet('${ev.id}','${pick}')">
-            <span class="sp-odds-team">${label}</span><span class="sp-odds-price">${price.toFixed(2)}</span></button>`;
-        };
-        return `<div class="sp-match ${started?'started':''}">
-          <div class="sp-match-time">🕒 ${fmtTime(ev.commence)}${started?' · 시작됨(마감)':''}</div>
-          <div class="sp-match-odds ${o.draw!=null?'three':'two'}">
-            ${cell('home', ev.home, o.home)}
-            ${o.draw!=null ? cell('draw','무승부',o.draw) : ''}
-            ${cell('away', ev.away, o.away)}
-          </div>
-        </div>`;
-      }).join('');
+      // 리그별로 묶기 (등장 순서 유지, 그룹 안은 시작시간순)
+      const groups = []; const map = {};
+      SP.events.forEach(ev => {
+        const lg = ev.league || '경기';
+        if (!map[lg]) { map[lg] = { league: lg, items: [] }; groups.push(map[lg]); }
+        map[lg].items.push(ev);
+      });
+      groups.forEach(g => g.items.sort((a,b)=> new Date(a.commence)-new Date(b.commence)));
+      list.innerHTML = groups.map(g => `
+        <div class="sp-league-group">
+          <div class="sp-league-head">${g.league} <span>${g.items.length}경기</span></div>
+          ${g.items.map(matchHtml).join('')}
+        </div>`).join('');
     }
 
     async function loadSpEvents() {
       const list = document.getElementById('spMatchList');
-      document.getElementById('spLeagueName').textContent = LEAGUE_NAME[SP.sport] || SP.sport;
       list.innerHTML = '<div class="sp-loading">경기 불러오는 중...</div>';
       try {
         const data = await fetchJSON(`/api/sports?type=odds&sport=${SP.sport}`);
         if (data.error) {
           const msg = data.error === 'NO_API_KEY'
-            ? 'API 키가 아직 등록되지 않았습니다. (Cloudflare 환경변수 ODDS_API_KEY 설정 필요)'
+            ? 'API 키가 아직 등록되지 않았습니다.'
             : (data.message || data.error);
           list.innerHTML = `<div class="sp-empty">⚠ ${msg}</div>`;
           return;
         }
-        SP.events = (data.events || []).sort((a,b)=> new Date(a.commence)-new Date(b.commence));
-        const c = document.getElementById('spCredits');
-        if (c) c.textContent = data.remaining!=null ? `API 잔여 ${data.remaining}회` : '';
+        SP.events = data.events || [];
         renderMatches();
       } catch(e) {
         list.innerHTML = `<div class="sp-empty">경기를 불러오지 못했습니다. (${e.message})<br>잠시 후 새로고침해 주세요.</div>`;
@@ -387,30 +418,49 @@
 
     window.switchSport = function(sport) {
       if (SP.sport === sport) return;
-      SP.sport = sport;   // cart는 유지 — 다른 종목 경기도 함께 묶을 수 있음
+      SP.sport = sport;   // cart는 유지 — 다른 종목도 함께 묶을 수 있음
       document.querySelectorAll('.sp-tab').forEach(t => t.classList.toggle('active', t.dataset.sport === sport));
       loadSpEvents();
     };
 
-    window.selectSpBet = function(eventId, pick) {
+    // 픽의 배당/기준점/표시라벨 만들기
+    function pickInfo(ev, market, pick) {
+      const o = ev.odds || {};
+      if (market === 'h2h') {
+        const price = o.h2h ? o.h2h[pick] : null;
+        const label = pick==='draw' ? `무승부 (${ev.home} vs ${ev.away})` : `${pick==='home'?ev.home:ev.away} 승`;
+        return { price, point: null, label };
+      }
+      if (market === 'spreads') {
+        const s = o.spreads ? o.spreads[pick] : null;
+        if (!s) return { price:null };
+        return { price: s.price, point: s.point, label: `${pick==='home'?ev.home:ev.away} ${signPoint(s.point)} (핸디캡)` };
+      }
+      if (market === 'totals') {
+        const t = o.totals ? o.totals[pick] : null;
+        if (!t) return { price:null };
+        return { price: t.price, point: t.point, label: `${pick==='over'?'오버':'언더'} ${t.point} (${ev.home} vs ${ev.away})` };
+      }
+      return { price:null };
+    }
+
+    window.selectSpBet = function(eventId, market, pick) {
       const ev = SP.events.find(e => e.id === eventId);
       if (!ev) return;
       if (new Date(ev.commence) <= new Date()) return;
-      const idx = SP.cart.findIndex(s => s.eventId === eventId);
-      if (idx >= 0 && SP.cart[idx].pick === pick) {
+      const idx = SP.cart.findIndex(s => s.eventId === eventId);  // 한 경기당 한 픽만
+      if (idx >= 0 && SP.cart[idx].market === market && SP.cart[idx].pick === pick) {
         SP.cart.splice(idx, 1);            // 같은 선택 다시 누르면 빼기
       } else {
-        const price = ev.odds[pick];
-        if (price == null) return;
-        const pickName = pick==='home' ? ev.home : pick==='away' ? ev.away : '무승부';
+        const info = pickInfo(ev, market, pick);
+        if (info.price == null) return;
         const sel = {
-          eventId: ev.id, sport: SP.sport, home: ev.home, away: ev.away, commence: ev.commence,
-          pick, odds: price,
-          label: pick==='draw' ? `무승부 (${ev.home} vs ${ev.away})` : `${pickName} 승`,
-          matchup: `${ev.home} vs ${ev.away}`,
+          eventId: ev.id, sport: SP.sport, market, pick, point: info.point ?? null,
+          odds: info.price, label: info.label, matchup: `${ev.home} vs ${ev.away}`,
+          home: ev.home, away: ev.away, commence: ev.commence,
         };
         if (idx >= 0) SP.cart[idx] = sel;   // 같은 경기 다른 픽 → 교체
-        else SP.cart.push(sel);             // 새 경기 → 추가
+        else SP.cart.push(sel);
       }
       renderMatches(); renderSpCart(); updateSummary();
     };
@@ -419,10 +469,7 @@
       SP.cart = SP.cart.filter(s => s.eventId !== eventId);
       renderMatches(); renderSpCart(); updateSummary();
     };
-    window.clearAllLegs = function() {
-      SP.cart = [];
-      renderMatches(); renderSpCart(); updateSummary();
-    };
+    window.clearAllLegs = function() { SP.cart = []; renderMatches(); renderSpCart(); updateSummary(); };
 
     function renderSpCart() {
       const el = document.getElementById('lgCartItems'); if (!el) return;
@@ -453,8 +500,8 @@
       const combined = combinedOdds();
       points -= bet; updatePointsDisplay(); await savePoints();
       const legs = SP.cart.map(l => ({
-        eventId:l.eventId, sport:l.sport, pick:l.pick, odds:l.odds,
-        home:l.home, away:l.away, commence:l.commence, label:l.label,
+        eventId:l.eventId, sport:l.sport, market:l.market, pick:l.pick, point:l.point ?? null,
+        odds:l.odds, home:l.home, away:l.away, commence:l.commence, label:l.label,
       }));
       const choiceText = legs.map(l => `${l.label}(${l.odds.toFixed(2)})`).join(' + ');
       const pending = {
@@ -477,11 +524,35 @@
       renderMatches(); renderSpCart(); updateSummary();
     };
 
-    // ── 정산: 끝난 경기 점수로 대기중 배팅 결제 ──────────────────
+    // ── 정산 ───────────────────────────────────────────────────
+    // 한 leg의 결과: win / lose / push / pending
+    function legResult(ev, leg) {
+      const h = ev.homeScore, a = ev.awayScore;
+      if (h == null || a == null) return 'pending';
+      if (leg.market === 'h2h') {
+        const w = h>a?'home':a>h?'away':'draw';
+        return leg.pick === w ? 'win' : 'lose';
+      }
+      if (leg.market === 'spreads') {
+        const team = leg.pick==='home' ? h : a;
+        const other = leg.pick==='home' ? a : h;
+        const adj = team + (leg.point || 0);
+        if (adj > other) return 'win';
+        if (adj < other) return 'lose';
+        return 'push';
+      }
+      if (leg.market === 'totals') {
+        const total = h + a;
+        if (total === leg.point) return 'push';
+        if (leg.pick === 'over')  return total > leg.point ? 'win' : 'lose';
+        return total < leg.point ? 'win' : 'lose';
+      }
+      return 'lose';
+    }
+
     async function settleSportsBets() {
       const pendings = gameHistory.filter(h => h.gameType==='sports' && h.status==='pending' && Array.isArray(h.legs) && h.legs.length);
       if (!pendings.length) return;
-      // 필요한 종목들의 점수를 한 번씩만 가져오기
       const sportsNeeded = new Set();
       pendings.forEach(p => p.legs.forEach(l => sportsNeeded.add(l.sport)));
       const scoresBySport = {};
@@ -495,25 +566,25 @@
       }
       let delta = 0;
       for (const h of pendings) {
-        let allDone = true, anyLost = false, wonCount = 0;
+        let allDone = true, anyLost = false, factor = 1, wonCount = 0;
         for (const leg of h.legs) {
           const byId = scoresBySport[leg.sport];
           const ev = byId ? byId[leg.eventId] : null;
-          if (!ev || !ev.completed || ev.homeScore == null || ev.awayScore == null) { allDone = false; continue; }
-          const winner = ev.homeScore > ev.awayScore ? 'home' : ev.awayScore > ev.homeScore ? 'away' : 'draw';
-          if (leg.pick === winner) wonCount++; else anyLost = true;
+          const res = (ev && ev.completed) ? legResult(ev, leg) : 'pending';
+          if (res === 'pending') { allDone = false; continue; }
+          if (res === 'lose') anyLost = true;
+          else if (res === 'win') { factor *= leg.odds; wonCount++; }
+          // push → 배당 1로 처리(곱하지 않음)
         }
-        // 조합 배팅: 한 경기라도 지면 즉시 패배 확정 (나머지 결과 안 기다림)
         if (anyLost) {
           const num = `${wonCount}/${h.legs.length} 적중`;
           h.status='settled'; h.isWin=false; h.payout=0; h.netChange=-h.bet; h.number=num;
           if (h._docId) updateBetRecord(h._docId, { status:'settled', isWin:false, payout:0, netChange:-h.bet, number:num });
           continue;
         }
-        if (!allDone) continue;   // 아직 안 끝난 경기가 있으면 대기
-        // 전부 적중 → 당첨
-        const payout = Math.floor(h.bet * h.odds);
-        const num = `${h.legs.length}/${h.legs.length} 적중`;
+        if (!allDone) continue;
+        const payout = Math.floor(h.bet * factor);
+        const num = `${wonCount}/${h.legs.length} 적중`;
         h.status='settled'; h.isWin=true; h.payout=payout; h.netChange=payout - h.bet; h.number=num;
         if (h._docId) updateBetRecord(h._docId, { status:'settled', isWin:true, payout, netChange:payout - h.bet, number:num });
         delta += payout;
@@ -527,9 +598,7 @@
       loadSpEvents();
       if (SP.refreshTimer) clearInterval(SP.refreshTimer);
       if (SP.settleTimer)  clearInterval(SP.settleTimer);
-      // 배당/시작여부 주기 갱신 (함수가 캐싱하므로 실제 API 호출은 제한적)
       SP.refreshTimer = setInterval(loadSpEvents, 60000);
-      // 정산 주기 점검
       SP.settleTimer  = setInterval(settleSportsBets, 120000);
     }
   </script>

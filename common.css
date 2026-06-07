@@ -1191,35 +1191,53 @@ body {
 }
 .sp-tab:hover { border-color: #c8a951; color: #c8a951; }
 .sp-tab.active { background: #1a2240; border-color: #c8a951; color: #e0c87a; }
-.sp-subbar {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 4px 4px 10px; font-size: 0.82rem; color: #c8a951; font-weight: bold;
-}
-.sp-credits { color: #555; font-size: 0.7rem; font-weight: normal; }
-.sp-match-list { display: flex; flex-direction: column; gap: 9px; }
+.sp-match-list { display: flex; flex-direction: column; gap: 14px; }
 .sp-loading, .sp-empty { text-align: center; color: #666; padding: 40px 16px; font-size: 0.88rem; line-height: 1.6; }
-.sp-match {
-  background: #13192e; border: 1px solid #2a2a4a; border-radius: 8px; padding: 11px 12px;
+/* 리그 묶음 */
+.sp-league-group { display: flex; flex-direction: column; gap: 9px; }
+.sp-league-head {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.86rem; font-weight: bold; color: #e0c87a;
+  padding: 6px 10px; background: linear-gradient(90deg, #1a2240, #16213e);
+  border: 1px solid #2a2a4a; border-radius: 6px;
 }
-.sp-match.started { opacity: 0.55; }
-.sp-match-time { font-size: 0.74rem; color: #7a85a0; margin-bottom: 8px; }
+.sp-league-head span { color: #6a7390; font-size: 0.72rem; font-weight: normal; }
+.sp-match {
+  background: #13192e; border: 1px solid #2a2a4a; border-radius: 8px; padding: 10px 12px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.sp-match.started { opacity: 0.5; }
+.sp-match-head {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap;
+}
+.sp-match-teams { font-size: 0.86rem; color: #e8ecf5; font-weight: bold; }
+.sp-vs { color: #6a7390; font-size: 0.72rem; font-weight: normal; margin: 0 2px; }
+.sp-match-time { font-size: 0.72rem; color: #7a85a0; white-space: nowrap; }
 .sp-match.started .sp-match-time { color: #e05555; }
-.sp-match-odds { display: grid; gap: 7px; }
-.sp-match-odds.three { grid-template-columns: 1fr 1fr 1fr; }
-.sp-match-odds.two   { grid-template-columns: 1fr 1fr; }
+/* 마켓 한 줄 */
+.sp-market { display: flex; align-items: stretch; gap: 7px; }
+.sp-market-label {
+  flex-shrink: 0; width: 54px; display: flex; align-items: center;
+  font-size: 0.68rem; color: #8893ad; font-weight: bold;
+}
+.sp-market-odds { flex: 1; display: grid; gap: 6px; min-width: 0; }
+.sp-market-odds.three { grid-template-columns: 1fr 1fr 1fr; }
+.sp-market-odds.two   { grid-template-columns: 1fr 1fr; }
 .sp-odds-btn {
-  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  display: flex; align-items: center; justify-content: space-between; gap: 6px;
   background: #0f1428; border: 1px solid #2a3660; border-radius: 6px;
-  padding: 9px 6px; cursor: pointer; font-family: inherit; transition: all 0.13s; min-width: 0;
+  padding: 8px 9px; cursor: pointer; font-family: inherit; transition: all 0.13s; min-width: 0;
 }
 .sp-odds-btn:hover:not(:disabled) { border-color: #c8a951; background: #1a2240; }
 .sp-odds-btn.selected { border-color: #c8a951; background: rgba(200,169,81,0.18); }
 .sp-odds-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .sp-odds-team {
-  font-size: 0.76rem; color: #d8dcea; font-weight: bold; text-align: center;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;
+  font-size: 0.74rem; color: #d8dcea; font-weight: bold;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;
+  display: flex; align-items: center; gap: 4px;
 }
-.sp-odds-price { font-size: 0.95rem; color: #4ade80; font-weight: bold; }
+.sp-odds-pt { color: #c8a951; font-size: 0.68rem; font-weight: bold; flex-shrink: 0; }
+.sp-odds-price { font-size: 0.9rem; color: #4ade80; font-weight: bold; flex-shrink: 0; }
 .sp-odds-btn.selected .sp-odds-price { color: #ffe26a; }
 .sp-cart-combo {
   display: flex; justify-content: space-between; align-items: center;
