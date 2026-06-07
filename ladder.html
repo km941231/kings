@@ -574,9 +574,9 @@
       });
       c.textAlign = 'center'; c.textBaseline = 'middle';
       if (pending) {
-        c.font = 'bold 13px Malgun Gothic, sans-serif';
-        c.fillStyle = '#2a3a54';
-        c.fillText('?', LX, TOP - 44); c.fillText('?', RX, TOP - 44);
+        c.font = 'bold 14px Malgun Gothic, sans-serif';
+        c.fillStyle = '#3a4e68';
+        c.fillText('좌', LX, TOP - 44); c.fillText('우', RX, TOP - 44);
       } else {
         // 출발 위치를 또렷하게: 활성 쪽은 금색 강조 + 글로우, 비활성은 흐리게
         [['좌', LX, startLeft], ['우', RX, !startLeft]].forEach(([t, x, active]) => {
