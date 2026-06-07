@@ -250,6 +250,7 @@
 
     <!-- 모바일 하단 고정 배팅 바 -->
     <div class="lg-mobile-betbar" id="lgMobileBetBar">
+      <div class="lg-mbb-points">보유 포인트 <span id="lgMobPoints">0 P</span></div>
       <div class="lg-mbb-quick">
         <button onclick="addBet(10000)">+1만</button>
         <button onclick="addBet(50000)">+5만</button>
@@ -432,6 +433,8 @@
       document.getElementById('slipPoints').textContent   = txt;
       const mob = document.getElementById('mobPoints');
       if (mob) mob.textContent = txt;
+      const mbb = document.getElementById('lgMobPoints');
+      if (mbb) mbb.textContent = txt;
     }
 
     window.handleLogout = async function() {
@@ -569,14 +572,26 @@
         c.moveTo(x + r, cy - r); c.lineTo(x - r, cy + r);
         c.stroke();
       });
-      c.font = 'bold 13px Malgun Gothic, sans-serif';
       c.textAlign = 'center'; c.textBaseline = 'middle';
       if (pending) {
+        c.font = 'bold 13px Malgun Gothic, sans-serif';
         c.fillStyle = '#2a3a54';
         c.fillText('?', LX, TOP - 44); c.fillText('?', RX, TOP - 44);
       } else {
-        c.fillStyle = startLeft  ? '#e8c84a' : '#3a4e68'; c.fillText('좌', LX, TOP - 44);
-        c.fillStyle = !startLeft ? '#e8c84a' : '#3a4e68'; c.fillText('우', RX, TOP - 44);
+        // 출발 위치를 또렷하게: 활성 쪽은 금색 강조 + 글로우, 비활성은 흐리게
+        [['좌', LX, startLeft], ['우', RX, !startLeft]].forEach(([t, x, active]) => {
+          if (active) {
+            c.fillStyle = 'rgba(232,200,74,0.16)';
+            c.beginPath(); c.arc(x, TOP - 44, 15, 0, Math.PI * 2); c.fill();
+            c.shadowColor = 'rgba(232,200,74,0.7)'; c.shadowBlur = 10;
+            c.fillStyle = '#ffe26a'; c.font = 'bold 18px Malgun Gothic, sans-serif';
+          } else {
+            c.shadowBlur = 0;
+            c.fillStyle = '#33425c'; c.font = 'bold 12px Malgun Gothic, sans-serif';
+          }
+          c.fillText(t, x, TOP - 44);
+          c.shadowBlur = 0;
+        });
       }
       if (!pending) {
         c.fillStyle = '#3c5068'; c.font = '11px Malgun Gothic, sans-serif';
@@ -653,11 +668,12 @@
     }
 
     function makeLGBadge(d) {
-      const hjCls  = d.result === '홀' ? 'hol' : 'jjak';
-      const posCls = d.startLeft ? 'left' : 'right';
-      return `<div class="lg-res-wrap">
-        <div class="lg-res-big ${hjCls}">${d.result}</div>
-        <div class="lg-res-small ${posCls}">${d.numBars}</div>
+      const hjCls   = d.result === '홀' ? 'hol' : 'jjak';
+      const sideCls = d.startLeft ? 'lr-left' : 'lr-right';
+      return `<div class="lg-res-chips">
+        <span class="lg-chip ${sideCls}">${d.startLeft ? '좌' : '우'}</span>
+        <span class="lg-chip line">${d.numBars}줄</span>
+        <span class="lg-chip ${hjCls}">${d.result}</span>
       </div>`;
     }
 

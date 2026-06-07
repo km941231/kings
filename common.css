@@ -1226,6 +1226,10 @@ body {
     flex-direction: column; gap: 6px;
   }
   .lg-mobile-betbar.show { display: flex; }
+  .lg-mbb-points {
+    font-size: 0.74rem; color: #9aa4bd; text-align: right; margin-bottom: 1px;
+  }
+  .lg-mbb-points span { color: #c8a951; font-weight: bold; }
   .lg-mbb-quick { display: flex; gap: 5px; }
   .lg-mbb-quick button {
     flex: 1; background: #1a2240; border: 1px solid #2a3660; color: #c8d0e8;
@@ -1330,8 +1334,8 @@ body {
   border-bottom: 1px solid #2a2a4a; background: #0d0d1a;
 }
 .lg-result-item {
-  display: grid; grid-template-columns: 1fr 58px;
-  padding: 6px 12px; border-bottom: 1px solid #1a2030; align-items: center;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 6px 12px; border-bottom: 1px solid #1a2030; gap: 8px;
 }
 .lg-result-item:last-child { border-bottom: none; }
 .lg-result-round { color: #666; font-size: 0.68rem; }
@@ -1360,6 +1364,19 @@ body {
 }
 .lg-res-small.left  { left: -4px; }
 .lg-res-small.right { right: -4px; }
+
+/* 좌/우·줄수·홀짝 칩 (회차별 결과 — 좌/우를 또렷하게) */
+.lg-res-chips { display: flex; gap: 3px; align-items: center; flex-shrink: 0; }
+.lg-chip {
+  font-size: 0.66rem; font-weight: bold; border-radius: 4px;
+  padding: 3px 5px; min-width: 18px; color: #fff;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.lg-chip.lr-left  { background: #c8a951; color: #1a1a1a; }  /* 좌 — 금색 */
+.lg-chip.lr-right { background: #8e7cc3; color: #fff; }     /* 우 — 보라 */
+.lg-chip.line     { background: #2a3350; color: #aeb8d4; }  /* 줄수 */
+.lg-chip.hol      { background: #e05555; }                  /* 홀 */
+.lg-chip.jjak     { background: #4a9eff; }                  /* 짝 */
 
 .lg-result-list { max-height: 430px; overflow-y: auto; }
 .lg-result-list::-webkit-scrollbar { width: 3px; }
