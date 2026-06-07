@@ -210,6 +210,22 @@
         </div>
       </aside>
     </div>
+
+    <!-- 모바일 하단 고정 배팅 바 -->
+    <div class="lg-mobile-betbar" id="lgMobileBetBar">
+      <div class="lg-mbb-points">보유 포인트 <span id="lgMobPoints">0 P</span></div>
+      <div class="lg-mbb-quick">
+        <button onclick="addBet(10000)">+1만</button>
+        <button onclick="addBet(50000)">+5만</button>
+        <button onclick="addBet(100000)">+10만</button>
+        <button onclick="setBetAll()">MAX</button>
+        <button onclick="resetBet()">초기화</button>
+      </div>
+      <div class="lg-mbb-row">
+        <input type="number" id="lgMobBetInput" placeholder="배팅 금액" inputmode="numeric">
+        <button class="lg-mbb-confirm" id="lgMobConfirm" onclick="confirmPDTBet()">배팅하기</button>
+      </div>
+    </div>
   </div>
 
   <script type="module">
@@ -228,12 +244,30 @@
     };
 
     document.getElementById('betInput').addEventListener('input', updateSummary);
+    document.getElementById('lgMobBetInput').addEventListener('input', () => {
+      document.getElementById('betInput').value = document.getElementById('lgMobBetInput').value;
+      updateSummary();
+    });
 
     function updateSummary() {
       const bet = getBet();
       const multiplier = PDT.bet === 'tie' ? 6.5 : PDT.bet === 'specialtie' ? 20 : PDT.bet ? 2 : 1;
       document.getElementById('summaryBet').textContent = bet.toLocaleString() + ' P';
       document.getElementById('summaryWin').textContent = Math.floor(bet * multiplier).toLocaleString() + ' P';
+      const mob = document.getElementById('lgMobBetInput');
+      if (mob && document.activeElement !== mob) mob.value = document.getElementById('betInput').value;
+      updateMobBetBar();
+    }
+
+    function updateMobBetBar() {
+      const bar = document.getElementById('lgMobileBetBar');
+      if (!bar) return;
+      bar.classList.toggle('show', !!PDT.bet && !PDT.confirmed);
+      const locked = !!document.getElementById('btnBetConfirm')?.disabled;
+      const btn = document.getElementById('lgMobConfirm');
+      if (btn) { btn.disabled = locked || PDT.confirmed; btn.textContent = PDT.confirmed ? '배팅 완료' : '배팅하기'; }
+      const inp = document.getElementById('lgMobBetInput');
+      if (inp) inp.disabled = locked || PDT.confirmed;
     }
 
     onAuthStateChanged(auth, async (user) => {
@@ -345,6 +379,7 @@
       document.getElementById('headerPoints').textContent = txt;
       document.getElementById('slipPoints').textContent   = txt;
       const mob = document.getElementById('mobPoints'); if (mob) mob.textContent = txt;
+      const mbb = document.getElementById('lgMobPoints'); if (mbb) mbb.textContent = txt;
     }
 
     window.handleLogout = async function() { await signOut(auth); gameHistory = []; renderHistory(); };
@@ -520,6 +555,15 @@
       const s = document.getElementById('pdtBetStatus');
       if (s) { s.textContent = `✅ 배팅 완료! (수수료 ${commission.toLocaleString()}P 차감)`; s.style.color='#4ade80'; }
       renderPDTCart();
+      updateMobBetBar();
+      const pdtOdds = { dragon:2, tiger:2, tie:6.5, specialtie:20 }[PDT.confirmedBet] || 2;
+      const pdtLabel = { dragon:'🐉 드래곤', tiger:'🐯 타이거', tie:'🤝 타이', specialtie:'⭐ 스페셜타이' }[PDT.confirmedBet];
+      window.kingsAlert(
+        `<b style="color:#c8a951">${pdtLabel}</b><br>배팅액 <b>${bet.toLocaleString()}P</b> ` +
+        `<span style="color:#9aa4bd">(수수료 ${commission.toLocaleString()}P)</span><br>` +
+        `예상 당첨금 <b style="color:#4ade80">${Math.floor(bet * pdtOdds).toLocaleString()}P</b>`,
+        '✅ 배팅 완료'
+      );
     };
 
     function pdtShowPowerCard(round) {
@@ -583,6 +627,7 @@
       }
       PDT.timer = setInterval(() => {
         const newRound = getDTRound(); pdtUpdateTimer();
+        updateMobBetBar();
         const sec = new Date().getSeconds();
         if (sec >= 50 && !PDT.confirmed) {
           ['pdtBtnDragon','pdtBtnTie','pdtBtnTiger','pdtBtnSpecialTie'].forEach(id => { const e=document.getElementById(id); if(e) e.disabled=true; });

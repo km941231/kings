@@ -204,6 +204,22 @@
         </div>
       </aside>
     </div>
+
+    <!-- 모바일 하단 고정 배팅 바 -->
+    <div class="lg-mobile-betbar" id="lgMobileBetBar">
+      <div class="lg-mbb-points">보유 포인트 <span id="lgMobPoints">0 P</span></div>
+      <div class="lg-mbb-quick">
+        <button onclick="addBet(10000)">+1만</button>
+        <button onclick="addBet(50000)">+5만</button>
+        <button onclick="addBet(100000)">+10만</button>
+        <button onclick="setBetAll()">MAX</button>
+        <button onclick="resetBet()">초기화</button>
+      </div>
+      <div class="lg-mbb-row">
+        <input type="number" id="lgMobBetInput" placeholder="배팅 금액" inputmode="numeric">
+        <button class="lg-mbb-confirm" id="lgMobConfirm" onclick="confirmBacBet()">배팅하기</button>
+      </div>
+    </div>
   </div>
 
   <script type="module">
@@ -222,6 +238,10 @@
     };
 
     document.getElementById('betInput').addEventListener('input', updateSummary);
+    document.getElementById('lgMobBetInput').addEventListener('input', () => {
+      document.getElementById('betInput').value = document.getElementById('lgMobBetInput').value;
+      updateSummary();
+    });
 
     function updateSummary() {
       const bet = getBet();
@@ -229,6 +249,20 @@
       const multiplier = om[BAC.bet] || 1;
       document.getElementById('summaryBet').textContent = bet.toLocaleString() + ' P';
       document.getElementById('summaryWin').textContent = Math.floor(bet * multiplier).toLocaleString() + ' P';
+      const mob = document.getElementById('lgMobBetInput');
+      if (mob && document.activeElement !== mob) mob.value = document.getElementById('betInput').value;
+      updateMobBetBar();
+    }
+
+    function updateMobBetBar() {
+      const bar = document.getElementById('lgMobileBetBar');
+      if (!bar) return;
+      bar.classList.toggle('show', !!BAC.bet && !BAC.confirmed);
+      const locked = !!document.getElementById('btnBetConfirm')?.disabled;
+      const btn = document.getElementById('lgMobConfirm');
+      if (btn) { btn.disabled = locked || BAC.confirmed; btn.textContent = BAC.confirmed ? '배팅 완료' : '배팅하기'; }
+      const inp = document.getElementById('lgMobBetInput');
+      if (inp) inp.disabled = locked || BAC.confirmed;
     }
 
     onAuthStateChanged(auth, async (user) => {
@@ -327,6 +361,7 @@
       document.getElementById('headerPoints').textContent = txt;
       document.getElementById('slipPoints').textContent   = txt;
       const mob = document.getElementById('mobPoints'); if (mob) mob.textContent = txt;
+      const mbb = document.getElementById('lgMobPoints'); if (mbb) mbb.textContent = txt;
     }
 
     window.handleLogout = async function() { await signOut(auth); gameHistory = []; renderHistory(); };
@@ -569,6 +604,14 @@
       const btn = document.getElementById('btnBetConfirm'); if(btn){btn.disabled=true;btn.textContent='배팅 완료';}
       const s = document.getElementById('bacBetStatus'); if(s){s.textContent='✅ 배팅 완료! 결과를 기다리세요.';s.style.color='#4ade80';}
       renderBacCart();
+      updateMobBetBar();
+      const bacOdds = { player:2, banker:1.95, tie:8, ppair:11, bpair:11 }[BAC.confirmedBet] || 2;
+      const bacLabel = { player:'PLAYER', banker:'BANKER', tie:'🤝 타이', ppair:'플레이어 페어', bpair:'뱅커 페어' }[BAC.confirmedBet];
+      window.kingsAlert(
+        `<b style="color:#c8a951">${bacLabel}</b><br>배팅액 <b>${bet.toLocaleString()}P</b><br>` +
+        `예상 당첨금 <b style="color:#4ade80">${Math.floor(bet * bacOdds).toLocaleString()}P</b>`,
+        '✅ 배팅 완료'
+      );
     };
 
     function initBacGame() {
@@ -594,6 +637,7 @@
         const sec = now.getSeconds(); const rem = 60 - sec;
         const tEl = document.getElementById('bacTimer');
         if (tEl) tEl.textContent = `00:${String(rem).padStart(2,'0')}`;
+        updateMobBetBar();
         if (sec >= 50 && !BAC.confirmed) {
           ['bacBtnPlayer','bacBtnTie','bacBtnBanker','bacBtnPPlayer','bacBtnPBanker'].forEach(id => { const e=document.getElementById(id); if(e) e.disabled=true; });
           const s=document.getElementById('bacBetStatus'); if(s&&!BAC.confirmed){s.textContent='⛔ 배팅 마감';s.style.color='#e05555';}
