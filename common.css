@@ -1374,7 +1374,9 @@ body {
 }
 .lg-chip.lr-left  { background: #c8a951; color: #1a1a1a; }  /* 좌 — 금색 */
 .lg-chip.lr-right { background: #8e7cc3; color: #fff; }     /* 우 — 보라 */
-.lg-chip.line     { background: #2a3350; color: #aeb8d4; }  /* 줄수 */
+.lg-chip.line       { background: #2a3350; color: #aeb8d4; }  /* 줄수 기본 */
+.lg-chip.line.three { background: #4ade80; color: #0c2a16; }  /* 3줄 — 초록 */
+.lg-chip.line.four  { background: #f59e0b; color: #2a1c00; }  /* 4줄 — 주황 */
 .lg-chip.hol      { background: #e05555; }                  /* 홀 */
 .lg-chip.jjak     { background: #4a9eff; }                  /* 짝 */
 

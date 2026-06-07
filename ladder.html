@@ -672,7 +672,7 @@
       const sideCls = d.startLeft ? 'lr-left' : 'lr-right';
       return `<div class="lg-res-chips">
         <span class="lg-chip ${sideCls}">${d.startLeft ? '좌' : '우'}</span>
-        <span class="lg-chip line">${d.numBars}줄</span>
+        <span class="lg-chip line ${d.numBars === 3 ? 'three' : 'four'}">${d.numBars}줄</span>
         <span class="lg-chip ${hjCls}">${d.result}</span>
       </div>`;
     }
