@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KINGS - 스포츠</title>
+  <link rel="stylesheet" href="common.css">
+</head>
+<body>
+
+  <div id="loadingScreen">
+    <div class="loading-logo">♠ KINGS</div>
+    <div class="loading-spinner"></div>
+  </div>
+
+  <div id="loginScreen" style="display:none">
+    <div class="login-wrap">
+      <div class="login-logo-area"><h1>♠ KINGS</h1><p>로그인하고 시작하세요</p></div>
+      <div class="login-card">
+        <div class="tab-row">
+          <button class="tab-btn active" id="tabLogin" onclick="switchTab('login')">로그인</button>
+          <button class="tab-btn" id="tabRegister" onclick="switchTab('register')">회원가입</button>
+        </div>
+        <div class="field"><label>아이디</label><input type="text" id="usernameInput" placeholder="아이디 입력" maxlength="16" autocomplete="username"></div>
+        <div class="field"><label>비밀번호</label><input type="password" id="passwordInput" placeholder="6자 이상" onkeydown="handleEnter(event)" autocomplete="current-password"></div>
+        <div id="registerFields" style="display:none">
+          <div class="field"><label>비밀번호 확인</label><input type="password" id="passwordConfirmInput" placeholder="비밀번호를 다시 입력"></div>
+          <div class="field"><label>닉네임</label><input type="text" id="nicknameInput" placeholder="게임에서 표시될 이름" maxlength="12"></div>
+          <div class="field"><label>휴대폰 번호</label><input type="tel" id="phoneInput" placeholder="010-0000-0000" maxlength="13" oninput="formatPhone(this)"></div>
+          <div class="field"><label>추천인 코드</label><input type="text" id="referralInput" placeholder="추천인 코드 입력 (필수)" maxlength="16"></div>
+        </div>
+        <p class="error-msg" id="authError"></p>
+        <button class="btn-login-submit" id="submitBtn" onclick="handleSubmit()">로그인</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="gameScreen">
+    <header class="header">
+      <a class="header-logo" href="index.html" style="text-decoration:none;color:inherit">♠ KINGS</a>
+      <div class="header-user">
+        <div class="user-point-box" id="headerPoints">0 P</div>
+        <div class="myinfo-nickname" id="userNickname">—</div>
+        <button class="btn-myinfo" onclick="location.href='myinfo.html'">👤 내정보</button>
+        <button class="btn-myinfo" id="btnAdmin" style="display:none;border-color:#e05555;color:#e05555;background:#1a0d0d" onclick="location.href='admin.html'">⚙ 관리자</button>
+        <button class="btn-logout-top" onclick="handleLogout()">로그아웃</button>
+      </div>
+      <button class="btn-hamburger" id="btnHamburger" onclick="toggleMobileMenu()">☰</button>
+    </header>
+
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay" onclick="closeMobileMenu()">
+      <div class="mobile-menu-drawer" onclick="event.stopPropagation()">
+        <div class="mob-user-row">
+          <div><div class="mob-user-sub">환영합니다</div><div class="mob-user-name" id="mobNickname">—</div></div>
+          <div class="user-point-box" id="mobPoints" style="font-size:0.8rem">0 P</div>
+        </div>
+        <div class="mob-section-title">GAME</div>
+        <a class="mob-item" href="ladder.html">사다리 <span class="sidebar-badge">LIVE</span></a>
+        <a class="mob-item active" href="sports.html">스포츠 <span class="sidebar-badge">LIVE</span></a>
+        <div class="mob-section-title">CASINO</div>
+        <a class="mob-item" href="dragon.html">드래곤타이거 <span class="sidebar-badge">LIVE</span></a>
+        <a class="mob-item" href="pdragon.html">파워 드래곤타이거 <span class="sidebar-badge">LIVE</span></a>
+        <a class="mob-item" href="baccarat.html">바카라 <span class="sidebar-badge">LIVE</span></a>
+        <a class="mob-item" href="blackjack.html">블랙잭 <span class="sidebar-badge">LIVE</span></a>
+        <div class="mob-section-title">MENU</div>
+        <a class="mob-item" href="bethistory.html">배팅내역</a>
+        <div class="mob-actions">
+          <button class="btn-myinfo" id="mobBtnAdmin" style="display:none;border-color:#e05555;color:#e05555;background:#1a0d0d" onclick="location.href='admin.html'">⚙ 관리자</button>
+          <button class="btn-myinfo" onclick="location.href='myinfo.html'">👤 내정보</button>
+          <button class="btn-logout-top" style="flex:1;text-align:center" onclick="handleLogout()">로그아웃</button>
+        </div>
+      </div>
+    </div>
+
+    <nav class="subnav">
+      <div class="subnav-category" id="catGame">
+        <button class="subnav-cat-btn active" onclick="toggleSubnav('game')">게임 <span class="subnav-arrow">▼</span></button>
+        <div class="subnav-dropdown">
+          <a class="subnav-drop-item" href="ladder.html">사다리 <span class="sidebar-badge">LIVE</span></a>
+          <a class="subnav-drop-item active" href="sports.html">스포츠 <span class="sidebar-badge">LIVE</span></a>
+        </div>
+      </div>
+      <div class="subnav-category" id="catCasino">
+        <button class="subnav-cat-btn" onclick="toggleSubnav('casino')">카지노 <span class="subnav-arrow">▼</span></button>
+        <div class="subnav-dropdown">
+          <a class="subnav-drop-item" href="dragon.html">드래곤타이거 <span class="sidebar-badge">LIVE</span></a>
+          <a class="subnav-drop-item" href="pdragon.html">파워 드래곤타이거 <span class="sidebar-badge">LIVE</span></a>
+          <a class="subnav-drop-item" href="baccarat.html">바카라 <span class="sidebar-badge">LIVE</span></a>
+          <a class="subnav-drop-item" href="blackjack.html">블랙잭 <span class="sidebar-badge">LIVE</span></a>
+        </div>
+      </div>
+      <div class="subnav-category" id="catMenu">
+        <button class="subnav-cat-btn" onclick="toggleSubnav('menu')">메뉴 <span class="subnav-arrow">▼</span></button>
+        <div class="subnav-dropdown"><a class="subnav-drop-item" href="bethistory.html">배팅내역</a></div>
+      </div>
+    </nav>
+
+    <div class="main-layout">
+      <aside class="sidebar-left">
+        <div class="sidebar-section-title">GAME</div>
+        <a class="sidebar-menu-item" href="ladder.html">사다리 <span class="sidebar-badge">LIVE</span></a>
+        <a class="sidebar-menu-item active" href="sports.html">스포츠 <span class="sidebar-badge">LIVE</span></a>
+        <div class="sidebar-section-title" style="margin-top:10px">CASINO</div>
+        <a class="sidebar-menu-item" href="dragon.html">드래곤타이거 <span class="sidebar-badge">LIVE</span></a>
+        <a class="sidebar-menu-item" href="pdragon.html">파워 드래곤타이거 <span class="sidebar-badge">LIVE</span></a>
+        <a class="sidebar-menu-item" href="baccarat.html">바카라 <span class="sidebar-badge">LIVE</span></a>
+        <a class="sidebar-menu-item" href="blackjack.html">블랙잭 <span class="sidebar-badge">LIVE</span></a>
+      </aside>
+
+      <main class="main-content">
+        <div class="content-header">
+          <div class="content-title">스포츠 배팅</div>
+          <div class="saving-indicator" id="savingIndicator"></div>
+        </div>
+
+        <div id="panelSports">
+          <div class="sp-tabs">
+            <button class="sp-tab active" data-sport="baseball"   onclick="switchSport('baseball')">⚾ 야구</button>
+            <button class="sp-tab"        data-sport="basketball" onclick="switchSport('basketball')">🏀 농구</button>
+            <button class="sp-tab"        data-sport="soccer"     onclick="switchSport('soccer')">⚽ 축구</button>
+          </div>
+          <div class="sp-subbar">
+            <span id="spLeagueName">MLB</span>
+            <span class="sp-credits" id="spCredits"></span>
+          </div>
+          <div class="sp-match-list" id="spMatchList">
+            <div class="sp-loading">경기 불러오는 중...</div>
+          </div>
+        </div>
+      </main>
+
+      <aside class="sidebar-right">
+        <div class="slip-header">BETTING SLIP</div>
+        <div class="slip-body">
+          <div class="slip-point-row">
+            <div class="slip-point-label">보유 포인트</div>
+            <div class="slip-point-value" id="slipPoints">0 P</div>
+          </div>
+          <div class="slip-section-label">선택한 배팅</div>
+          <div id="lgCartItems" class="cart-items"><div class="cart-empty">선택된 배팅 없음</div></div>
+          <div class="slip-section-label">배팅 금액</div>
+          <div class="bet-quick-btns">
+            <button class="bet-quick-btn" id="qbtn5000" onclick="addBet(5000)">+5,000</button>
+            <button class="bet-quick-btn" id="qbtn10000" onclick="addBet(10000)">+10,000</button>
+            <button class="bet-quick-btn" id="qbtn30000" onclick="addBet(30000)">+30,000</button>
+            <button class="bet-quick-btn" id="qbtn50000" onclick="addBet(50000)">+50,000</button>
+            <button class="bet-quick-btn" id="qbtn100000" onclick="addBet(100000)">+100,000</button>
+            <button class="bet-quick-btn" id="qbtnMax" onclick="setBetAll()">MAX</button>
+          </div>
+          <div class="bet-input-row">
+            <input class="bet-input" type="number" id="betInput" placeholder="배팅 금액">
+            <button class="bet-reset-btn" onclick="resetBet()">초기화</button>
+          </div>
+          <hr class="slip-divider">
+          <div class="slip-summary"><span class="label">배팅액</span><span class="value" id="summaryBet">0 P</span></div>
+          <div class="slip-summary"><span class="label">예상 당첨금</span><span class="value gold" id="summaryWin">0 P</span></div>
+          <hr class="slip-divider">
+          <div id="spBetStatus" style="text-align:center;font-size:0.78rem;min-height:18px;margin-bottom:6px"></div>
+          <button class="btn-bet-now" id="btnBetConfirm" onclick="confirmSpBet()">배팅하기</button>
+          <button class="btn-recharge-slip" style="margin-top:8px" onclick="recharge()">+ 포인트 충전 (10,000P)</button>
+        </div>
+        <div class="history-panel">
+          <div class="history-panel-title">최근 배팅 기록</div>
+          <div class="history-rows" id="historyList"><div class="history-empty">기록 없음</div></div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- 모바일 하단 고정 배팅 바 -->
+    <div class="lg-mobile-betbar" id="lgMobileBetBar">
+      <div class="lg-mbb-points">보유 포인트 <span id="lgMobPoints">0 P</span></div>
+      <div class="lg-mbb-info">
+        <span class="lg-mbb-choice" id="lgMobChoice">선택 항목 없음</span>
+        <span class="lg-mbb-round" id="lgMobRound">-</span>
+      </div>
+      <div class="lg-mbb-quick">
+        <button onclick="addBet(10000)">+1만</button>
+        <button onclick="addBet(50000)">+5만</button>
+        <button onclick="addBet(100000)">+10만</button>
+        <button onclick="setBetAll()">MAX</button>
+        <button onclick="resetBet()">초기화</button>
+      </div>
+      <div class="lg-mbb-row">
+        <input type="number" id="lgMobBetInput" placeholder="배팅 금액" inputmode="numeric">
+        <button class="lg-mbb-confirm" id="lgMobConfirm" onclick="confirmSpBet()">배팅하기</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { auth, db, onAuthStateChanged, doc, getDoc, setDoc, updateDoc,
+             collection, getDocs, addDoc, query, orderBy, serverTimestamp, signOut }
+      from './common.js';
+
+    let points = 0;
+    let gameHistory = [];
+    let currentUid = null;
+    let currentUserData = {};
+
+    const LEAGUE_NAME = { baseball:'MLB', basketball:'NBA', soccer:'MLS' };
+    const SP = { sport:'baseball', events:[], refreshTimer:null, settleTimer:null, bet:null };
+
+    document.getElementById('betInput').addEventListener('input', updateSummary);
+    document.getElementById('lgMobBetInput').addEventListener('input', () => {
+      document.getElementById('betInput').value = document.getElementById('lgMobBetInput').value;
+      updateSummary();
+    });
+
+    function getBet() { const v = parseInt(document.getElementById('betInput').value, 10); return isNaN(v)||v<=0?0:v; }
+
+    function updateSummary() {
+      const bet = getBet();
+      const mult = SP.bet ? SP.bet.odds : 1;
+      document.getElementById('summaryBet').textContent = bet.toLocaleString() + ' P';
+      document.getElementById('summaryWin').textContent = Math.floor(bet * mult).toLocaleString() + ' P';
+      const mob = document.getElementById('lgMobBetInput');
+      if (mob && document.activeElement !== mob) mob.value = document.getElementById('betInput').value;
+      updateMobBetBar();
+    }
+
+    function updateMobBetBar() {
+      const bar = document.getElementById('lgMobileBetBar');
+      if (!bar) return;
+      bar.classList.toggle('show', !!SP.bet);
+      const started = SP.bet ? (new Date(SP.bet.commence) <= new Date()) : false;
+      const btn = document.getElementById('lgMobConfirm');
+      if (btn) { btn.disabled = started; btn.textContent = started ? '경기 시작됨' : '배팅하기'; }
+      const inp = document.getElementById('lgMobBetInput');
+      if (inp) inp.disabled = started;
+      const choiceEl = document.getElementById('lgMobChoice');
+      if (choiceEl) choiceEl.textContent = SP.bet ? SP.bet.label : '선택 항목 없음';
+      const roundEl = document.getElementById('lgMobRound');
+      if (roundEl) roundEl.textContent = SP.bet ? fmtTime(SP.bet.commence) : '-';
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      document.getElementById('loadingScreen').style.display = 'none';
+      if (user) {
+        currentUid = user.uid;
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('gameScreen').style.display = 'flex';
+        document.getElementById('gameScreen').style.flexDirection = 'column';
+        await loadUserData(user.uid);
+        await loadBetHistory();
+        localStorage.setItem('lastGame', 'sports');
+        initSports();
+      } else {
+        currentUid = null;
+        document.getElementById('loginScreen').style.display = 'flex';
+        document.getElementById('gameScreen').style.display = 'none';
+      }
+    });
+
+    async function loadUserData(uid) {
+      try {
+        const snap = await getDoc(doc(db, 'users', uid));
+        if (snap.exists()) {
+          const data = snap.data(); currentUserData = data; points = data.points ?? 10000;
+          const nick = data.nickname || data.username || '유저';
+          document.getElementById('userNickname').textContent = nick;
+          document.getElementById('mobNickname').textContent  = nick;
+          if (data.isAdmin) { document.getElementById('btnAdmin').style.display='flex'; const m=document.getElementById('mobBtnAdmin'); if(m) m.style.display='flex'; }
+        } else {
+          const uname = auth.currentUser?.email?.split('@')[0] || '유저';
+          currentUserData = { username: uname, nickname: uname, points: 10000 }; points = 10000;
+          document.getElementById('userNickname').textContent = uname;
+          document.getElementById('mobNickname').textContent  = uname;
+          await setDoc(doc(db, 'users', uid), currentUserData);
+        }
+        sessionStorage.setItem('userData', JSON.stringify({ ...currentUserData, points }));
+        updatePointsDisplay();
+      } catch(e) { points = 10000; updatePointsDisplay(); }
+    }
+
+    async function savePoints() {
+      if (!currentUid) return;
+      const ind = document.getElementById('savingIndicator'); ind.textContent = '저장 중...';
+      try { await updateDoc(doc(db, 'users', currentUid), { points }); ind.textContent='✓ 저장됨'; setTimeout(()=>{ind.textContent='';},1500); }
+      catch(e){ ind.textContent=''; }
+    }
+
+    async function saveBet(betData) {
+      if (!currentUid) return null;
+      try { const ref = await addDoc(collection(db,'users',currentUid,'bets'), { ...betData, timestamp: serverTimestamp() }); return ref.id; }
+      catch(e){ return null; }
+    }
+    async function updateBetRecord(docId, data) {
+      if (!currentUid || !docId) return;
+      try { await updateDoc(doc(db,'users',currentUid,'bets',docId), data); } catch(e){}
+    }
+
+    async function loadBetHistory() {
+      if (!currentUid) return;
+      try {
+        const q = query(collection(db,'users',currentUid,'bets'), orderBy('timestamp','desc'));
+        const snap = await getDocs(q);
+        gameHistory = snap.docs.map(d => ({ _docId: d.id, ...d.data() }));
+        renderHistory();
+        await settleSportsBets();
+      } catch(e){}
+    }
+
+    function updatePointsDisplay() {
+      const txt = points.toLocaleString() + ' P';
+      document.getElementById('headerPoints').textContent = txt;
+      document.getElementById('slipPoints').textContent   = txt;
+      const mob = document.getElementById('mobPoints'); if (mob) mob.textContent = txt;
+      const mbb = document.getElementById('lgMobPoints'); if (mbb) mbb.textContent = txt;
+    }
+
+    window.handleLogout = async function(){ await signOut(auth); gameHistory=[]; renderHistory(); };
+    window.addBet = function(n){ document.getElementById('betInput').value = getBet()+n; updateSummary(); };
+    window.setBetAll = function(){ document.getElementById('betInput').value = points; updateSummary(); };
+    window.resetBet = function(){ document.getElementById('betInput').value=''; updateSummary(); };
+    window.recharge = async function(){ points += 10000; updatePointsDisplay(); await savePoints(); };
+
+    function renderHistory() {
+      const list = document.getElementById('historyList');
+      if (!gameHistory.length) { list.innerHTML = '<div class="history-empty">기록 없음</div>'; return; }
+      list.innerHTML = gameHistory.slice(0,20).map(h => {
+        const isPending = h.status === 'pending';
+        return `<div class="h-row ${isPending?'':h.isWin?'win':'lose'}">
+          <span class="h-num ${h.cls||''}">${isPending?'?':(h.number||'-')}</span>
+          <span class="h-info">${h.choice} / ${(h.bet||0).toLocaleString()}P</span>
+          <span class="h-result ${isPending?'':h.isWin?'win':'lose'}">${isPending?'대기중':(h.netChange>=0?'+':'')+(h.netChange||0).toLocaleString()}</span>
+        </div>`;
+      }).join('');
+    }
+
+    // ── 화면 헬퍼 ──────────────────────────────────────────────
+    function fmtTime(iso) {
+      const d = new Date(iso), p = n => String(n).padStart(2,'0');
+      return `${d.getMonth()+1}/${d.getDate()} ${p(d.getHours())}:${p(d.getMinutes())}`;
+    }
+    function isSel(id, pick) { return SP.bet && SP.bet.eventId === id && SP.bet.pick === pick; }
+    async function fetchJSON(url) { const r = await fetch(url); if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); }
+
+    function renderMatches() {
+      const list = document.getElementById('spMatchList');
+      if (!SP.events.length) { list.innerHTML = '<div class="sp-empty">현재 진행 예정인 경기가 없습니다.<br>다른 종목 탭을 눌러보세요.</div>'; return; }
+      const now = new Date();
+      list.innerHTML = SP.events.map(ev => {
+        const started = new Date(ev.commence) <= now;
+        const o = ev.odds || {};
+        const cell = (pick, label, price) => {
+          if (price == null) return `<button class="sp-odds-btn" disabled><span class="sp-odds-team">${label}</span><span class="sp-odds-price">-</span></button>`;
+          return `<button class="sp-odds-btn ${isSel(ev.id,pick)?'selected':''}" ${started?'disabled':''} onclick="selectSpBet('${ev.id}','${pick}')">
+            <span class="sp-odds-team">${label}</span><span class="sp-odds-price">${price.toFixed(2)}</span></button>`;
+        };
+        return `<div class="sp-match ${started?'started':''}">
+          <div class="sp-match-time">🕒 ${fmtTime(ev.commence)}${started?' · 시작됨(마감)':''}</div>
+          <div class="sp-match-odds ${o.draw!=null?'three':'two'}">
+            ${cell('home', ev.home, o.home)}
+            ${o.draw!=null ? cell('draw','무승부',o.draw) : ''}
+            ${cell('away', ev.away, o.away)}
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    async function loadSpEvents() {
+      const list = document.getElementById('spMatchList');
+      document.getElementById('spLeagueName').textContent = LEAGUE_NAME[SP.sport] || SP.sport;
+      list.innerHTML = '<div class="sp-loading">경기 불러오는 중...</div>';
+      try {
+        const data = await fetchJSON(`/api/sports?type=odds&sport=${SP.sport}`);
+        if (data.error) {
+          const msg = data.error === 'NO_API_KEY'
+            ? 'API 키가 아직 등록되지 않았습니다. (Cloudflare 환경변수 ODDS_API_KEY 설정 필요)'
+            : (data.message || data.error);
+          list.innerHTML = `<div class="sp-empty">⚠ ${msg}</div>`;
+          return;
+        }
+        SP.events = (data.events || []).sort((a,b)=> new Date(a.commence)-new Date(b.commence));
+        const c = document.getElementById('spCredits');
+        if (c) c.textContent = data.remaining!=null ? `API 잔여 ${data.remaining}회` : '';
+        renderMatches();
+      } catch(e) {
+        list.innerHTML = `<div class="sp-empty">경기를 불러오지 못했습니다. (${e.message})<br>잠시 후 새로고침해 주세요.</div>`;
+      }
+    }
+
+    window.switchSport = function(sport) {
+      if (SP.sport === sport) return;
+      SP.sport = sport;
+      SP.bet = null;
+      document.querySelectorAll('.sp-tab').forEach(t => t.classList.toggle('active', t.dataset.sport === sport));
+      renderSpCart(); updateSummary();
+      loadSpEvents();
+    };
+
+    window.selectSpBet = function(eventId, pick) {
+      const ev = SP.events.find(e => e.id === eventId);
+      if (!ev) return;
+      if (new Date(ev.commence) <= new Date()) return;
+      if (isSel(eventId, pick)) { SP.bet = null; }
+      else {
+        const price = ev.odds[pick];
+        if (price == null) return;
+        const pickName = pick==='home' ? ev.home : pick==='away' ? ev.away : '무승부';
+        SP.bet = {
+          eventId: ev.id, sport: SP.sport, home: ev.home, away: ev.away, commence: ev.commence,
+          pick, odds: price,
+          label: pick==='draw' ? '무승부' : `${pickName} 승`,
+          matchup: `${ev.home} vs ${ev.away}`,
+        };
+      }
+      renderMatches(); renderSpCart(); updateSummary();
+    };
+
+    window.clearSpBet = function() { SP.bet = null; renderMatches(); renderSpCart(); updateSummary(); };
+
+    function renderSpCart() {
+      const el = document.getElementById('lgCartItems'); if (!el) return;
+      if (!SP.bet) { el.innerHTML = '<div class="cart-empty">선택된 배팅 없음</div>'; return; }
+      el.innerHTML = `<div class="cart-item">
+        <div class="cart-item-left">
+          <span class="cart-item-name">${SP.bet.label}</span>
+          <span class="cart-item-odds">${SP.bet.matchup} · ${SP.bet.odds.toFixed(2)}배</span>
+        </div>
+        <button class="cart-item-remove" onclick="clearSpBet()">✕</button>
+      </div>`;
+    }
+
+    window.confirmSpBet = async function() {
+      const s = document.getElementById('spBetStatus');
+      const warn = (m) => { if(s){ s.textContent=m; s.style.color='#e05555'; } };
+      if (!SP.bet) { warn('⚠ 배팅할 경기를 선택하세요'); return; }
+      if (new Date(SP.bet.commence) <= new Date()) { warn('⛔ 이미 시작된 경기입니다'); loadSpEvents(); return; }
+      const bet = getBet();
+      if (bet < 1000) { warn('⚠ 최소 1,000P 이상 배팅하세요'); return; }
+      if (bet > points) { warn('⚠ 포인트가 부족합니다'); return; }
+
+      points -= bet; updatePointsDisplay(); await savePoints();
+      const pending = {
+        gameType:'sports', gameName:'스포츠', sport:SP.sport, league:LEAGUE_NAME[SP.sport]||SP.sport,
+        eventId:SP.bet.eventId, home:SP.bet.home, away:SP.bet.away, pick:SP.bet.pick,
+        odds:SP.bet.odds, commence:SP.bet.commence,
+        choice:`${SP.bet.matchup} · ${SP.bet.label}`, number:'-',
+        bet, payout:0, netChange:-bet, isWin:false, status:'pending', createdAt:new Date(),
+      };
+      gameHistory.unshift(pending); renderHistory();
+      saveBet(pending).then(id => { if(id) pending._docId = id; });
+      window.kingsAlert(
+        `<b style="color:#c8a951">${SP.bet.label}</b><br>` +
+        `<span style="font-size:0.82rem">${SP.bet.matchup}</span><br>` +
+        `🕒 ${fmtTime(SP.bet.commence)}<br>` +
+        `배팅액 <b>${bet.toLocaleString()}P</b> · 배당 <b>${SP.bet.odds.toFixed(2)}</b><br>` +
+        `예상 당첨금 <b style="color:#4ade80">${Math.floor(bet*SP.bet.odds).toLocaleString()}P</b>`,
+        '✅ 배팅 완료'
+      );
+      if (s) { s.textContent='✅ 배팅 완료! 다른 경기에도 배팅할 수 있어요.'; s.style.color='#4ade80'; }
+      SP.bet = null; document.getElementById('betInput').value = '';
+      renderMatches(); renderSpCart(); updateSummary();
+    };
+
+    // ── 정산: 끝난 경기 점수로 대기중 배팅 결제 ──────────────────
+    async function settleSportsBets() {
+      const pendings = gameHistory.filter(h => h.gameType==='sports' && h.status==='pending');
+      if (!pendings.length) return;
+      const sports = [...new Set(pendings.map(p => p.sport))];
+      let delta = 0;
+      for (const sp of sports) {
+        let data;
+        try { data = await fetchJSON(`/api/sports?type=scores&sport=${sp}`); } catch(e) { continue; }
+        if (!data || data.error) continue;
+        const byId = {};
+        (data.events || []).forEach(e => { byId[e.id] = e; });
+        for (const h of pendings.filter(p => p.sport === sp)) {
+          const ev = byId[h.eventId];
+          if (!ev || !ev.completed) continue;
+          if (ev.homeScore == null || ev.awayScore == null) continue;
+          const winner = ev.homeScore > ev.awayScore ? 'home' : ev.awayScore > ev.homeScore ? 'away' : 'draw';
+          const isWin = h.pick === winner;
+          const payout = isWin ? Math.floor(h.bet * h.odds) : 0;
+          const numberLabel = `${ev.homeScore}:${ev.awayScore}`;
+          h.status='settled'; h.isWin=isWin; h.payout=payout; h.netChange=payout - h.bet; h.number=numberLabel;
+          if (h._docId) updateBetRecord(h._docId, { status:'settled', isWin, payout, netChange:payout - h.bet, number:numberLabel });
+          delta += payout;
+        }
+      }
+      if (delta > 0) { points += delta; updatePointsDisplay(); await savePoints(); }
+      renderHistory();
+    }
+
+    function initSports() {
+      renderSpCart(); updateSummary();
+      loadSpEvents();
+      if (SP.refreshTimer) clearInterval(SP.refreshTimer);
+      if (SP.settleTimer)  clearInterval(SP.settleTimer);
+      // 배당/시작여부 주기 갱신 (함수가 캐싱하므로 실제 API 호출은 제한적)
+      SP.refreshTimer = setInterval(loadSpEvents, 60000);
+      // 정산 주기 점검
+      SP.settleTimer  = setInterval(settleSportsBets, 120000);
+    }
+  </script>
+</body>
+</html>

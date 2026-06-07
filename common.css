@@ -1182,6 +1182,46 @@ body {
 
 .saving-indicator { font-size: 0.72rem; color: #c8a951; text-align: center; height: 16px; }
 
+/* ─── 스포츠 배팅 ─── */
+.sp-tabs { display: flex; gap: 8px; margin-bottom: 10px; }
+.sp-tab {
+  flex: 1; background: #13192e; border: 1px solid #2a2a4a; color: #9aa4bd;
+  padding: 11px 0; border-radius: 7px; font-size: 0.9rem; font-weight: bold;
+  font-family: inherit; cursor: pointer; transition: all 0.15s;
+}
+.sp-tab:hover { border-color: #c8a951; color: #c8a951; }
+.sp-tab.active { background: #1a2240; border-color: #c8a951; color: #e0c87a; }
+.sp-subbar {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 4px 4px 10px; font-size: 0.82rem; color: #c8a951; font-weight: bold;
+}
+.sp-credits { color: #555; font-size: 0.7rem; font-weight: normal; }
+.sp-match-list { display: flex; flex-direction: column; gap: 9px; }
+.sp-loading, .sp-empty { text-align: center; color: #666; padding: 40px 16px; font-size: 0.88rem; line-height: 1.6; }
+.sp-match {
+  background: #13192e; border: 1px solid #2a2a4a; border-radius: 8px; padding: 11px 12px;
+}
+.sp-match.started { opacity: 0.55; }
+.sp-match-time { font-size: 0.74rem; color: #7a85a0; margin-bottom: 8px; }
+.sp-match.started .sp-match-time { color: #e05555; }
+.sp-match-odds { display: grid; gap: 7px; }
+.sp-match-odds.three { grid-template-columns: 1fr 1fr 1fr; }
+.sp-match-odds.two   { grid-template-columns: 1fr 1fr; }
+.sp-odds-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  background: #0f1428; border: 1px solid #2a3660; border-radius: 6px;
+  padding: 9px 6px; cursor: pointer; font-family: inherit; transition: all 0.13s; min-width: 0;
+}
+.sp-odds-btn:hover:not(:disabled) { border-color: #c8a951; background: #1a2240; }
+.sp-odds-btn.selected { border-color: #c8a951; background: rgba(200,169,81,0.18); }
+.sp-odds-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.sp-odds-team {
+  font-size: 0.76rem; color: #d8dcea; font-weight: bold; text-align: center;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;
+}
+.sp-odds-price { font-size: 0.95rem; color: #4ade80; font-weight: bold; }
+.sp-odds-btn.selected .sp-odds-price { color: #ffe26a; }
+
 /* 반응형 */
 @media (max-width: 900px) {
   .main-layout { grid-template-columns: 1fr; }
